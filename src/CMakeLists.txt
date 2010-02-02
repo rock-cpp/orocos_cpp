@@ -35,9 +35,11 @@ else()
     add_library(${PROJECT_NAME} ${sources} ${sources_MOC_HDRS})
 endif(executable)
 
-
-target_link_libraries(${PROJECT_NAME} ${EXTERNAL_LIBS} ${USER_DEFINED_LIBS})
-install(TARGETS ${PROJECT_NAME} 
-		RUNTIME DESTINATION bin
-		LIBRARY DESTINATION lib
-)
+find_file(projectbinary ${PROJECT_NAME})
+if(projectbinary)
+	target_link_libraries(${PROJECT_NAME} ${EXTERNAL_LIBS} ${USER_DEFINED_LIBS})
+	install(TARGETS ${PROJECT_NAME} 
+			RUNTIME DESTINATION bin
+			LIBRARY DESTINATION lib
+	)
+endif(projectbinary)
