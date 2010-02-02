@@ -8,11 +8,11 @@
 # If the user specifies -DCMAKE_BUILD_TYPE on the command line, take their definition
 # and dump it in the cache along with proper documentation, otherwise set CMAKE_BUILD_TYPE
 # to Debug prior to calling PROJECT()
-IF(DEFINED CMAKE_BUILD_TYPE)
-   SET(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Choose the type of
+if(DEFINED CMAKE_BUILD_TYPE)
+   set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Choose the type of
 build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug
 Release RelWithDebInfo MinSizeRel.")
-ELSE()
+else()
    ##### Build types #################################################
    # single-configuration generator like Makefile generator creates following variables per default
    #
@@ -22,10 +22,10 @@ ELSE()
    # RelWithDebInfo (CMAKE_C_FLAGS_RELWITHDEBINFO or CMAKE_CXX_FLAGS_RELWITHDEBINFO
    # MinSizeRel (CMAKE_C_FLAGS_MINSIZEREL or CMAKE_CXX_FLAGS_MINSIZEREL) 
    ####################################################################
-   SET(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build,
+   set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build,
 options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release
 RelWithDebInfo MinSizeRel.")
-ENDIF()
+endif()
 
 message("Build type set to: " ${CMAKE_BUILD_TYPE})
 
@@ -33,8 +33,8 @@ cmake_minimum_required(VERSION 2.6)
 
 ##### Set Project name and version #####################################
 project(dummyproject)
-SET(PROJECT_VERSION 1.0)
-SET(PROJECT_DESCRIPTION "Template project for C++ development"
+set(PROJECT_VERSION 1.0)
+set(PROJECT_DESCRIPTION "Dummy project just to show how the infrastructure is working")
 ##### End Set Project name and version #################################
 
 ##### Specification of build directory #################################
@@ -48,18 +48,18 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 include_directories(${PROJECT_SOURCE_DIR}/src)
 ##### End specification of build directory ##############################
 
+
 # Process CMakeLists.txt in the following subdirectory
 add_subdirectory(src)
 
 # command line output on, you can also use make VERBOSE=1
-# SET(CMAKE_VERBOSE_MAKEFILE on)
+# set(CMAKE_VERBOSE_MAKEFILE on)
 
 
 ##### Select required libraries and desired versions######################
 set(PROJECT_USES_QT FALSE)
 set(DESIRED_QT_VERSION 4.5)
 set(PROJECT_USES_BOOST FALSE)
-# Required boost components will be set in the Boost section below
 # Set your boost version here, otherwise the installed version might not be found
 set( Boost_ADDITIONAL_VERSIONS "1.40 1.41")
 ##### End Select required libaries #######################################
@@ -69,7 +69,7 @@ if(PROJECT_USES_QT)
 	# FINDING QT
 	# Note: entries are case sensitive, i.e. use 'Qt4' and not 'QT4'
 	# If you have a local installation of a qt version, add it to the search path
-	SET(QT_SEARCH_PATH /opt)
+	set(QT_SEARCH_PATH /opt)
 	message(Desired Qt version is: ${DESIRED_QT_VERSION})
 	# Try to find Qt4 libraries and set all required variables
 	find_package(Qt4 REQUIRED)
@@ -77,14 +77,14 @@ if(PROJECT_USES_QT)
 	if(QT_FOUND)
 		message("Prerequisite ok: QT installation found")
 		# Activate the required Qt-libraries here
-		SET (QT_USE_QTTEST TRUE)
-		SET (QT_USE_QTTHREAD TRUE)
-		SET(QT_USE_QTXML TRUE)
-		SET(QT_USE_QTNETWORK TRUE)
-		SET(QT_USE_QTGUI TRUE)
+		set (QT_USE_QTTEST TRUE)
+		set (QT_USE_QTTHREAD TRUE)
+		set(QT_USE_QTXML TRUE)
+		set(QT_USE_QTNETWORK TRUE)
+		set(QT_USE_QTGUI TRUE)
 		# QtCore and QtGui libraries are loaded by default
-		# SET(QT_DONT_USE_QTCORE TRUE)
-		# SET(QT_DONT_USE_QTGUI TRUE)
+		# set(QT_DONT_USE_QTCORE TRUE)
+		# set(QT_DONT_USE_QTGUI TRUE)
 
 		# Definitions to use when compiling code that uses Qt
 		add_definitions(${QT_DEFINITIONS})
@@ -111,49 +111,61 @@ if(PROJECT_USES_BOOST)
 	endif(Boost_FOUND)	
 	
 	include_directories( ${Boost_INCLUDE_DIRS})
-	link_directories( ${Boost_LIBRARY_DIRS})
 endif(PROJECT_USES_BOOST)
 ##### End boost support #####################################################
 
 ##### Update external libaries variable ####################################
-SET(EXTERNAL_LIBS ${Boost_LIBRARIES} ${QT_LIBRARIES})
+set(EXTERNAL_LIBS ${Boost_LIBRARIES} ${QT_LIBRARIES})
 ##### End Update external libraries  #######################################
 
 ##### User defined area ####################################################
 
 # EXAMPLE: 
-# SET(PC104_ROOT_DIR /opt/PC104/)
-# SET(PC104_LIBRARIES module monsterframes communication)
+# set(PC104_ROOT_DIR /opt/PC104/)
+# set(PC104_LIBRARIES module monsterframes communication)
 # include_directories(${PC104_ROOT_DIR})
 # link_directories(${PC104_ROOT_DIR}
 #		/usr/lib
 # )
 
 # Other required libraries
-# SET(OTHER_LIBS log4cxx sqlite3 uuid)
+# set(OTHER_LIBS log4cxx sqlite3 uuid)
 # add_definitions(-DLOGGER_EXTERNAL_)
 
-# SET(USER_DEFINED_LIBS ${OTHER_LIBS} ${PC104_LIBRARIES})
+# set(USER_DEFINED_LIBS ${OTHER_LIBS} ${PC104_LIBRARIES})
 
-###### End User define area #################################################
+###### End User define area ################################################
 
-###### COPY Configuration files into build directory ########################
-execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory 
-		${PROJECT_SOURCE_DIR}/configuration ${PROJECT_BINARY_DIR}/configuration)
+##### COPY Configuration files into build directory
+execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/configuration ${PROJECT_BINARY_DIR}/configuration)
 
-##### INSTALL Process #######################################################
-# ACTUALLY only *.h files should be used
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/src DESTINATION include/${PROJECT_NAME}
-	 FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
+# Workaround: Cleanup the in file from build directory
+execute_process(COMMAND ${CMAKE_COMMAND} -E remove -f ${PROJECT_BINARY_DIR}/configuration/${PROJECT_NAME}.pc.in)
+
+##### INSTALL Configuration ####################################################
+
+# include/
+# TODO: recursive copy with directories
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/src/ DESTINATION include/${PROJECT_NAME}
+	FILES_MATCHING PATTERN "*.h")
+
+# scripts/
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/scripts/ DESTINATION scripts)
+
+# configuration/<projectname>.pc
+configure_file(${PROJECT_SOURCE_DIR}/configuration/${PROJECT_NAME}.pc.in
+		${PROJECT_BINARY_DIR}/configuration/${PROJECT_NAME}.pc @ONLY)
+
+# Install pkg-config file
+install(FILES ${CMAKE_BINARY_DIR}/configuration/${PROJECT_NAME}.pc DESTINATION lib/pkgconfig)
 
 # Dont' forget to add an install for your target, when you create your executable or library
 #    install(TARGETS ${PROJECT_NAME} 
-#               RUNTIME DESTINATION bin
-#               LIBRARY DESTINATION lib
+#		RUNTIME DESTINATION bin
+#		LIBRARY DESTINATION lib
 #    )
 
-
-##### End INSTALL Process ###################################################
+##### End INSTALL Configuration ################################################
 
 ##### Add doxygen support ###################################################
 include(FindDoxygen) #sets DOXYGEN_EXECUTABLE

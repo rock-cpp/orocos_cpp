@@ -28,20 +28,16 @@ if(QT_FOUND)
 	include_directories(${CMAKE_CURRENT_BINARY_DIR})
 endif(QT_FOUND)
 
-# Build executable or library 
-FIND_FILE(executable ${main_cpp} PATHS ${CMAKE_CURRENT_SOURCE_DIR} NO_DEFAULT_PATH)
+find_file(executable ${main_cpp} PATHS ${CMAKE_CURRENT_SOURCE_DIR} NO_DEFAULT_PATH)
 if(executable)
     add_executable(${PROJECT_NAME} ${sources} ${main_cpp} ${sources_MOC_HDRS} ${sources_ui})   
 else()
-    add_library(${PROJECT_NAME} SHARED ${sources} ${sources_MOC_HDRS})
+    add_library(${PROJECT_NAME} ${sources} ${sources_MOC_HDRS})
 endif(executable)
 
-# Link other libraries
+
 target_link_libraries(${PROJECT_NAME} ${EXTERNAL_LIBS} ${USER_DEFINED_LIBS})
-
-# Actions to perform when calling 'make install'
 install(TARGETS ${PROJECT_NAME} 
-              RUNTIME DESTINATION bin
-              LIBRARY DESTINATION lib
+		RUNTIME DESTINATION bin
+		LIBRARY DESTINATION lib
 )
-
