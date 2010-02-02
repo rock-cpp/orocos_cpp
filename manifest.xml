@@ -1,12 +1,13 @@
 <package>
   <description brief="dummy-brief-desc">
   dummy-long-desc
+  <description>
   <author>dummy-author/dummy-email</author>
   <license>dummy-license</license>
   <url>dummy-url</url>
   <logo>dummy-logo-url</logo>
-  <depend package="dummy-dependency">
-  <versioncontrol type="dummy-version-control" url="dummy-version-control-url">
+  <depend package="dummy-dependency" />
+  <versioncontrol type="dummy-version-control" url="dummy-version-control-url" />
   <export>
     <cpp cflags="dummy-cflags" lflags="dummy-lflags" />
   </export>
