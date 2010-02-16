@@ -6,13 +6,14 @@
   <license>dummy-license</license>
   <url>dummy-url</url>
   <logo>dummy-logo-url</logo>
- <!--DEPEND-BEGIN
+ <!--
    To add any dependencies use the depend tag
   <depend package="dummy-dependency-0" />
 	...
   <depend package="dummy-dependency-n-1" />
   <depend package="dummy-dependency-n" />
-DEPEND-END-->
+-->
+<!--DEPEND-ENTRY-->
   <versioncontrol type="dummy-version-control" url="dummy-version-control-url" />
   <export>
     <cpp cflags="dummy-cflags" lflags="dummy-lflags" />
