@@ -19,11 +19,6 @@ endif()
 
 message(STATUS "Build type set to: " ${CMAKE_BUILD_TYPE})
 
-# Specifies a common place where CMake should put all the executables.
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
-# Specifies a common place where CMake should put all the libraries
-set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
-
 ##### Add doxygen support ###################################################
 include(FindDoxygen) #sets DOXYGEN_EXECUTABLE
 if(DOXYGEN_EXECUTABLE)
@@ -41,4 +36,35 @@ if(DOXYGEN_EXECUTABLE)
     EXECUTE_PROCESS(COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_SOURCE_DIR}/doc/Doxyfile )
 endif(DOXYGEN_EXECUTABLE)
 ##### End doxygen support ###################################################
+
+#### Common installation #################################################
+## bin/
+## Specifies a common place where CMake should put all the executables.
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
+
+## lib/
+# Specifies a common place where CMake should put all the libraries
+set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
+
+## include/
+# does a recursive copy of the src directory for all files matching
+# the pattern and it maintains the directory-tree
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/src/ DESTINATION include/${PROJECT_NAME}
+        FILES_MATCHING PATTERN "*.h")
+
+## configuration/
+# COPY Configuration files into build directory. Workaround: remove the .pc.in
+# file, as we don't want to install it
+execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/configuration ${PROJECT_BINARY_DIR}/configuration)
+execute_process(COMMAND ${CMAKE_COMMAND} -E remove -f ${PROJECT_BINARY_DIR}/configuration/${PROJECT_NAME}.pc.in)
+
+# scripts/
+# Install the scripts
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/scripts/ DESTINATION scripts)
+
+
+# Generate and install the pkg-config file
+configure_file(${PROJECT_SOURCE_DIR}/configuration/${PROJECT_NAME}.pc.in
+		${PROJECT_BINARY_DIR}/configuration/${PROJECT_NAME}.pc @ONLY)
+install(FILES ${CMAKE_BINARY_DIR}/configuration/${PROJECT_NAME}.pc DESTINATION lib/pkgconfig)
 

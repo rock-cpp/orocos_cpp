@@ -7,12 +7,13 @@ project(dummyproject)
 set(PROJECT_VERSION 1.0)
 set(PROJECT_DESCRIPTION "Dummy project just to show how the infrastructure is working")
 
-SET (CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-USE(CommonSetup)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
+include(CommonSetup)
 
 # Include headers within source
 # If you create subdirectories within source include headers with subdirectory, i.e. 
 # #include "subdirectory/myheader.h"
+include_directories(${PROJECT_SOURCE_DIR}/external/include)
 include_directories(${PROJECT_SOURCE_DIR}/src)
 
 # command line output on, you can also use make VERBOSE=1
@@ -25,25 +26,15 @@ include_directories(${PROJECT_SOURCE_DIR}/src)
 
 ### Uncomment if you want to use Boost. Use the first find_package stanza to
 ### search for headers only, and the second one if you need binary libraries
-# set(Boost_ADDITIONAL_VERSION 1.40 1.41)
-# find_package(Boost REQUIRED)
-# # find_package(Boost REQUIRED COMPONENTS graph)
-# include_directories(${Boost_INCLUDE_DIRS})
+#set(Boost_ADDITIONAL_VERSION 1.40 1.41)
+#find_package(Boost REQUIRED)
+#find_package(Boost REQUIRED COMPONENTS graph filesystem)
+#include_directories(${Boost_INCLUDE_DIRS})
+
+### Update external libraries that are available
+set(EXTERNAL_LIBS ${Boost_LIBRARIES} ${QT_LIBRARIES})
 
 # Process CMakeLists.txt in the following subdirectory
 add_subdirectory(src)
 
-##### Common installation #################################################
-# COPY Configuration files into build directory. Workaround: remove the .pc.in
-# file, as we don't want to install it
-execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/configuration ${PROJECT_BINARY_DIR}/configuration)
-execute_process(COMMAND ${CMAKE_COMMAND} -E remove -f ${PROJECT_BINARY_DIR}/configuration/${PROJECT_NAME}.pc.in)
-
-# Install the scripts
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/scripts/ DESTINATION scripts)
-
-# Generate and install the pkg-config file
-configure_file(${PROJECT_SOURCE_DIR}/configuration/${PROJECT_NAME}.pc.in
-		${PROJECT_BINARY_DIR}/configuration/${PROJECT_NAME}.pc @ONLY)
-install(FILES ${CMAKE_BINARY_DIR}/configuration/${PROJECT_NAME}.pc DESTINATION lib/pkgconfig)
 
