@@ -22,7 +22,16 @@ include_directories(${PROJECT_SOURCE_DIR}/src)
 ### Uncomment if you want to use Qt
 # set(QT_SEARCH_PATH /opt)
 # find_package(Qt4 4.5 REQUIRED QtTest QtThread QtXml QtNetwork QtGui)
-# include(${QT_USE_FILES})
+
+# Definitions to use when compiling code that uses Qt
+#add_definitions(${QT_DEFINITIONS})
+
+# Set your desired Qt-Version here
+#include_directories(${QT_INCLUDE_DIR})
+
+# Path to a Cmake file that can be included to compile Qt4 applications and libraries
+#include(${QT_USE_FILE})
+
 
 ### Uncomment if you want to use Boost. Use the first find_package stanza to
 ### search for headers only, and the second one if you need binary libraries
