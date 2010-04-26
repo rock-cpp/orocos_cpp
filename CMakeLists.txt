@@ -21,7 +21,7 @@ include_directories(${PROJECT_SOURCE_DIR}/src)
 
 ### Uncomment if you want to use Qt
 # set(QT_SEARCH_PATH /opt)
-# find_package(QT4 4.5 REQUIRED QtTest QtThread QtXml QtNetwork QtGui)
+# find_package(Qt4 4.5 REQUIRED QtTest QtThread QtXml QtNetwork QtGui)
 # include(${QT_USE_FILES})
 
 ### Uncomment if you want to use Boost. Use the first find_package stanza to
