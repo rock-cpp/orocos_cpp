@@ -46,4 +46,5 @@ set(EXTERNAL_LIBS ${Boost_LIBRARIES} ${QT_LIBRARIES})
 # Process CMakeLists.txt in the following subdirectory
 add_subdirectory(src)
 
-
+# Performing some setup step after all variables are know, e.g. such as needed for pkg-config
+include(PostSetup)

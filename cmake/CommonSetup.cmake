@@ -1,7 +1,7 @@
 if(DEFINED CMAKE_BUILD_TYPE)
-   set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Choose the type of
-build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug
-Release RelWithDebInfo MinSizeRel.")
+#   set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Choose the type of
+# build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug
+# Release RelWithDebInfo MinSizeRel.")
 else()
    ##### Build types #################################################
    # single-configuration generator like Makefile generator creates following variables per default
@@ -12,9 +12,9 @@ else()
    # RelWithDebInfo (CMAKE_C_FLAGS_RELWITHDEBINFO or CMAKE_CXX_FLAGS_RELWITHDEBINFO
    # MinSizeRel (CMAKE_C_FLAGS_MINSIZEREL or CMAKE_CXX_FLAGS_MINSIZEREL) 
    ####################################################################
-   set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build,
-options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release
-RelWithDebInfo MinSizeRel.")
+   set(CMAKE_BUILD_TYPE Debug)
+# Cache only works for the cmake gui
+# CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
 endif()
 
 message(STATUS "Build type set to: " ${CMAKE_BUILD_TYPE})
@@ -33,7 +33,11 @@ if(DOXYGEN_EXECUTABLE)
     ADD_CUSTOM_TARGET(doc ${DOXYGEN_EXECUTABLE} ${PROJECT_SOURCE_DIR}/doc/Doxyfile)
     # generates documentation with cmake
     # QUIET mode is enabled in the configuration file (QUIET = YES)
-    EXECUTE_PROCESS(COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_SOURCE_DIR}/doc/Doxyfile )
+    # If you want to autogenerate you documentation use SET(AUTOGENERATE_DOC) in the main 
+    # CMakeList.txt file
+    if(AUTOGENERATE_DOC)
+	    EXECUTE_PROCESS(COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_SOURCE_DIR}/doc/Doxyfile )
+    endif(AUTOGENERATE_DOC)
 endif(DOXYGEN_EXECUTABLE)
 ##### End doxygen support ###################################################
 
@@ -69,9 +73,3 @@ endif( ${BUILDING_IN_SRC_DIR} )
 # scripts/
 # Install the scripts
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/scripts/ DESTINATION scripts)
-
-# Generate and install the pkg-config file
-configure_file(${PROJECT_SOURCE_DIR}/configuration/${PROJECT_NAME}.pc.in
-		${PROJECT_BINARY_DIR}/configuration/${PROJECT_NAME}.pc @ONLY)
-install(FILES ${CMAKE_BINARY_DIR}/configuration/${PROJECT_NAME}.pc DESTINATION lib/pkgconfig)
-
