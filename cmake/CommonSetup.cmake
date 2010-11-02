@@ -33,9 +33,9 @@ if(DOXYGEN_EXECUTABLE)
     ADD_CUSTOM_TARGET(doc ${DOXYGEN_EXECUTABLE} ${PROJECT_SOURCE_DIR}/doc/Doxyfile)
     # generates documentation with cmake
     # QUIET mode is enabled in the configuration file (QUIET = YES)
-    # If you want to autogenerate you documentation use SET(AUTOGENERATE_DOC) in the main 
+    # If you want to autogenerate you documentation use set(AUTOGENERATE_DOC True) in the main 
     # CMakeList.txt file
-    if(AUTOGENERATE_DOC)
+    if(DEFINED AUTOGENERATE_DOC)
 	    EXECUTE_PROCESS(COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_SOURCE_DIR}/doc/Doxyfile )
     endif(AUTOGENERATE_DOC)
 endif(DOXYGEN_EXECUTABLE)
