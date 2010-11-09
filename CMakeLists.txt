@@ -19,29 +19,25 @@ include_directories(${PROJECT_SOURCE_DIR}/src)
 # command line output on, you can also use make VERBOSE=1
 # set(CMAKE_VERBOSE_MAKEFILE on)
 
-### Uncomment if you want to use Qt
-# set(QT_SEARCH_PATH /opt)
-# find_package(Qt4 4.5 REQUIRED QtTest QtThread QtXml QtNetwork QtGui)
+# check cmake/PkgConfigPackages if you want to add a certain library using 
+# pkg-config. It provides examples and you can also add pkg packages there
+include(PkgConfigPackages)
 
-# Definitions to use when compiling code that uses Qt
-#add_definitions(${QT_DEFINITIONS})
-
-# Set your desired Qt-Version here
-#include_directories(${QT_INCLUDE_DIR})
-
-# Path to a Cmake file that can be included to compile Qt4 applications and libraries
-#include(${QT_USE_FILE})
-
+# edit cmake/templates/QtSetup if you want to embedd Qt into your project, and uncomment the
+# include. Don't forget to include and edit cmake/QtSetupSources in src/CMakeLists.txt
+#include(QtSetup)
 
 ### Uncomment if you want to use Boost. Use the first find_package stanza to
 ### search for headers only, and the second one if you need binary libraries
-#set(Boost_ADDITIONAL_VERSION 1.40 1.41)
+#set(Boost_ADDITIONAL_VERSION 1.40 1.41 1.42 1.43 1.44)
+# In case you require a local installation of boost, active the following comment
+#set(Boost_LOCALFIRST True)
 #find_package(Boost REQUIRED)
 #find_package(Boost REQUIRED COMPONENTS graph filesystem)
 #include_directories(${Boost_INCLUDE_DIRS})
 
 ### Update external libraries that are available
-set(EXTERNAL_LIBS ${Boost_LIBRARIES} ${QT_LIBRARIES})
+set(EXTERNAL_LIBS ${EXTERNAL_LIBS} ${Boost_LIBRARIES})
 
 # Process CMakeLists.txt in the following subdirectory
 add_subdirectory(src)

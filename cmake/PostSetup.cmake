@@ -1,1 +1,1 @@
-include(PkgSetup)
+include(PkgConfigure)

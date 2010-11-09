@@ -1,3 +1,5 @@
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/templates")
+
 if(DEFINED CMAKE_BUILD_TYPE)
 #   set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Choose the type of
 # build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug
@@ -37,7 +39,7 @@ if(DOXYGEN_EXECUTABLE)
     # CMakeList.txt file
     if(DEFINED AUTOGENERATE_DOC)
 	    EXECUTE_PROCESS(COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_SOURCE_DIR}/doc/Doxyfile )
-    endif(AUTOGENERATE_DOC)
+    endif()
 endif(DOXYGEN_EXECUTABLE)
 ##### End doxygen support ###################################################
 
