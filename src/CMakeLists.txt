@@ -8,7 +8,7 @@ set(SOURCES dummy.cpp)
 
 ###### Define a binary
 # Note: the library (see below) and executable names can't be the same
-add_executable(${PROJECT_NAME} ${SOURCES} ${moc_cpp} ${ui_cpp})
+add_executable(${PROJECT_NAME} ${MAIN} ${SOURCES} ${moc_cpp} ${ui_cpp})
 
 ###### Define a library
 # Note: the library and executable names can't be the same
