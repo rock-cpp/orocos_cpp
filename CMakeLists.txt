@@ -42,5 +42,9 @@ set(EXTERNAL_LIBS ${EXTERNAL_LIBS} ${Boost_LIBRARIES})
 # Process CMakeLists.txt in the following subdirectory
 add_subdirectory(src)
 
+# Add testing facility based on the boost unittest framework
+# (requires boost header files) 
+#add_subdirectory(test/unittests)
+
 # Performing some setup step after all variables are know, e.g. such as needed for pkg-config
 include(PostSetup)
