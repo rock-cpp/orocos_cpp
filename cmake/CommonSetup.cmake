@@ -63,6 +63,10 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/src/ DESTINATION include/${PROJECT_NAME}
 # file, as we don't want to install it
 execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/configuration ${PROJECT_BINARY_DIR}/configuration)
 
+# install configuration files
+install(DIRECTORY ${PROJECT_BINARY_DIR}/configuration/ DESTINATION configuration/${PROJECT_NAME}
+	FILES_MATCHING PATTERN "*.properties")
+
 # Workaround: Cleanup the in file from build directory
 # First making sure we are not in the source directory, otherwise we can delete the in files
 string(COMPARE NOTEQUAL "${PROJECT_SOURCE_DIR}" "${PROJECT_BINARY_DIR}" BUILDING_IN_SRC_DIR)
@@ -74,4 +78,4 @@ endif( ${BUILDING_IN_SRC_DIR} )
 
 # scripts/
 # Install the scripts
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/scripts/ DESTINATION scripts)
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/scripts/ DESTINATION scripts/${PROJECT_NAME} )

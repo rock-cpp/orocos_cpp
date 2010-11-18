@@ -11,7 +11,7 @@ include(FindPkgConfig)
 
 # The values _INCLUDE_DIRS _LIBRARY_DIRS and _LIBRARIES are created automatically
 include_directories(${MyLib_INCLUDE_DIRS})
-link_directories(${MyLib}_LIBRARY_DIRS})
+link_directories(${MyLib_LIBRARY_DIRS})
 
 # Using the EXTERNAL_LIBS variable to bring add the libraries
 set(EXTERNAL_LIBS ${EXTERNAL_LIBS} ${MyLib_LIBRARIES})
