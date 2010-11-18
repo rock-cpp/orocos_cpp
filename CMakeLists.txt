@@ -7,6 +7,9 @@ project(dummyproject)
 set(PROJECT_VERSION 1.0)
 set(PROJECT_DESCRIPTION "Dummy project just to show how the infrastructure is working")
 
+# Add command line options for gcc
+# add_definitions(-Wall -DDebug)
+
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 include(CommonSetup)
 
