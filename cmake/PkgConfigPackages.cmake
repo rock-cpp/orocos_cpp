@@ -13,6 +13,7 @@ include(FindPkgConfig)
 include_directories(${MyLib_INCLUDE_DIRS})
 link_directories(${MyLib_LIBRARY_DIRS})
 
+# NOTE: You have to perform the following step in your main CMakeLists.txt to make it work
 # Using the EXTERNAL_LIBS variable to bring add the libraries
 set(EXTERNAL_LIBS ${EXTERNAL_LIBS} ${MyLib_LIBRARIES})
 
