@@ -17,7 +17,7 @@ if [ "$1" = "-h" ] || [ "$1" = "--help" ]
 	echo "This script prepares a cmake-template for usage. It requests required"
 	echo "information from the user when needed."
 	echo "Note, that if no package name is given, the name of the parent directory"
-	echo " of this script (${PACKAGE_SHORT_NAME}) applies."
+	echo " of this script (${PACKAGE_DIR_NAME}) applies."
 	echo "as project name."
 	exit 0
 fi
