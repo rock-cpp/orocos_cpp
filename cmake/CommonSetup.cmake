@@ -72,7 +72,8 @@ execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}
 
 # install configuration files
 install(DIRECTORY ${PROJECT_BINARY_DIR}/configuration/ DESTINATION configuration/${PROJECT_NAME}
-	FILES_MATCHING PATTERN "*.properties")
+	        FILES_MATCHING PATTERN "*" 
+	                       PATTERN "*.pc" EXCLUDE)
 
 # Workaround: Cleanup the in file from build directory
 # First making sure we are not in the source directory, otherwise we can delete the in files
