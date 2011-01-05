@@ -52,16 +52,16 @@ PACKAGE_TYPE="CMAKE"
 
 # CMAKE-TEMPLATE-ADAPTION
 if [ $PACKAGE_TYPE = "CMAKE" ]; then
-	# Replace existance of dummyproject files
-	# TODO: do a more generic replacement  
-	mv configuration/dummyproject.pc.in configuration/$PACKAGE_SHORT_NAME.pc.in
-	mv configuration/dummyproject-core.properties configuration/$PACKAGE_SHORT_NAME-core.properties
-
 	# removing git references to prepare for new check in
-	find . | grep -e ".git$" | xargs rm -rf
+	rm -rf .git
 
-	# replace dummyproject with projectname
-	sed -i 's/dummyproject/'$PACKAGE_SHORT_NAME'/' CMakeLists.txt
+	# replace dummyproject with projectname in the files
+        find . -type f -exec sed -i 's/dummyproject/'$PACKAGE_SHORT_NAME'/' {} \;
+        # also rename the relevant files
+        find . -type f -name '*dummyproject*' | while read path; do
+            newpath=`echo $path | sed "s/dummyproject/$PACKAGE_SHORT_NAME/"`
+            mv $path $newpath
+        done
 
 	PKG_DESC=
 	PKG_LONG_DESC=
