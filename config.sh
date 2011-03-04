@@ -5,11 +5,12 @@
 
 #Check for name of project
 # Extract directory for config.sh
-SCRIPT_DIR=`echo $0 | sed 's/\([^/]*\)$//'`
+SCRIPT=$0
+SCRIPT_DIR=`dirname $SCRIPT`
 # Retrieve Absolute dir from subshell
-DIR=$(cd "$SCRIPT_DIR" && pwd)
+DIR=`cd "$SCRIPT_DIR" && pwd`
 # Extract Projectname
-PACKAGE_DIR_NAME=`echo $DIR | sed 's/\/$//g' | sed 's/.*\/\([^/]*\)$/\1/g'`
+PACKAGE_DIR_NAME=`basename $DIR`
 
 # If no arguments are given or help is requested
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]
