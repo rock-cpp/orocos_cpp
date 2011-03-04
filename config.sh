@@ -3,6 +3,8 @@
 # Author: Alexander Duda, Thomas Roehr, thomas.roehr@dfki.de
 # This script sets up a git repository based on an existing template project
 
+set -e
+
 #Check for name of project
 # Extract directory for config.sh
 SCRIPT=$0
