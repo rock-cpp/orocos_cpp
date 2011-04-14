@@ -59,10 +59,10 @@ if [ $PACKAGE_TYPE = "CMAKE" ]; then
 	rm -rf .git
 
 	# replace dummyproject with projectname in the files
-        find . -type f ! -name 'config.sh' -exec sed -i 's/dummyproject/'$PACKAGE_SHORT_NAME'/' {} \;
+        find . -type f ! -name 'config.sh' -exec sed -i 's#dummyproject#'$PACKAGE_SHORT_NAME'#' {} \;
         # also rename the relevant files
         find . -type f ! -name 'config.sh' -name '*dummyproject*' | while read path; do
-            newpath=`echo $path | sed "s/dummyproject/$PACKAGE_SHORT_NAME/"`
+            newpath=`echo $path | sed "s#dummyproject#$PACKAGE_SHORT_NAME#"`
             mv $path $newpath
         done
 
@@ -135,16 +135,16 @@ if [ $PACKAGE_TYPE = "CMAKE" ]; then
 	#	esac
 	#done
 
-	sed -i "s/\(PROJECT_DESCRIPTION\ \).*/\1\"$PKG_DESC\")/" CMakeLists.txt
-	sed -i "s/dummy-brief-desc/$PKG_DESC/" $MANIFEST
-	sed -i "s/dummy-long-desc/$PKG_LONG_DESC/" $MANIFEST
-	sed -i "s/dummy-author/$PKG_AUTHOR/" $MANIFEST
-	sed -i "s/dummy-email/$PKG_EMAIL/" $MANIFEST
-	sed -i "s/dummy-url/http:\/\/$PKG_URL/" $MANIFEST
-	sed -i "s/dummy-version-control/$PKG_SCM/" $MANIFEST
-	sed -i "s/dummy-version-control-url/$PKG_SCM_URL/" $MANIFEST
-	sed -i "s/dummy-license/$PKG_LICENSE/" $MANIFEST
-	sed -i "s/dummy-logo-url/http:\/\/$PKG_LOGO_URL/" $MANIFEST
+	sed -i "s#\(PROJECT_DESCRIPTION\ \).*#\1\"$PKG_DESC\")#" CMakeLists.txt
+	sed -i "s#dummy-brief-desc#$PKG_DESC#" $MANIFEST
+	sed -i "s#dummy-long-desc#$PKG_LONG_DESC#" $MANIFEST
+	sed -i "s#dummy-author#$PKG_AUTHOR#" $MANIFEST
+	sed -i "s#dummy-email#$PKG_EMAIL#" $MANIFEST
+	sed -i "s#dummy-url#http://$PKG_URL#" $MANIFEST
+	sed -i "s#dummy-version-control#$PKG_SCM#" $MANIFEST
+	sed -i "s#dummy-version-control-url#$PKG_SCM_URL#" $MANIFEST
+	sed -i "s#dummy-license#$PKG_LICENSE#" $MANIFEST
+	sed -i "s#dummy-logo-url#http://$PKG_LOGO_URL#" $MANIFEST
 
 	# Enter list of dependencies if there are any
 	if [ "$PKG_DEPENDENCIES" != "" ]
@@ -155,12 +155,12 @@ if [ $PACKAGE_TYPE = "CMAKE" ]; then
 			do
 			# Use the <!--DEPEND-ENTRY--> as a hook for subsequent replacements
 			# replace with <depend package="pkgname"> 
-			sed -i "s/<\!--DEPEND-ENTRY-->/<depend package=\"${dep}\"\ \/>\n<\!--DEPEND-ENTRY-->/" $MANIFEST
+			sed -i "s#<\!--DEPEND-ENTRY-->#<depend package=\"${dep}\"\ />\n<\!--DEPEND-ENTRY-->#" $MANIFEST
 		done
 	fi
 
-	sed -i "s/dummy-cflags/$PKG_CFLAGS/" $MANIFEST
-	sed -i "s/dummy-lflags/$PKG_LFLAGS/" $MANIFEST
+	sed -i "s#dummy-cflags#$PKG_CFLAGS#" $MANIFEST
+	sed -i "s#dummy-lflags#$PKG_LFLAGS#" $MANIFEST
 fi
 # end of CMAKE-TEMPLATE-ADAPTION
 
