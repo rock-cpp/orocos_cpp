@@ -1,6 +1,6 @@
 rock_library(dummyproject
-    SOURCES dummy.cpp)
+    SOURCES Dummy.cpp)
 
-rock_executable(dummyproject_bin main.cpp
+rock_executable(dummyproject_bin Main.cpp
     DEPS dummyproject)
 

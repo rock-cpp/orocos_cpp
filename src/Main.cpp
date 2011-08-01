@@ -1,5 +1,5 @@
 #include <iostream>
-#include "dummy.h"
+#include <dummyproject/Dummy.hpp>
 
 int main(int argc, char** argv)
 {

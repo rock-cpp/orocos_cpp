@@ -1,4 +1,4 @@
-#include "dummy.h"
+#include "Dummy.hpp"
 
 namespace DummyProject
 {
