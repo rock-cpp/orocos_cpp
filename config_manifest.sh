@@ -69,7 +69,9 @@ read PKG_DEPENDENCIES
 #	esac
 #done
 
-sed -i "s#\(PROJECT_DESCRIPTION\ \).*#\1\"$PKG_DESC\")#" CMakeLists.txt
+if [ -e CMakeLists.txt ]; then
+    sed -i "s#\(PROJECT_DESCRIPTION\ \).*#\1\"$PKG_DESC\")#" CMakeLists.txt
+fi
 sed -i "s#dummy-brief-desc#$PKG_DESC#" $MANIFEST
 sed -i "s#dummy-long-desc#$PKG_LONG_DESC#" $MANIFEST
 sed -i "s#dummy-author#$PKG_AUTHOR#" $MANIFEST
