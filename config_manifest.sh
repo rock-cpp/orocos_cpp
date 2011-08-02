@@ -91,7 +91,7 @@ if [ "$PKG_DEPENDENCIES" != "" ]
 		do
 		# Use the <!--DEPEND-ENTRY--> as a hook for subsequent replacements
 		# replace with <depend package="pkgname"> 
-		sed -i "s#<\!--DEPEND-ENTRY-->#<depend package=\"${dep}\"\ />\n<\!--DEPEND-ENTRY-->#" $MANIFEST
+		sed -i "s#<\!--DEPEND-ENTRY-->#<depend package=\"${dep}\"\ />\n  <\!--DEPEND-ENTRY-->#" $MANIFEST
 	done
 fi
 
