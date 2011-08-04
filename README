@@ -10,19 +10,18 @@ STRUCTURE
 	Contains all header (*.h/*.hpp) and source files
 -- build/
 	The target directory for the build process, temporary content
+-- bindings/
+	Language bindings for this package, e.g. put into subfolders such as
+   |-- ruby/ 
+        Ruby language bindings
+-- viz/
+        Source files for a vizkit plugin / widget related to this library 
 -- resources/
 	General resources such as images that are needed by the program
--- etc/
+-- configuration/
 	Configuration files for running the program
 -- external/
 	When including software that needs a non standard installation process, or one that can be
 	easily embedded include the external software directly here
-   |-- include
-	header files
-   |-- libs
-	precompiled libraries 
 -- doc/
 	should contain the existing doxygen file: doxygen.conf
-   |-- manual/
-	Should contain manual.tex 
-	Manual for the software 	
