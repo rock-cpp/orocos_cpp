@@ -1,12 +1,20 @@
+#ifndef _DUMMYPROJECT_DUMMY_HPP_
+#define _DUMMYPROJECT_DUMMY_HPP_
+
 #include <iostream>
 
-namespace DummyProject
+namespace dummy_project
 {
 	class DummyClass
 	{
 		public: 
+			/**
+			* Print a welcome to stdout
+			* \return nothing
+			*/
 			void welcome();
-		
 	};
 
-} // end namespace DummyProject
+} // end namespace dummy_project
+
+#endif // _DUMMYPROJECT_DUMMY_HPP_

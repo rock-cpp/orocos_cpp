@@ -1,6 +1,6 @@
 #include "Dummy.hpp"
 
-namespace DummyProject
+namespace dummy_project
 {
 
 	void DummyClass::welcome()
