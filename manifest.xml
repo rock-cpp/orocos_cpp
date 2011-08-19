@@ -13,9 +13,4 @@
   <depend package="dummy-dependency-n-1" />
   <depend package="dummy-dependency-n" />
   -->
-  <!--DEPEND-ENTRY-->
-  <versioncontrol type="dummy-version-control" url="dummy-version-control-url" />
-  <export>
-    <cpp cflags="dummy-cflags" lflags="dummy-lflags" />
-  </export>
 </package>
