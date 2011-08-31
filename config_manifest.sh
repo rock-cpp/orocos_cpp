@@ -89,9 +89,8 @@ if [ "$PKG_DEPENDENCIES" != "" ]
 	PKG_DEPENDENCIES=`echo $PKG_DEPENDENCIES | sed "s/,/ /g"`
 	for dep in ${PKG_DEPENDENCIES}
 		do
-		# Use the <!--DEPEND-ENTRY--> as a hook for subsequent replacements
-		# replace with <depend package="pkgname"> 
-		sed -i "s#<\!--DEPEND-ENTRY-->#<depend package=\"${dep}\"\ />\n  <\!--DEPEND-ENTRY-->#" $MANIFEST
+		# Use the </package> as a hook to place <depend package="pkg">
+		sed -i "s#</package>#  <depend package=\"${dep}\"\ />\n</package>#" $MANIFEST
 	done
 fi
 
