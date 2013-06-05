@@ -2,5 +2,5 @@
 # executed from 'project/build' with 'cmake ../'.
 cmake_minimum_required(VERSION 2.6)
 find_package(Rock)
-rock_init(dummyproject 0.1)
+rock_init(dummy_project 0.1)
 rock_standard_layout()

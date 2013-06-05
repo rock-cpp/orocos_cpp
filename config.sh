@@ -59,10 +59,10 @@ if [ $PACKAGE_TYPE = "CMAKE" ]; then
 	rm -rf .git
 
 	# replace dummyproject with projectname in the files
-        find . -type f ! -name 'config.sh' -exec sed -i 's#dummyproject#'$PACKAGE_SHORT_NAME'#' {} \;
+        find . -type f ! -name 'config.sh' -exec sed -i 's#dummy_project#'$PACKAGE_SHORT_NAME'#' {} \;
         # also rename the relevant files
-        find . -type f -name '*dummyproject*' | while read path; do
-            newpath=`echo $path | sed "s#dummyproject#$PACKAGE_SHORT_NAME#"`
+        find . -type f -name '*dummy_project*' | while read path; do
+            newpath=`echo $path | sed "s#dummy_project#$PACKAGE_SHORT_NAME#"`
             mv $path $newpath
         done
 	

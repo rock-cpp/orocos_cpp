@@ -1,7 +1,7 @@
-rock_library(dummyproject
+rock_library(dummy_project
     SOURCES Dummy.cpp
     HEADERS Dummy.hpp)
 
-rock_executable(dummyproject_bin Main.cpp
-    DEPS dummyproject)
+rock_executable(dummy_project_bin Main.cpp
+    DEPS dummy_project)
 
