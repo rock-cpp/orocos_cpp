@@ -6,6 +6,7 @@
   <license>dummy-license</license>
   <url>dummy-url</url>
   <logo>dummy-logo-url</logo>
+  <depend package="base/cmake" />
   <!--
    To add any dependencies use the depend tag
   <depend package="dummy-dependency-0" />
