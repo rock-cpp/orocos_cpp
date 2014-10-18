@@ -8,8 +8,22 @@ rock_library(orocos_cpp
         orocos-rtt-${OROCOS_TARGET}
         orocos-rtt-mqueue-${OROCOS_TARGET}
         orocos-rtt-corba-${OROCOS_TARGET}
+        typelib
+    DEPS_PLAIN 
+        Boost_SYSTEM Boost_FILESYSTEM Boost_THREAD
+#         rtt-typekit-gnulinux
     )
 
 rock_executable(listAll Main.cpp
     DEPS orocos_cpp)
+    
+# target_link_libraries(listAll rtt-typekit-gnulinux)
 
+# orogen_pkg_check_modules(base_TYPEKIT REQUIRED base-typekit-gnulinux)
+# include_directories(${base_TYPEKIT_INCLUDE_DIRS})
+# add_definitions(${base_TYPEKIT_CFLAGS_OTHER})
+# link_directories(${base_TYPEKIT_LIBRARY_DIRS})
+# orogen_pkg_check_modules(std_TYPEKIT REQUIRED std-typekit-gnulinux)
+# include_directories(${std_TYPEKIT_INCLUDE_DIRS})
+# add_definitions(${std_TYPEKIT_CFLAGS_OTHER})
+# link_directories(${std_TYPEKIT_LIBRARY_DIRS})
