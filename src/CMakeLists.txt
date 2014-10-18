@@ -1,3 +1,4 @@
+find_package( Boost COMPONENTS thread system filesystem)
 rock_library(orocos_cpp
     SOURCES 
         corba.cc
