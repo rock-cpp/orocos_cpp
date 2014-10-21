@@ -1,6 +1,7 @@
 #include <iostream>
 #include "corba.hh"
 #include "corba_name_service_client.hh"
+#include <rtt/Activity.hpp>
 #include <rtt/transports/corba/TaskContextProxy.hpp>
 
 
@@ -12,6 +13,7 @@
     
 #include <boost/filesystem.hpp>
 #include <rtt/plugin/PluginLoader.hpp>
+#include <rtt/InputPort.hpp>
 
 void loadAllPluginsInDir(const std::string &path)
 {
@@ -65,13 +67,21 @@ int main(int argc, char** argv)
     
     CorbaAccess::init(argc, argv);
     CorbaAccess *acc = CorbaAccess::instance();
-
-    corba::NameServiceClient client;
     
-    std::vector<std::string> taskList = client.getTaskContextNames();
+    corba::NameServiceClient client;
+        
+    std::vector<std::string> taskList;
+    try {
+         taskList = client.getTaskContextNames();
+    } catch (CosNaming::NamingContext::NotFound e)
+    {
+        std::cout << "Could not get Task Context list." << std::endl;
+        exit(EXIT_FAILURE);
+    }
     
     RTT::base::PortInterface *portReader;
-    
+    RTT::base::InputPortInterface *inputPort;
+    RTT::base::OutputPortInterface *outputPort;
     for(std::vector<std::string>::const_iterator it = taskList.begin(); it != taskList.end(); it++)
     {
         std::cout << "Task : " << *it << std::endl;
@@ -79,10 +89,14 @@ int main(int argc, char** argv)
         std::string curIOR = client.getIOR(*it);
 //         std::cout << "IOR is " << curIOR  << std::endl;
         
-        if(*it == "command_server")
+        if(*it == "orogen_default_mirror__Task")
         {
-        
+            
             RTT::corba::TaskContextProxy *proxy = RTT::corba::TaskContextProxy::Create(curIOR, true);
+            
+            proxy->configure();
+            proxy->start();
+            
             RTT::DataFlowInterface *flowInterface = proxy->ports();
             std::vector<RTT::base::PortInterface*> ports = flowInterface->getPorts();
             std::cout << "Number ports is " << flowInterface->getPorts().size() << std::endl;
@@ -97,6 +111,12 @@ int main(int argc, char** argv)
                 
                 std::cout << "Port name " << (iface)->getName() << " is input " << (input != 0)<<  " is  output"  << (output != 0) << std::endl;
             }
+            
+            inputPort =  dynamic_cast<RTT::base::InputPortInterface *>(proxy->getPort("input"));
+            outputPort =  dynamic_cast<RTT::base::OutputPortInterface *>(proxy->getPort("output"));
+            
+            std::cout << "Cast to port " << dynamic_cast<RTT::OutputPort<std::string> *>(outputPort) << std::endl;
+            
             RTT::TaskContext::PeerList peers = proxy->getPeerList();
             
             std::cout << "Number of peers " << peers.size() << std::endl;
@@ -108,6 +128,49 @@ int main(int argc, char** argv)
         }
     }
 
+    RTT::OutputPort<std::string> *writer = dynamic_cast<RTT::OutputPort<std::string> *>(inputPort->antiClone());
+    RTT::InputPort<std::string> *reader = dynamic_cast<RTT::InputPort<std::string> *>(outputPort->antiClone());
+
+    RTT::TaskContext context("orocosCpp");
+
+//     RTT::Activity* activity_orogen_default_mirror__Task = new RTT::Activity(
+//     ORO_SCHED_OTHER,
+//     RTT::os::LowestPriority,
+//     0.1,
+//     context.engine(),
+//     "orogen_default_mirror__Task");
+//     RTT::os::Thread* thread_orogen_default_mirror__Task =
+//     dynamic_cast<RTT::os::Thread*>(activity_orogen_default_mirror__Task->thread());
+// thread_orogen_default_mirror__Task->setMaxOverrun(-1);
+// 
+//     context.setActivity(activity_orogen_default_mirror__Task);
+//     
+//     { RTT::os::Thread* thread = dynamic_cast<RTT::os::Thread*>(activity_orogen_default_mirror__Task);
+//         if (thread)
+//             thread->setStopTimeout(10);
+//     }
+    
+    
+    context.addPort(*writer);
+    context.addPort(*reader);
+    
+    
+    std::string foo("FOOOOOOOOOO");
+    writer->connectTo(inputPort);
+    reader->connectTo(outputPort);
+    
+    
+    writer->write(foo);
+    
+    std::string foo2;
+    
+    while(reader->read(foo2) != RTT::NewData)
+    {
+        usleep(10000);
+    }
+    
+    std::cout << "Resulting sample is " << foo2 << std::endl;
+    
 //     while(true)
 //     {
 //         portReader;
