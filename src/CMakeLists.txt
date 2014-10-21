@@ -3,6 +3,7 @@ rock_library(orocos_cpp
     SOURCES 
         corba.cc
         corba_name_service_client.cc
+        OrocosHelpers.cpp
     HEADERS corba.hh
     DEPS_PKGCONFIG
         rtt_typelib-${OROCOS_TARGET}
@@ -16,6 +17,9 @@ rock_library(orocos_cpp
     )
 
 rock_executable(listAll Main.cpp
+    DEPS orocos_cpp)
+
+rock_executable(proxyTest main2.cpp
     DEPS orocos_cpp)
     
 # target_link_libraries(listAll rtt-typekit-gnulinux)
