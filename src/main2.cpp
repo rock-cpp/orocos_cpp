@@ -1,5 +1,6 @@
 #include "ProxyPort.hpp"
 #include <rtt/transports/corba/TaskContextProxy.hpp>
+#include <rtt/Property.hpp>
 #include "corba.hh"
 #include "corba_name_service_client.hh"
 #include "OrocosHelpers.hpp"
@@ -7,12 +8,17 @@
 class MirrorProxy: public RTT::corba::TaskContextProxy
 {
 public:
-    MirrorProxy(std::string location, bool is_ior) : TaskContextProxy(location, is_ior), input(getPort("input")), output(getPort("output"))
+    MirrorProxy(std::string location, bool is_ior) : TaskContextProxy(location, is_ior)
+    , input(getPort("input"))
+    , output(getPort("output"))
+    , testProp(*dynamic_cast<RTT::Property<std::string> *>(getProperty("testProp")))
     {
         
     };
     InputProxyPort<std::string> input;
     OutputProxyPort<std::string> output;
+    
+    RTT::Property<std::string> &testProp;
 };
 
 int main(int argc, char**argv)
@@ -69,6 +75,8 @@ int main(int argc, char**argv)
     }
     
     std::cout << "result is " << result << std::endl;
+    
+    std::cout << "Property is " << mirrorProxy->testProp.get() << std::endl;
     
     return 0;
 }

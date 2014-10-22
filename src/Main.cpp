@@ -82,6 +82,7 @@ int main(int argc, char** argv)
     RTT::base::PortInterface *portReader;
     RTT::base::InputPortInterface *inputPort;
     RTT::base::OutputPortInterface *outputPort;
+    RTT::corba::TaskContextProxy *proxy; 
     for(std::vector<std::string>::const_iterator it = taskList.begin(); it != taskList.end(); it++)
     {
         std::cout << "Task : " << *it << std::endl;
@@ -92,7 +93,7 @@ int main(int argc, char** argv)
         if(*it == "orogen_default_mirror__Task")
         {
             
-            RTT::corba::TaskContextProxy *proxy = RTT::corba::TaskContextProxy::Create(curIOR, true);
+            proxy = RTT::corba::TaskContextProxy::Create(curIOR, true);
             
             proxy->configure();
             proxy->start();
@@ -133,6 +134,15 @@ int main(int argc, char** argv)
 
     RTT::TaskContext context("orocosCpp");
 
+    RTT::base::PropertyBase *pbase = proxy->getProperty("testProp");
+    
+    RTT::Property<std::string> *prop = dynamic_cast<RTT::Property<std::string> *>(pbase);
+
+    std::cout << "Prop is " << prop->get() << std::endl;
+    
+    prop->set("Bla");
+    
+    
 //     RTT::Activity* activity_orogen_default_mirror__Task = new RTT::Activity(
 //     ORO_SCHED_OTHER,
 //     RTT::os::LowestPriority,
