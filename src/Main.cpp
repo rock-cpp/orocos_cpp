@@ -142,6 +142,25 @@ int main(int argc, char** argv)
     
     prop->set("Bla");
     
+    RTT::OperationInterfacePart *opIfac = proxy->getOperation("testOp");
+    
+    
+    
+    std::cout << "OpIface is " << opIfac << std::endl << std::flush;
+    
+//     RTT::OperationCaller< void(::std::vector< ::std::string > const &) >  testOp = dynamic_cast<RTT::OperationCaller< void(::std::vector< ::std::string > const &) > *>(opIfac);
+//      RTT::Operation<void (std::vector<std::string> const&)> *testOp = dynamic_cast<RTT::Operation<void (std::vector<std::string> const&)> *>(proxy->getOperation("testOp"));
+    RTT::OperationCaller< void(::std::vector< ::std::string > const &) >  testOp(opIfac);
+    
+//     std::cout << "TestOp is " << testOp << std::endl;
+    
+    std::vector<std::string> args;
+    args.push_back("bla");
+
+    
+    testOp(args);
+    
+//(*testOp)();
     
 //     RTT::Activity* activity_orogen_default_mirror__Task = new RTT::Activity(
 //     ORO_SCHED_OTHER,

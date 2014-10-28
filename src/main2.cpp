@@ -74,6 +74,8 @@ int main(int argc, char**argv)
         usleep(10000);
     }
     
+    
+    
     std::cout << "result is " << result << std::endl;
     
     std::cout << "Property is " << mirrorProxy->testProp.get() << std::endl;
