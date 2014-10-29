@@ -13,7 +13,6 @@ rock_library(orocos_cpp
         typelib
     DEPS_PLAIN 
         Boost_SYSTEM Boost_FILESYSTEM Boost_THREAD
-#         rtt-typekit-gnulinux
     )
 
 rock_executable(listAll Main.cpp
