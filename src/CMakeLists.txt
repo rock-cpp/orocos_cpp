@@ -4,7 +4,11 @@ rock_library(orocos_cpp
         corba.cc
         corba_name_service_client.cc
         OrocosHelpers.cpp
-    HEADERS corba.hh
+    HEADERS 
+        corba.hh
+        corba_name_service_client.hh
+        OrocosHelpers.hpp
+        ProxyPort.hpp
     DEPS_PKGCONFIG
         rtt_typelib-${OROCOS_TARGET}
         orocos-rtt-${OROCOS_TARGET}
