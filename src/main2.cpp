@@ -31,7 +31,6 @@ int main(int argc, char**argv)
     MirrorProxy *mirrorProxy;
     
     CorbaAccess::init(argc, argv);
-    CorbaAccess *acc = CorbaAccess::instance();
     
     std::cout << "Corba init done" << std::endl;
     

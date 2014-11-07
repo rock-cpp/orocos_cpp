@@ -89,46 +89,59 @@ int main(int argc, char** argv)
         
         std::string curIOR = client.getIOR(*it);
 //         std::cout << "IOR is " << curIOR  << std::endl;
+
+        proxy = RTT::corba::TaskContextProxy::Create(curIOR, true);
+        RTT::PropertyBag *pbag = proxy->properties();
         
-        if(*it == "orogen_default_mirror__Task")
+        for(RTT::PropertyBag::iterator it = pbag->begin(); it != pbag->end(); it++)
         {
-            
-            proxy = RTT::corba::TaskContextProxy::Create(curIOR, true);
-            
-            proxy->configure();
-            proxy->start();
-            
-            RTT::DataFlowInterface *flowInterface = proxy->ports();
-            std::vector<RTT::base::PortInterface*> ports = flowInterface->getPorts();
-            std::cout << "Number ports is " << flowInterface->getPorts().size() << std::endl;
-            for(std::vector<RTT::base::PortInterface*>::iterator it = ports.begin(); it != ports.end() ; it++)
-            {
-                RTT::base::PortInterface *iface = *it;
-            
-//                 portReader = iface->antiClone();
-                
-                RTT::base::InputPortInterface *input = dynamic_cast<RTT::base::InputPortInterface *>(iface);
-                RTT::base::OutputPortInterface *output = dynamic_cast<RTT::base::OutputPortInterface *>(iface);
-                
-                std::cout << "Port name " << (iface)->getName() << " is input " << (input != 0)<<  " is  output"  << (output != 0) << std::endl;
-            }
-            
-            inputPort =  dynamic_cast<RTT::base::InputPortInterface *>(proxy->getPort("input"));
-            outputPort =  dynamic_cast<RTT::base::OutputPortInterface *>(proxy->getPort("output"));
-            
-            std::cout << "Cast to port " << dynamic_cast<RTT::OutputPort<std::string> *>(outputPort) << std::endl;
-            
-            RTT::TaskContext::PeerList peers = proxy->getPeerList();
-            
-            std::cout << "Number of peers " << peers.size() << std::endl;
-            
-            for(RTT::TaskContext::PeerList::const_iterator it = peers.begin(); it != peers.end(); it++)
-            {
-                std::cout << "Peers is " << *it << std::endl;
-            }
+            std::cout << "found property " << (*it)->getName() << std::endl;
+            std::cout << "    Desc : " << (*it)->getDescription() << std::endl;
+            std::cout << "    Type : " << (*it)->getType() << std::endl;
         }
+        
+        
+//         if(*it == "orogen_default_mirror__Task")
+//         {
+//             
+//             proxy = RTT::corba::TaskContextProxy::Create(curIOR, true);
+//             
+//             proxy->configure();
+//             proxy->start();
+//             
+//             RTT::DataFlowInterface *flowInterface = proxy->ports();
+//             std::vector<RTT::base::PortInterface*> ports = flowInterface->getPorts();
+//             std::cout << "Number ports is " << flowInterface->getPorts().size() << std::endl;
+//             for(std::vector<RTT::base::PortInterface*>::iterator it = ports.begin(); it != ports.end() ; it++)
+//             {
+//                 RTT::base::PortInterface *iface = *it;
+//             
+// //                 portReader = iface->antiClone();
+//                 
+//                 RTT::base::InputPortInterface *input = dynamic_cast<RTT::base::InputPortInterface *>(iface);
+//                 RTT::base::OutputPortInterface *output = dynamic_cast<RTT::base::OutputPortInterface *>(iface);
+//                 
+//                 std::cout << "Port name " << (iface)->getName() << " is input " << (input != 0)<<  " is  output"  << (output != 0) << std::endl;
+//             }
+//             
+//             inputPort =  dynamic_cast<RTT::base::InputPortInterface *>(proxy->getPort("input"));
+//             outputPort =  dynamic_cast<RTT::base::OutputPortInterface *>(proxy->getPort("output"));
+//             
+//             std::cout << "Cast to port " << dynamic_cast<RTT::OutputPort<std::string> *>(outputPort) << std::endl;
+//             
+//             RTT::TaskContext::PeerList peers = proxy->getPeerList();
+//             
+//             std::cout << "Number of peers " << peers.size() << std::endl;
+//             
+//             for(RTT::TaskContext::PeerList::const_iterator it = peers.begin(); it != peers.end(); it++)
+//             {
+//                 std::cout << "Peers is " << *it << std::endl;
+//             }
+//         }
     }
 
+    return 0;
+    
     RTT::OutputPort<std::string> *writer = dynamic_cast<RTT::OutputPort<std::string> *>(inputPort->antiClone());
     RTT::InputPort<std::string> *reader = dynamic_cast<RTT::InputPort<std::string> *>(outputPort->antiClone());
 

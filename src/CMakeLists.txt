@@ -4,6 +4,7 @@ rock_library(orocos_cpp
         corba.cc
         corba_name_service_client.cc
         OrocosHelpers.cpp
+        ConfigurationHelper.cpp
     HEADERS 
         corba.hh
         corba_name_service_client.hh
@@ -15,6 +16,7 @@ rock_library(orocos_cpp
         orocos-rtt-mqueue-${OROCOS_TARGET}
         orocos-rtt-corba-${OROCOS_TARGET}
         typelib
+        yaml-cpp
     DEPS_PLAIN 
         Boost_SYSTEM Boost_FILESYSTEM Boost_THREAD
     )
@@ -24,7 +26,10 @@ rock_executable(listAll Main.cpp
 
 rock_executable(proxyTest main2.cpp
     DEPS orocos_cpp)
-    
+
+rock_executable(config main3.cpp
+    DEPS orocos_cpp)
+
 # target_link_libraries(listAll rtt-typekit-gnulinux)
 
 # orogen_pkg_check_modules(base_TYPEKIT REQUIRED base-typekit-gnulinux)
