@@ -320,6 +320,18 @@ bool ConfigurationHelper::loadConfigFile(const std::string& path)
 
 bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const std::vector< std::string >& names)
 {
+    Configuration config;
+    if(!mergeConfig(names, config))
+        return false;
+    
+    
+    std::cout << "Merging complete" << std::endl;
+    
+    return true;
+}
+
+bool ConfigurationHelper::mergeConfig(const std::vector< std::string >& names, Configuration& result)
+{
     if(names.empty())
         throw std::runtime_error("Error given config array was empty");
     
@@ -337,7 +349,7 @@ bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const std::vect
     }
     
     //first we merge the configurations
-    Configuration final = entry->second;
+    result = entry->second;
     
     std::vector< std::string >::const_iterator it = names.begin();
     it++;
@@ -352,12 +364,12 @@ bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const std::vect
             return false;
         }
 
-        if(!final.merge(entry->second))
+        if(!result.merge(entry->second))
             return false;
     }    
     
     std::cout << "Resulting config is :" << std::endl;
-    displayConfiguration(final);
+    displayConfiguration(result);
     
     return true;
 }

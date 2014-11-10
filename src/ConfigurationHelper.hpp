@@ -52,6 +52,9 @@ class ConfigurationHelper
 public:
     bool loadConfigFile(const std::string &path);
     bool applyConfig(RTT::TaskContext *context, const std::vector<std::string> &names);
+private:
+    bool mergeConfig(const std::vector<std::string> &names, Configuration &result);
+    bool applyConfToProperty(RTT::TaskContext* context, const std::string &propertyName, const ConfigValue &value);
 };
 
 #endif // CONFIGURATIONHELPER_H
