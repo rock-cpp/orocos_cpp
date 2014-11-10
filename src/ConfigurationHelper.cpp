@@ -2,6 +2,11 @@
 
 #include <yaml-cpp/yaml.h>
 #include <fstream>
+#include <rtt/types/TypeInfo.hpp>
+#include <rtt/typelib/TypelibMarshaller.hpp>
+#include <rtt/base/DataSourceBase.hpp>
+
+#include <boost/lexical_cast.hpp>
 
 ComplexConfigValue::ComplexConfigValue(): ConfigValue(COMPLEX)
 {
@@ -327,8 +332,250 @@ bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const std::vect
     
     std::cout << "Merging complete" << std::endl;
     
+    std::map<std::string, ConfigValue *>::const_iterator propIt;
+    for(propIt = config.values.begin(); propIt != config.values.end(); propIt++)
+    {
+        std::cout << "Applying conf to " << propIt->first << std::endl;
+        if(!applyConfToProperty(context, propIt->first, *(propIt->second)))
+            return false;
+    }
+
     return true;
 }
+
+template <typename T>
+void applyValue(Typelib::Value &value, const SimpleConfigValue& conf)
+{
+    T *val = static_cast<T *>(value.getData());
+    *val = boost::lexical_cast<T>(conf.value);
+}
+
+bool applyConfOnTypelibEnum(Typelib::Value &value, const SimpleConfigValue& conf)
+{
+    const Typelib::Enum *myenum = dynamic_cast<const Typelib::Enum *>(&(value.getType()));
+
+    std::map<std::string, int>::const_iterator it = myenum->values().find(conf.value);
+    
+    if(it == myenum->values().end())
+    {
+        std::cout << "Error : " << conf.value << " is not a valid enum name " << std::endl;
+        return false;
+    }
+    
+    if(myenum->getSize() != sizeof(int32_t))
+    {
+        std::cout << "Error, only 32 bit enums are supported atm" << std::endl;
+        return false;
+    }
+
+    int32_t *val = static_cast<int32_t *>(value.getData());
+    *val = it->second;
+    
+    return true;
+}
+
+bool applyConfOnTypelibNumeric(Typelib::Value &value, const SimpleConfigValue& conf)
+{
+    const Typelib::Numeric *num = dynamic_cast<const Typelib::Numeric *>(&(value.getType()));
+    
+    switch(num->getNumericCategory())
+    {
+        case Typelib::Numeric::Float:
+            if(num->getSize() == sizeof(float))
+            {
+                applyValue<float>(value, conf);
+            }
+            else
+            {
+                //double case
+                applyValue<double>(value, conf);
+            }
+            break;
+        case Typelib::Numeric::SInt:
+            switch(num->getSize())
+            {
+                case sizeof(int8_t):
+                    applyValue<int8_t>(value, conf);
+                    break;
+                case sizeof(int16_t):
+                    applyValue<int16_t>(value, conf);
+                    break;
+                case sizeof(int32_t):
+                    applyValue<int32_t>(value, conf);
+                    break;
+                case sizeof(int64_t):
+                    applyValue<int64_t>(value, conf);
+                    break;
+                default:
+                    std::cout << "Error, got integer of unexpected size " << num->getSize() << std::endl;
+                    return false;
+                    break;
+            }
+            break;
+        case Typelib::Numeric::UInt:
+            //HACK typelib encodes bools as unsigned integer. Brrrrr
+            std::string lowerCase = conf.value;
+            std::transform(lowerCase.begin(), lowerCase.end(), lowerCase.begin(), ::tolower);
+            if(lowerCase == "true")
+            {
+                SimpleConfigValue co2 = conf;
+                co2.value = "1";
+                return applyConfOnTypelibNumeric(value, co2);
+            }
+            if(lowerCase == "false")
+            {
+                SimpleConfigValue co2 = conf;
+                co2.value = "0";
+                return applyConfOnTypelibNumeric(value, co2);
+            }
+            
+            switch(num->getSize())
+            {
+                case sizeof(uint8_t):
+                    applyValue<uint8_t>(value, conf);
+                    break;
+                case sizeof(uint16_t):
+                    applyValue<uint16_t>(value, conf);
+                    break;
+                case sizeof(uint32_t):
+                    applyValue<uint32_t>(value, conf);
+                    break;
+                case sizeof(uint64_t):
+                    applyValue<uint64_t>(value, conf);
+                    break;
+                default:
+                    std::cout << "Error, got integer of unexpected size " << num->getSize() << std::endl;
+                    return false;
+                    break;
+            }
+            break;
+    }
+    return true;
+}
+
+bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
+{
+    switch(value.getType().getCategory())
+    {
+        case Typelib::Type::Array:
+            std::cout << "Warning, array is not supported " << std::endl;
+            break;
+        case Typelib::Type::Compound:
+        {
+            const Typelib::Compound &comp = dynamic_cast<const Typelib::Compound &>(value.getType());
+            Typelib::Compound::FieldList::const_iterator it = comp.getFields().begin();
+            ComplexConfigValue cpx = dynamic_cast<const ComplexConfigValue &>(conf);
+            for(;it != comp.getFields().end(); it++)
+            {
+                std::map<std::string, ConfigValue *>::const_iterator confIt = cpx.values.find(it->getName());
+                if(confIt == cpx.values.end())
+                    continue;
+
+                ConfigValue *curConf = confIt->second;
+                
+                cpx.values.erase(it->getName());
+                
+                Typelib::Value fieldValue(((uint8_t *) value.getData()) + it->getOffset(), it->getType());
+                applyConfOnTyplibValue(fieldValue, *curConf);
+            }
+            if(!cpx.values.empty())
+            {
+                std::cout << "Error :" << std::endl;
+                for(std::map<std::string, ConfigValue *>::const_iterator it = cpx.values.begin(); it != cpx.values.end();it++)
+                {
+                    std::cout << "  " << it->first << std::endl;
+                }
+                std::cout << "is/are not members of " << comp.getName() << std::endl;
+                return false;
+            }
+        }
+            break;
+        case Typelib::Type::Container:
+            {
+                const Typelib::Container &cont = dynamic_cast<const Typelib::Container &>(value.getType());
+                std::cout << cont.kind() <<std::endl;
+                if(cont.kind() == "/std/string")
+                {
+                    const SimpleConfigValue &sconf = dynamic_cast<const SimpleConfigValue &>(conf);
+                    size_t chars = sconf.value.size();
+                    
+                    cont.init(value.getData());
+                    
+                    const Typelib::Type &indirect = cont.getIndirection();
+                    for(int i = 0; i < chars; i++)
+                    {
+                        Typelib::Value singleChar((void *)( sconf.value.c_str() + i), indirect);
+                        cont.push(value.getData(), singleChar);
+                    }
+                }
+                else
+                {
+                    std::cout << "Warning, container is not supported " << value.getType().getName() << std::endl;
+                }
+            }
+            break;
+        case Typelib::Type::Enum:
+            break;
+        case Typelib::Type::Numeric:
+            applyConfOnTypelibNumeric(value, dynamic_cast<const SimpleConfigValue &>(conf));
+            break;
+        case Typelib::Type::Opaque:
+            std::cout << "Warning, opaque is not supported" << std::endl;
+            break;
+        case Typelib::Type::Pointer:
+            std::cout << "Warning, pointer is not supported" << std::endl;
+            break;
+        default:
+            std::cout << "Warning, unknown is not supported" << std::endl;
+            break;
+    }
+    return true;
+}
+
+bool ConfigurationHelper::applyConfToProperty(RTT::TaskContext* context, const std::string& propertyName, const ConfigValue& value)
+{
+    RTT::base::PropertyBase *property = context->getProperty(propertyName);
+    if(!property)
+    {
+        std::cout << "Error, there is no property with the name " << propertyName << " in the TaskContext " << context->getName() << std::endl;
+        return false;
+    }
+
+    //get Typelib value
+    const RTT::types::TypeInfo* typeInfo = property->getTypeInfo();
+    orogen_transports::TypelibMarshallerBase *typelibTransport = dynamic_cast<orogen_transports::TypelibMarshallerBase*>(typeInfo->getProtocol(orogen_transports::TYPELIB_MARSHALLER_ID));
+
+    //get data source
+    RTT::base::DataSourceBase::shared_ptr ds = property->getDataSource();
+    
+    //TODO make faster by adding getType to transport
+    const Typelib::Type *type = typelibTransport->getRegistry().get(typelibTransport->getMarshallingType());
+
+    orogen_transports::TypelibMarshallerBase::Handle *handle = typelibTransport->createSample();
+
+    uint8_t *buffer = typelibTransport->getTypelibSample(handle);
+            
+    Typelib::Value dest(buffer, *type);
+            
+    if(typelibTransport->readDataSource(*ds, handle))
+    {
+        std::cout << "Got vlaue from data source" << std::endl;
+//         typelibTransport->refreshTypelibSample(handle);
+    }
+
+    if(!applyConfOnTyplibValue(dest, value))
+        return false;
+    
+    //write value back
+    typelibTransport->writeDataSource(*ds, handle);
+    
+    //destroy handle to avoid memory leak
+    typelibTransport->deleteHandle(handle);
+    
+    return true;
+}
+
+
 
 bool ConfigurationHelper::mergeConfig(const std::vector< std::string >& names, Configuration& result)
 {
@@ -373,4 +620,5 @@ bool ConfigurationHelper::mergeConfig(const std::vector< std::string >& names, C
     
     return true;
 }
+
 
