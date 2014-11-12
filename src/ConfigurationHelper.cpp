@@ -602,6 +602,7 @@ bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
                         Typelib::Value singleChar((void *)( sconf.value.c_str() + i), indirect);
                         cont.push(value.getData(), singleChar);
                     }
+                    break;
                 }
                 else
                 {
