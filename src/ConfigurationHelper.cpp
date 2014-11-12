@@ -597,7 +597,7 @@ bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
                     cont.init(value.getData());
                     
                     const Typelib::Type &indirect = cont.getIndirection();
-                    for(int i = 0; i < chars; i++)
+                    for(size_t i = 0; i < chars; i++)
                     {
                         Typelib::Value singleChar((void *)( sconf.value.c_str() + i), indirect);
                         cont.push(value.getData(), singleChar);
