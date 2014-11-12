@@ -505,6 +505,45 @@ bool applyConfOnTypelibNumeric(Typelib::Value &value, const SimpleConfigValue& c
     return true;
 }
 
+bool initTyplibValueRecusive(Typelib::Value &value)
+{
+    switch(value.getType().getCategory())
+    {
+        case Typelib::Type::Array:
+            //nothing to do here (I think)
+            break;
+        case Typelib::Type::Compound:
+        {
+            const Typelib::Compound &comp = dynamic_cast<const Typelib::Compound &>(value.getType());
+            Typelib::Compound::FieldList::const_iterator it = comp.getFields().begin();
+            for(;it != comp.getFields().end(); it++)
+            {
+                Typelib::Value fieldValue(((uint8_t *) value.getData()) + it->getOffset(), it->getType());
+                initTyplibValueRecusive(fieldValue);
+            }
+        }
+            break;
+        case Typelib::Type::Container:
+            {
+                const Typelib::Container &cont = dynamic_cast<const Typelib::Container &>(value.getType());
+                cont.init(value.getData());
+            }
+            break;
+        case Typelib::Type::Enum:
+            break;
+        case Typelib::Type::Numeric:
+            break;
+        case Typelib::Type::Opaque:
+            break;
+        case Typelib::Type::Pointer:
+            break;
+        default:
+            std::cout << "Warning: Init on unknown is not supported" << std::endl;
+            break;
+    }
+    return true;    
+}
+
 bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
 {
     switch(value.getType().getCategory())
@@ -520,14 +559,18 @@ bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
             for(;it != comp.getFields().end(); it++)
             {
                 std::map<std::string, ConfigValue *>::const_iterator confIt = cpx.values.find(it->getName());
+                Typelib::Value fieldValue(((uint8_t *) value.getData()) + it->getOffset(), it->getType());
                 if(confIt == cpx.values.end())
+                {
+                    //even if we don't configure this one, we still need to initialize it
+                    initTyplibValueRecusive(fieldValue);
                     continue;
+                }
 
                 ConfigValue *curConf = confIt->second;
                 
                 cpx.values.erase(it->getName());
                 
-                Typelib::Value fieldValue(((uint8_t *) value.getData()) + it->getOffset(), it->getType());
                 applyConfOnTyplibValue(fieldValue, *curConf);
             }
             if(!cpx.values.empty())
