@@ -194,9 +194,17 @@ ConfigValue *getConfigValue(const YAML::Node &node)
         }
             break;
         case YAML::NodeType::Sequence:
-            std::cout << "a Sequence: " << node.Tag() << std::endl;
-            //Error for now
-            return NULL;
+//             std::cout << "a Sequence: " << node.Tag() << std::endl;
+            {
+                ArrayConfigValue *values = new ArrayConfigValue();
+                for(YAML::Iterator it = node.begin(); it != node.end(); it++)
+                {
+                    ConfigValue *curConf = getConfigValue(*it);
+                    
+                    values->values.push_back(curConf);
+                }
+                return values;
+            }
             break;
         case YAML::NodeType::Map:
         {
@@ -251,6 +259,17 @@ void displayConfig(ConfigValue *val, int level)
             for(std::map<std::string, ConfigValue *>::const_iterator it = c->values.begin(); it != c->values.end(); it++)
             {
                 displayConfig(it->second, level + 1);
+            }
+        }
+        break;
+        case ConfigValue::ARRAY:
+        {
+            ArrayConfigValue *a = dynamic_cast<ArrayConfigValue *>(val);
+            assert(a);
+            std::cout << val->name << ":" << std::endl;
+            for(std::vector<ConfigValue *>::const_iterator it = a->values.begin(); it != a->values.end(); it++)
+            {
+                displayConfig(*it, level + 1);
             }
         }
         break;
