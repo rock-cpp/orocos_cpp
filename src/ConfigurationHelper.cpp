@@ -41,6 +41,39 @@ bool ComplexConfigValue::merge(const ConfigValue* other)
     return true;
 }
 
+ArrayConfigValue::ArrayConfigValue(): ConfigValue(ARRAY)
+{
+
+}
+
+bool ArrayConfigValue::merge(const ConfigValue* other)
+{
+    if(other->type != ARRAY)
+        return false;
+
+    if(name != other->name)
+    {
+        throw std::runtime_error("Internal Error, merge between mismatching value");
+    }
+    
+    const ArrayConfigValue *aother = dynamic_cast<const ArrayConfigValue *>(other);
+    
+    //we only support direct overwrite by index
+    for(size_t i = 0; i < aother->values.size(); i++)
+    {
+        if(i < values.size())
+        {
+            values[i] = aother->values[i];
+        }
+        else
+        {
+            values.push_back(aother->values[i]);
+        }
+    }
+    
+    return true;
+}
+
 
 SimpleConfigValue::SimpleConfigValue(): ConfigValue(SIMPLE)
 {

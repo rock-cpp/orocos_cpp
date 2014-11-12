@@ -10,6 +10,7 @@ public:
     enum Type {
         SIMPLE,
         COMPLEX,
+        ARRAY,
     };
     
     enum Type type;
@@ -36,6 +37,14 @@ public:
     virtual bool merge(const ConfigValue* other);
     ComplexConfigValue();
     std::map<std::string, ConfigValue *> values;
+};
+
+class ArrayConfigValue : public ConfigValue
+{
+public:
+    virtual bool merge(const ConfigValue* other);
+    ArrayConfigValue();
+    std::vector<ConfigValue *> values;
 };
 
 class Configuration
