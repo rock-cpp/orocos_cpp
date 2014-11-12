@@ -606,7 +606,29 @@ bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
                 }
                 else
                 {
-                    std::cout << "Warning, container is not supported " << value.getType().getName() << std::endl;
+                    if(conf.type != ConfigValue::ARRAY)
+                    {
+                        std::cout << "Error, YAML representation << " << conf.name << " of type " << value.getType().getName() << " is not an array " << std::endl;
+                        std::cout << "Error, got container in property, but config value is not an array " << std::endl;
+                        return false;
+                    }
+                    const ArrayConfigValue &array = dynamic_cast<const ArrayConfigValue &>(conf);
+                    
+                    const Typelib::Type &indirect = cont.getIndirection();
+                    cont.init(value.getData());
+
+                    std::vector<ConfigValue *>::const_iterator it = array.values.begin();
+
+                    for(; it != array.values.end(); it++)
+                    {
+                        
+                        //TODO check, this may be a memory leak
+                        Typelib::Value v(new uint8_t[indirect.getSize()], indirect);
+                        
+                        applyConfOnTyplibValue(v, *(*it));
+                        
+                        cont.push(value.getData(), v);
+                    }
                 }
             }
             break;
