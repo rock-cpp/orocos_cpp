@@ -5,11 +5,14 @@ rock_library(orocos_cpp
         corba_name_service_client.cc
         OrocosHelpers.cpp
         ConfigurationHelper.cpp
+        TransformerHelper.cpp
     HEADERS 
         corba.hh
         corba_name_service_client.hh
         OrocosHelpers.hpp
         ProxyPort.hpp
+        ConfigurationHelper.hpp
+        TransformerHelper.hpp
     DEPS_PKGCONFIG
         rtt_typelib-${OROCOS_TARGET}
         orocos-rtt-${OROCOS_TARGET}
@@ -17,6 +20,8 @@ rock_library(orocos_cpp
         orocos-rtt-corba-${OROCOS_TARGET}
         typelib
         yaml-cpp
+        transformer
+        smurf
     DEPS_PLAIN 
         Boost_SYSTEM Boost_FILESYSTEM Boost_THREAD
     )

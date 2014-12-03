@@ -7,6 +7,7 @@
   <url>dummy-url</url>
   <logo>dummy-logo-url</logo>
   <depend package="base/cmake" />
+  <depend package="tools/smurf" />
   <!--
    To add any dependencies use the depend tag
   <depend package="dummy-dependency-0" />
