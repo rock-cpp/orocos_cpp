@@ -396,10 +396,48 @@ bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const std::vect
 }
 
 template <typename T>
-void applyValue(Typelib::Value &value, const SimpleConfigValue& conf)
+bool applyValue(Typelib::Value &value, const SimpleConfigValue& conf)
 {
     T *val = static_cast<T *>(value.getData());
-    *val = boost::lexical_cast<T>(conf.value);
+    try {
+        *val = boost::lexical_cast<T>(conf.value);
+    } catch (boost::bad_lexical_cast bc)
+    {
+        std::cout << "Error, could not set value " << conf.value << " on property " << conf.name << " Bad lexical cast : " << bc.what() << std::endl;
+        std::cout << " Target Type " << value.getType().getName() << std::endl;
+        return false;
+    }
+    return true;
+}
+
+template <>
+bool applyValue<uint8_t>(Typelib::Value &value, const SimpleConfigValue& conf)
+{
+    uint8_t *val = static_cast<uint8_t *>(value.getData());
+    try {
+        *val = boost::numeric_cast<uint8_t>(boost::lexical_cast<unsigned int>(conf.value));
+    } catch (boost::bad_lexical_cast bc)
+    {
+        std::cout << "Error, could not set value " << conf.value << " on property " << conf.name << " Bad lexical cast : " << bc.what() << std::endl;
+        std::cout << " Target Type " << value.getType().getName() << std::endl;
+        return false;
+    }
+    return true;
+}
+
+template <>
+bool applyValue<int8_t>(Typelib::Value &value, const SimpleConfigValue& conf)
+{
+    int8_t *val = static_cast<int8_t *>(value.getData());
+    try {
+        *val = boost::numeric_cast<int8_t>(boost::lexical_cast<int>(conf.value));
+    } catch (boost::bad_lexical_cast bc)
+    {
+        std::cout << "Error, could not set value " << conf.value << " on property " << conf.name << " Bad lexical cast : " << bc.what() << std::endl;
+        std::cout << " Target Type " << value.getType().getName() << std::endl;
+        return false;
+    }
+    return true;
 }
 
 bool applyConfOnTypelibEnum(Typelib::Value &value, const SimpleConfigValue& conf)
@@ -435,28 +473,28 @@ bool applyConfOnTypelibNumeric(Typelib::Value &value, const SimpleConfigValue& c
         case Typelib::Numeric::Float:
             if(num->getSize() == sizeof(float))
             {
-                applyValue<float>(value, conf);
+                return applyValue<float>(value, conf);
             }
             else
             {
                 //double case
-                applyValue<double>(value, conf);
+                return applyValue<double>(value, conf);
             }
             break;
         case Typelib::Numeric::SInt:
             switch(num->getSize())
             {
                 case sizeof(int8_t):
-                    applyValue<int8_t>(value, conf);
+                    return applyValue<int8_t>(value, conf);
                     break;
                 case sizeof(int16_t):
-                    applyValue<int16_t>(value, conf);
+                    return applyValue<int16_t>(value, conf);
                     break;
                 case sizeof(int32_t):
-                    applyValue<int32_t>(value, conf);
+                    return applyValue<int32_t>(value, conf);
                     break;
                 case sizeof(int64_t):
-                    applyValue<int64_t>(value, conf);
+                    return applyValue<int64_t>(value, conf);
                     break;
                 default:
                     std::cout << "Error, got integer of unexpected size " << num->getSize() << std::endl;
@@ -484,16 +522,16 @@ bool applyConfOnTypelibNumeric(Typelib::Value &value, const SimpleConfigValue& c
             switch(num->getSize())
             {
                 case sizeof(uint8_t):
-                    applyValue<uint8_t>(value, conf);
+                    return applyValue<uint8_t>(value, conf);
                     break;
                 case sizeof(uint16_t):
-                    applyValue<uint16_t>(value, conf);
+                    return applyValue<uint16_t>(value, conf);
                     break;
                 case sizeof(uint32_t):
-                    applyValue<uint32_t>(value, conf);
+                    return applyValue<uint32_t>(value, conf);
                     break;
                 case sizeof(uint64_t):
-                    applyValue<uint64_t>(value, conf);
+                    return applyValue<uint64_t>(value, conf);
                     break;
                 default:
                     std::cout << "Error, got integer of unexpected size " << num->getSize() << std::endl;
