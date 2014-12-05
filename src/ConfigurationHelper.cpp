@@ -304,48 +304,21 @@ bool Configuration::merge(const Configuration& other)
     return true;
 }
 
-bool ConfigurationHelper::loadConfigFile(const std::string& path)
+bool ConfigurationHelper::parseStringBuffer(Configuration &curConfig, const std::string& buffer)
 {
-    std::ifstream fin(path.c_str());
+    std::stringstream fin(buffer);
     YAML::Parser parser(fin);
 
     YAML::Node doc;
     
-    Configuration curConfig;
-    bool hasConfig = false;
-    
-    subConfigs.clear();
-    
     while(parser.GetNextDocument(doc)) {
-        //check for new configuration
-        if(doc.Type() == YAML::NodeType::Scalar)
+
+        if(doc.Type() != YAML::NodeType::Map)
         {
-            std::string value;
-            doc >> value;
-
-            std::cout << "Root is a scalar " << value << std::endl;
-
-            std::string searched("name:");
-            if(!value.compare(0, searched.size(), searched))
-            {
-                if(hasConfig)
-                {
-                    subConfigs.insert(std::make_pair(curConfig.name, curConfig));
-                }
-                
-                hasConfig = true;
-                
-                curConfig.name = value.substr(searched.size(), value.size());
-                curConfig.values.clear();
-
-                std::cout << "Found new configuration " << curConfig.name << std::endl;
-            } else
-            {
-                std::cout << "Error, this should not happen" << std::endl;
-            }
+            std::cout << "Error, configurations section should only contain yml maps" << std::endl;
+            return false;
         }
         
-        //we need to ignore the first map
         if(doc.Type() == YAML::NodeType::Map)
         {
             if(!insetMapIntoArray(doc, curConfig.values))
@@ -353,24 +326,76 @@ bool ConfigurationHelper::loadConfigFile(const std::string& path)
                 std::cout << "Warning, could not parse config" << std::endl;
             }
         }
-        
-//         std::cout << "Found a node" << std::endl;
-//         printNode(doc);
+    }
+    
+    return true;
+}
+
+
+bool ConfigurationHelper::loadConfigFile(const std::string& path)
+{
+    subConfigs.clear();
+
+    //as this is non standard yml, we need to load and parse the config file first
+    std::ifstream fin(path.c_str());
+    std::string line;
+    
+    std::string buffer;
+    
+    Configuration curConfig;
+    bool hasConfig = false;
+
+    
+    while(std::getline(fin, line))
+    {
+        if(line.size() >= 3 && line.at(0) == '-'  && line.at(1) == '-'  && line.at(2) == '-' )
+        {
+            //found new subsection
+//             std::cout << "found subsection " << line << std::endl;
+            
+            std::string searched("--- name:");
+            if(!line.compare(0, searched.size(), searched))
+            {
+
+                if(hasConfig)
+                {
+                    if(!parseStringBuffer(curConfig, buffer))
+                        return false;
+                    subConfigs.insert(std::make_pair(curConfig.name, curConfig));
+                }
+                
+                hasConfig = true;
+                
+                curConfig.name = line.substr(searched.size(), line.size());
+                curConfig.values.clear();
+
+//                 std::cout << "Found new configuration " << curConfig.name << std::endl;
+            } else
+            {
+                std::cout << "Error, sections must begin with '--- name:<SectionName>'" << std::endl;
+                return false;
+            }
+
+        } else
+        {
+            //line belongs to the last detected section, add it to the buffer
+            buffer.append(line);
+            buffer.append("\n");
+        }
     }
     
     if(hasConfig)
     {
+        if(!parseStringBuffer(curConfig, buffer))
+            return false;
         subConfigs.insert(std::make_pair(curConfig.name, curConfig));
     }
 
-    
     for(std::map<std::string, Configuration>::const_iterator it = subConfigs.begin(); it != subConfigs.end(); it++)
     {
         std::cout << "Cur conf \"" << it->first << "\"" << std::endl;
         displayConfiguration(it->second);
     }
-    
-    
     
     return true;
 }

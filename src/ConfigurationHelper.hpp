@@ -64,6 +64,7 @@ public:
 private:
     bool mergeConfig(const std::vector<std::string> &names, Configuration &result);
     bool applyConfToProperty(RTT::TaskContext* context, const std::string &propertyName, const ConfigValue &value);
+    bool parseStringBuffer(Configuration& curConfig, const std::string& buffer);
 };
 
 #endif // CONFIGURATIONHELPER_H
