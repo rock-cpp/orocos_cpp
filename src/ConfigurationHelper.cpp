@@ -698,7 +698,17 @@ bool ConfigurationHelper::applyConfToProperty(RTT::TaskContext* context, const s
     RTT::base::PropertyBase *property = context->getProperty(propertyName);
     if(!property)
     {
-        std::cout << "Error, there is no property with the name " << propertyName << " in the TaskContext " << context->getName() << std::endl;
+        std::cout << "Error, there is no property with the name '" << propertyName << "' in the TaskContext " << context->getName() << std::endl;
+        
+        RTT::PropertyBag *bag = context->properties();
+        
+        std::cout << "Known Properties " << std::endl;
+        for(RTT::base::PropertyBase *prop: *bag)
+        {
+            std::cout << "Name " << prop->getName() << std::endl;
+        }
+        
+        
         return false;
     }
 
