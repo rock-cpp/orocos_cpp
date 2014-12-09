@@ -147,6 +147,17 @@ Spawner::ProcessHandle &Spawner::spawnTask(const std::string& cmp1, const std::s
     return *handle;
 }
 
+Spawner::ProcessHandle& Spawner::spawnDeployment(const std::string& dplName)
+{
+    //FIXME check if executable exists
+
+    ProcessHandle *handle = new ProcessHandle(dplName, std::vector<std::string>());
+
+    handles.push_back(handle);
+    
+    return *handle;
+}
+
 bool Spawner::checkAllProcesses()
 {
     bool allOk = true;

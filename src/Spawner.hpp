@@ -31,6 +31,16 @@ public:
     ProcessHandle &spawnTask(const std::string &cmp1, const std::string &as = std::string());
     
     /**
+     * This method spawns a process that executes the deployment
+     * with the given name. This method will throw is any error
+     * occures.
+     * 
+     * @arg dplName Name of the deployment executable that should be started
+     * @return  A Process handle, which may be used to request the process status
+     * */
+    ProcessHandle &spawnDeployment(const std::string &dplName);
+    
+    /**
      * This method checks if all spawened processes are still alive
      * @return false if any process died
      * */
