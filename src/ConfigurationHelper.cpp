@@ -400,26 +400,6 @@ bool ConfigurationHelper::loadConfigFile(const std::string& path)
     return true;
 }
 
-bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const std::vector< std::string >& names)
-{
-    Configuration config;
-    if(!mergeConfig(names, config))
-        return false;
-    
-    
-    std::cout << "Merging complete" << std::endl;
-    
-    std::map<std::string, ConfigValue *>::const_iterator propIt;
-    for(propIt = config.values.begin(); propIt != config.values.end(); propIt++)
-    {
-        std::cout << "Applying conf to " << propIt->first << std::endl;
-        if(!applyConfToProperty(context, propIt->first, *(propIt->second)))
-            return false;
-    }
-
-    return true;
-}
-
 template <typename T>
 bool applyValue(Typelib::Value &value, const SimpleConfigValue& conf)
 {
@@ -802,4 +782,61 @@ bool ConfigurationHelper::mergeConfig(const std::vector< std::string >& names, C
     return true;
 }
 
+bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const std::vector< std::string >& names)
+{
+    Configuration config;
+    if(!mergeConfig(names, config))
+        return false;
+    
+    
+    std::cout << "Merging complete" << std::endl;
+    
+    std::map<std::string, ConfigValue *>::const_iterator propIt;
+    for(propIt = config.values.begin(); propIt != config.values.end(); propIt++)
+    {
+        std::cout << "Applying conf to " << propIt->first << std::endl;
+        if(!applyConfToProperty(context, propIt->first, *(propIt->second)))
+            return false;
+    }
+
+    return true;
+}
+
+bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const std::string& conf1)
+{
+    std::vector<std::string> configs;
+    configs.push_back(conf1);
+    
+    return applyConfig(context, configs);
+}
+
+bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const std::string& conf1, const std::string& conf2)
+{
+    std::vector<std::string> configs;
+    configs.push_back(conf1);
+    configs.push_back(conf2);
+    
+    return applyConfig(context, configs);
+}
+
+bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const std::string& conf1, const std::string& conf2, const std::string& conf3)
+{
+    std::vector<std::string> configs;
+    configs.push_back(conf1);
+    configs.push_back(conf2);
+    configs.push_back(conf3);
+    
+    return applyConfig(context, configs);
+}
+
+bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const std::string& conf1, const std::string& conf2, const std::string& conf3, const std::string& conf4)
+{
+    std::vector<std::string> configs;
+    configs.push_back(conf1);
+    configs.push_back(conf2);
+    configs.push_back(conf3);
+    configs.push_back(conf4);
+    
+    return applyConfig(context, configs);
+}
 
