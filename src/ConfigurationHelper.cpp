@@ -7,6 +7,7 @@
 #include <rtt/base/DataSourceBase.hpp>
 
 #include <boost/lexical_cast.hpp>
+#include <rtt/OperationCaller.hpp>
 
 ComplexConfigValue::ComplexConfigValue(): ConfigValue(COMPLEX)
 {
@@ -331,9 +332,19 @@ bool ConfigurationHelper::parseStringBuffer(Configuration &curConfig, const std:
     return true;
 }
 
+#include <boost/filesystem.hpp>
 
-bool ConfigurationHelper::loadConfigFile(const std::string& path)
+bool ConfigurationHelper::loadConfigFile(const std::string& pathStr)
 {
+    using namespace boost::filesystem;
+    
+    path path(pathStr);
+
+    if(!exists(path))
+    {
+        throw std::runtime_error(std::string("Error, could not find config file ") + path.c_str());
+    }
+    
     subConfigs.clear();
 
     //as this is non standard yml, we need to load and parse the config file first
@@ -792,8 +803,15 @@ bool ConfigurationHelper::mergeConfig(const std::vector< std::string >& names, C
     return true;
 }
 
-bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const std::vector< std::string >& names)
+void ConfigurationHelper::setBundlePath(const std::string& path)
 {
+    bundlePath = path;
+}
+
+bool ConfigurationHelper::applyConfig(const std::string& configFilePath, RTT::TaskContext* context, const std::vector< std::string >& names)
+{
+    loadConfigFile(configFilePath);
+    
     Configuration config;
     if(!mergeConfig(names, config))
         return false;
@@ -810,6 +828,22 @@ bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const std::vect
     }
 
     return true;
+}
+
+bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const std::vector< std::string >& names)
+{
+    if(bundlePath.empty())
+        throw std::runtime_error("Error, no bundle path set");
+    
+    //we need to figure out the model name first
+    RTT::OperationInterfacePart *op = context->getOperation("getModelName");
+    if(!op)
+        throw std::runtime_error("Could not get model name of task");
+    
+    RTT::OperationCaller< ::std::string() >  caller(op);
+    std::string modelName = caller();
+    
+    return applyConfig(bundlePath + "/config/orogen/" + modelName + ".yml", context, names);
 }
 
 bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const std::string& conf1)

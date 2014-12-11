@@ -58,14 +58,18 @@ public:
 class ConfigurationHelper
 {
     std::map<std::string, Configuration> subConfigs;
+    std::string bundlePath;
 public:
-    bool loadConfigFile(const std::string &path);
+    void setBundlePath(const std::string &path);
+    
+    bool applyConfig(const std::string &configFilePath, RTT::TaskContext *context, const std::vector<std::string> &names);
     bool applyConfig(RTT::TaskContext *context, const std::vector<std::string> &names);
     bool applyConfig(RTT::TaskContext *context, const std::string &conf1);
     bool applyConfig(RTT::TaskContext *context, const std::string &conf1, const std::string &conf2);
     bool applyConfig(RTT::TaskContext *context, const std::string &conf1, const std::string &conf2, const std::string &conf3);
     bool applyConfig(RTT::TaskContext *context, const std::string &conf1, const std::string &conf2, const std::string &conf3, const std::string &conf4);
 private:
+    bool loadConfigFile(const std::string &path);
     bool mergeConfig(const std::vector<std::string> &names, Configuration &result);
     bool applyConfToProperty(RTT::TaskContext* context, const std::string &propertyName, const ConfigValue &value);
     bool parseStringBuffer(Configuration& curConfig, const std::string& buffer);
