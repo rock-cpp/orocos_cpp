@@ -79,7 +79,13 @@ bool TransformerHelper::configureTransformer(RTT::TaskContext* task)
             }
             
             //get task context and connect them
-            RTT::corba::TaskContextProxy *proxy = RTT::corba::TaskContextProxy::Create(prov->providerName, false);
+            RTT::corba::TaskContextProxy *proxy = NULL;
+            try {
+                proxy = RTT::corba::TaskContextProxy::Create(prov->providerName, false);
+            } catch (...) {
+                std::cout << "Error, could not connect to transformation provider '" << prov->providerName << "'" << std::endl;
+                return false;
+            }
             if(!proxy)
             {
                 std::cout << "Error, could not connect to transformation provider '" << prov->providerName << "'" << std::endl;
