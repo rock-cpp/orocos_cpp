@@ -824,7 +824,10 @@ bool ConfigurationHelper::applyConfig(const std::string& configFilePath, RTT::Ta
     {
         std::cout << "Applying conf to " << propIt->first << std::endl;
         if(!applyConfToProperty(context, propIt->first, *(propIt->second)))
+        {
+            std::cout << "ERROR configuration of " << propIt->first << " failed" << std::endl;
             return false;
+        }
     }
 
     return true;
