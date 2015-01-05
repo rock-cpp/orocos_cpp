@@ -45,7 +45,7 @@ bool TransformerHelper::configureTransformer(RTT::TaskContext* task)
     for(const auto tr : robotConfiguration.getStaticTransforms())
     {
         base::samples::RigidBodyState transform;
-        transform.setTransform(tr->sourceToTarget);
+        transform.setTransform(tr->getTransformation());
         tree.addTransformation(new transformer::StaticTransformationElement(tr->getSourceFrame().getName(), tr->getTargetFrame().getName(), transform));
     }
     
