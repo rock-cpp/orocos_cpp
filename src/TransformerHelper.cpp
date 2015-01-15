@@ -42,11 +42,16 @@ bool TransformerHelper::configureTransformer(RTT::TaskContext* task)
     
     transformer::TransformationTree tree;
     
+    ::std::vector< ::base::samples::RigidBodyState > staticTransforms;
+
     for(const auto tr : robotConfiguration.getStaticTransforms())
     {
         base::samples::RigidBodyState transform;
+        transform.sourceFrame = tr->getSourceFrame().getName();
+        transform.targetFrame = tr->getTargetFrame().getName();
         transform.setTransform(tr->getTransformation());
         tree.addTransformation(new transformer::StaticTransformationElement(tr->getSourceFrame().getName(), tr->getTargetFrame().getName(), transform));
+        staticTransforms.push_back(transform);
     }
     
     for(const auto tr : robotConfiguration.getDynamicTransforms())
@@ -100,6 +105,21 @@ bool TransformerHelper::configureTransformer(RTT::TaskContext* task)
             port->connectTo(dynamicTransformsPort, conPolicy);
         }
     }
+    
+    //write static stransformations
+    RTT::base::PropertyBase *pStaticTransformationsProperty = task->getProperty("static_transformations");
+    if(!pStaticTransformationsProperty)
+    {
+        throw std::runtime_error("Error, could not get Property 'static_transformations' for transformer task " + task->getName());
+    }
+    
+    RTT::Property< ::std::vector< ::base::samples::RigidBodyState > > *staticTransformationsProperty = dynamic_cast<RTT::Property< ::std::vector< ::base::samples::RigidBodyState > > *>(pStaticTransformationsProperty);
+    if(!staticTransformationsProperty)
+    {
+        throw std::runtime_error("Error, property 'static_transformations' of task " + task->getName() + " has wrong type (not  RTT::Property< ::std::vector< ::base::samples::RigidBodyState > >)");
+    }
+
+    staticTransformationsProperty->set(staticTransforms);
     
     return true;
 }
