@@ -101,6 +101,7 @@ bool TransformerHelper::configureTransformer(RTT::TaskContext* task)
             if(!port)
             {
                 std::cout << "Error, task " << prov->providerName << " has not port named '" << prov->portName << "'"<< std::endl;
+                return false;
             }
             port->connectTo(dynamicTransformsPort, conPolicy);
         }
