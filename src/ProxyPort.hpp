@@ -145,6 +145,11 @@ public:
         }
     }
     
+    bool connectTo(InputProxyPort<T> &inputPort, RTT::ConnPolicy const& policy)
+    {
+        return port->connectTo(inputPort.port, policy);
+    };
+    
     bool connectTo(InputProxyPort<T> &inputPort)
     {
         return port->connectTo(inputPort.port);
