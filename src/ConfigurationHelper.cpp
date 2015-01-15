@@ -402,11 +402,11 @@ bool ConfigurationHelper::loadConfigFile(const std::string& pathStr)
         subConfigs.insert(std::make_pair(curConfig.name, curConfig));
     }
 
-    for(std::map<std::string, Configuration>::const_iterator it = subConfigs.begin(); it != subConfigs.end(); it++)
-    {
-        std::cout << "Cur conf \"" << it->first << "\"" << std::endl;
-        displayConfiguration(it->second);
-    }
+//     for(std::map<std::string, Configuration>::const_iterator it = subConfigs.begin(); it != subConfigs.end(); it++)
+//     {
+//         std::cout << "Cur conf \"" << it->first << "\"" << std::endl;
+//         displayConfiguration(it->second);
+//     }
     
     return true;
 }
@@ -642,7 +642,6 @@ bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
         case Typelib::Type::Container:
             {
                 const Typelib::Container &cont = dynamic_cast<const Typelib::Container &>(value.getType());
-                std::cout << cont.kind() <<std::endl;
                 if(cont.kind() == "/std/string")
                 {
                     const SimpleConfigValue &sconf = dynamic_cast<const SimpleConfigValue &>(conf);
@@ -741,7 +740,6 @@ bool ConfigurationHelper::applyConfToProperty(RTT::TaskContext* context, const s
             
     if(typelibTransport->readDataSource(*ds, handle))
     {
-        std::cout << "Got vlaue from data source" << std::endl;
 //         typelibTransport->refreshTypelibSample(handle);
     }
 
@@ -797,8 +795,8 @@ bool ConfigurationHelper::mergeConfig(const std::vector< std::string >& names, C
             return false;
     }    
     
-    std::cout << "Resulting config is :" << std::endl;
-    displayConfiguration(result);
+//     std::cout << "Resulting config is :" << std::endl;
+//     displayConfiguration(result);
     
     return true;
 }
@@ -817,12 +815,9 @@ bool ConfigurationHelper::applyConfig(const std::string& configFilePath, RTT::Ta
         return false;
     
     
-    std::cout << "Merging complete" << std::endl;
-    
     std::map<std::string, ConfigValue *>::const_iterator propIt;
     for(propIt = config.values.begin(); propIt != config.values.end(); propIt++)
     {
-        std::cout << "Applying conf to " << propIt->first << std::endl;
         if(!applyConfToProperty(context, propIt->first, *(propIt->second)))
         {
             std::cout << "ERROR configuration of " << propIt->first << " failed" << std::endl;
