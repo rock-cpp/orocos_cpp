@@ -63,7 +63,6 @@ class InputProxyPort
 public:
     InputProxyPort(RTT::base::PortInterface *iface): port(dynamic_cast<RTT::base::InputPortInterface *>(iface)), writer(NULL)
     {
-        std::cout << "Input : Iface is " << iface << std::endl;
         if(!port)
             throw std::runtime_error("Flow interface of wrong type given");
     };
@@ -112,7 +111,6 @@ class OutputProxyPort
 public:
     OutputProxyPort(RTT::base::PortInterface *iface): port(dynamic_cast<RTT::base::OutputPortInterface *>(iface)), reader(NULL)
     {
-        std::cout << "Output : Iface is " << iface << std::endl;
         if(!port)
             throw std::runtime_error("Flow interface of wrong type given");
     };
