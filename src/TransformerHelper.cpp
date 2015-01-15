@@ -22,7 +22,7 @@ public:
     std::string portName;
 };
 
-TransformerHelper::TransformerHelper(const smurf::Robot& robotConfiguration): conPolicy(RTT::ConnPolicy::circularBuffer(DEFAULT_CONNECTION_BUFFER_SIZE)), robotConfiguration(robotConfiguration)
+TransformerHelper::TransformerHelper(const smurf::Robot& robotConfiguration): conPolicy(RTT::ConnPolicy::buffer(DEFAULT_CONNECTION_BUFFER_SIZE)), robotConfiguration(robotConfiguration)
 {
 }
 
