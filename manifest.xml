@@ -8,5 +8,6 @@
   <logo>dummy-logo-url</logo>
   <depend package="base/cmake" />
   <depend package="rtt" />
+  <depend package="rtt_typelib" />
   <depend package="tools/smurf" />
 </package>
