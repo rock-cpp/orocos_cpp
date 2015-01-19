@@ -8,8 +8,12 @@
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <boost/lexical_cast.hpp>
 
-Spawner::ProcessHandle::ProcessHandle(const std::string& cmd, const std::vector<std::string> &args) : isRunning(true)
+Spawner::ProcessHandle::ProcessHandle(const std::string& cmd, const std::vector< std::string >& args, bool redirectOutputv) : isRunning(true)
 {
     pid = fork();
     
@@ -21,9 +25,14 @@ Spawner::ProcessHandle::ProcessHandle(const std::string& cmd, const std::vector<
     //we are the parent
     if(pid != 0)
         return;
+
+    //child, redirect output
+    if(redirectOutputv)
+    {
+        redirectOutput(cmd + "-" + boost::lexical_cast<std::string>(getpid()) + ".txt");
+    }
     
-    
-    //child, do the exec
+    //do the exec
     
     char * argv[args.size() + 2];
 
@@ -101,7 +110,7 @@ void Spawner::ProcessHandle::sendSigTerm() const
 }
 
 
-Spawner::ProcessHandle &Spawner::spawnTask(const std::string& cmp1, const std::string& as)
+Spawner::ProcessHandle &Spawner::spawnTask(const std::string& cmp1, const std::string& as, bool redirectOutput)
 {
     //cmp1 is expected in the format "module::TaskSpec"
     std::string::size_type pos = cmp1.find_first_of(":");
@@ -140,18 +149,18 @@ Spawner::ProcessHandle &Spawner::spawnTask(const std::string& cmp1, const std::s
         args.push_back(defaultDeploymentName  + "_Logger:" + taskName + "_Logger");
     }
     
-    ProcessHandle *handle = new ProcessHandle(defaultDeploymentName, args);
+    ProcessHandle *handle = new ProcessHandle(defaultDeploymentName, args, redirectOutput);
 
     handles.push_back(handle);
     
     return *handle;
 }
 
-Spawner::ProcessHandle& Spawner::spawnDeployment(const std::string& dplName)
+Spawner::ProcessHandle& Spawner::spawnDeployment(const std::string& dplName, bool redirectOutput)
 {
     //FIXME check if executable exists
 
-    ProcessHandle *handle = new ProcessHandle(dplName, std::vector<std::string>());
+    ProcessHandle *handle = new ProcessHandle(dplName, std::vector<std::string>(), redirectOutput);
 
     handles.push_back(handle);
     
@@ -214,4 +223,27 @@ void Spawner::killAll()
         }
     }
 }
+
+
+void Spawner::ProcessHandle::redirectOutput(const std::string& filename)
+{
+    int newFd = open(filename.c_str(), O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+    if(!newFd)
+    {
+        std::cout << "Error, could not redirect cout to " << filename << std::endl;
+        return;
+    }
+    
+    if(dup2(newFd, fileno(stdout))  == -1)
+    {
+        std::cout << "Error, could not redirect cout to " << filename << std::endl;
+        return;
+    }
+    if(dup2(newFd, fileno(stderr))  == -1)
+    {
+        std::cout << "Error, could not redirect cerr to " << filename << std::endl;
+        return;
+    }
+}
+
 

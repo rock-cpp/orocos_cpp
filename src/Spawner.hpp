@@ -12,8 +12,10 @@ public:
     {
         mutable bool isRunning;
         pid_t pid;
+        
+        void redirectOutput(const std::string &filename);
     public:
-        ProcessHandle(const std::string& cmd, const std::vector<std::string> &args);
+        ProcessHandle(const std::string& cmd, const std::vector<std::string> &args, bool redirectOutput);
         bool alive() const;
         void sendSigTerm() const;
         void sendSigKill() const;
@@ -28,7 +30,7 @@ public:
      * @arg as The name unter wich the taskmodel should be registered a the nameservice
      * @return A Process handle, which may be used to request the process status
      * */
-    ProcessHandle &spawnTask(const std::string &cmp1, const std::string &as = std::string());
+    ProcessHandle &spawnTask(const std::string &cmp1, const std::string &as = std::string(), bool redirectOutput = true);
     
     /**
      * This method spawns a process that executes the deployment
@@ -38,7 +40,7 @@ public:
      * @arg dplName Name of the deployment executable that should be started
      * @return  A Process handle, which may be used to request the process status
      * */
-    ProcessHandle &spawnDeployment(const std::string &dplName);
+    ProcessHandle &spawnDeployment(const std::string &dplName, bool redirectOutput = true);
     
     /**
      * This method checks if all spawened processes are still alive
@@ -53,6 +55,7 @@ public:
      * */
     void killAll();
 private:
+    
     std::vector<ProcessHandle *> handles;
 };
 
