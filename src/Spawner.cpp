@@ -50,6 +50,7 @@ Spawner::ProcessHandle::ProcessHandle(const std::string& cmd, const std::vector<
     //failure case
     std::cout << "Start of " << cmd << " failed:" << strerror(errno) << std::endl;
     
+    throw std::runtime_error(std::string("Start of ") + cmd + " failed:" + strerror(errno));
     
     exit(EXIT_FAILURE);
 }
