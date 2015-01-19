@@ -63,6 +63,7 @@ bool TransformerHelper::configureTransformer(RTT::TaskContext* task)
     if(!dynamicTransformsPort)
     {
         std::cout << "Error, given task " << task->getName() << " has not input port 'dynamic_transformations' " << std::endl;
+        throw std::runtime_error("Error, given task " + task->getName() + " has not input port 'dynamic_transformations' ");
         return false;
     }
     
@@ -72,6 +73,7 @@ bool TransformerHelper::configureTransformer(RTT::TaskContext* task)
         if(!tree.getTransformationChain(rbs.sourceFrame, rbs.targetFrame, result))
         {
             std::cout << "Error, there is no known transformation from " << rbs.sourceFrame << " to " << rbs.targetFrame << " which is needed by the component " << task->getName() << std::endl;
+            throw std::runtime_error("Error, there is no known transformation from " + rbs.sourceFrame + " to " + rbs.targetFrame + " which is needed by the component " + task->getName());
             return false;
         }
 
@@ -88,12 +90,13 @@ bool TransformerHelper::configureTransformer(RTT::TaskContext* task)
             try {
                 proxy = RTT::corba::TaskContextProxy::Create(prov->providerName, false);
             } catch (...) {
-                std::cout << "Error, could not connect to transformation provider '" << prov->providerName << "'" << std::endl;
-                return false;
+                //if below handles the error, nothing to do here
             }
+            
             if(!proxy)
             {
                 std::cout << "Error, could not connect to transformation provider '" << prov->providerName << "'" << std::endl;
+                throw std::runtime_error("Error, could not connect to transformation provider '" + prov->providerName + "'");
                 return false;
             }
             
@@ -101,6 +104,7 @@ bool TransformerHelper::configureTransformer(RTT::TaskContext* task)
             if(!port)
             {
                 std::cout << "Error, task " << prov->providerName << " has not port named '" << prov->portName << "'"<< std::endl;
+                throw std::runtime_error("Error, task " + prov->providerName + " has not port named '" + prov->portName + "'");
                 return false;
             }
             port->connectTo(dynamicTransformsPort, conPolicy);
