@@ -812,7 +812,10 @@ bool ConfigurationHelper::applyConfig(const std::string& configFilePath, RTT::Ta
     
     Configuration config;
     if(!mergeConfig(names, config))
+    {
+        throw std::runtime_error("Error, merging of configuarations for context " + context->getName() + " failed ");
         return false;
+    }
     
     
     std::map<std::string, ConfigValue *>::const_iterator propIt;
@@ -821,6 +824,7 @@ bool ConfigurationHelper::applyConfig(const std::string& configFilePath, RTT::Ta
         if(!applyConfToProperty(context, propIt->first, *(propIt->second)))
         {
             std::cout << "ERROR configuration of " << propIt->first << " failed" << std::endl;
+            throw std::runtime_error("ERROR configuration of "  + propIt->first + " failed for context " + context->getName());
             return false;
         }
     }
