@@ -7,6 +7,7 @@ rock_library(orocos_cpp
         ConfigurationHelper.cpp
         TransformerHelper.cpp
         Spawner.cpp
+        ProxyPort.cpp
     HEADERS 
         corba.hh
         corba_name_service_client.hh
