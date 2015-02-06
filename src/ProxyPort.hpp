@@ -47,15 +47,21 @@ public:
         clientTask->addPort(*localPort);
         localPort->connectTo(port);
     }
-    
+
     void write(const T &sample)
     {
         localPort->write(sample);
     };
 };
 
+class ProxyPortBase
+{
+protected:
+    std::string getFreePortName(RTT::TaskContext *clientTask, RTT::base::PortInterface *portIf);
+};
+
 template<typename T>
-class InputProxyPort
+class InputProxyPort : public ProxyPortBase
 {
     friend class OutputProxyPort<T>;
     RTT::base::InputPortInterface *port;
@@ -79,6 +85,7 @@ public:
         {
             writer = dynamic_cast<RTT::OutputPort<T> * >(port->antiClone());
             RTT::TaskContext *clientTask = getClientTask();
+            writer->setName(getFreePortName(clientTask, port));
             clientTask->addPort(*writer);
             port->connectTo(writer, policy);
         }
@@ -103,7 +110,7 @@ public:
 };
 
 template<typename T>
-class OutputProxyPort
+class OutputProxyPort : public ProxyPortBase
 {
     friend class InputProxyPort<T>;
     RTT::base::OutputPortInterface *port;
@@ -126,6 +133,7 @@ public:
         {
             reader = dynamic_cast<RTT::InputPort<T> *>(port->antiClone());
             RTT::TaskContext *clientTask = getClientTask();
+            reader->setName(getFreePortName(clientTask, port));
             clientTask->addPort(*reader);
             reader->connectTo(port, policy);
         }
