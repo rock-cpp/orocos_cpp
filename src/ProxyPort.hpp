@@ -46,7 +46,8 @@ public:
             RTT::TaskContext *clientTask = getClientTask();
             writer->setName(getFreePortName(clientTask, port));
             clientTask->addPort(*writer);
-            port->connectTo(writer, policy);
+            if(!port->connectTo(writer, policy))
+                throw std::runtime_error("InputProxyPort::getWriter(): Error could not connect writer to port " + port->getName() + " of task " + port->getInterface()->getOwner()->getName());
         }
         return *writer;
     };
@@ -94,9 +95,9 @@ public:
             RTT::TaskContext *clientTask = getClientTask();
             reader->setName(getFreePortName(clientTask, port));
             clientTask->addPort(*reader);
-            reader->connectTo(port, policy);
-        }
-        
+            if(!reader->connectTo(port, policy))
+                throw std::runtime_error("InputProxyPort::getReader(): Error could not connect reader to port " + port->getName() + " of task " + port->getInterface()->getOwner()->getName());
+        }        
         return *reader;
     };    
 
