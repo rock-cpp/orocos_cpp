@@ -13,47 +13,6 @@ class OutputProxyPort;
 template<typename T>
 class InputProxyPort;
 
-template<typename T>
-class ProxyReader
-{
-    RTT::InputPort<T> *localPort;
-public:
-    ProxyReader(RTT::base::OutputPortInterface *port): localPort()
-    {
-        if(!localPort)
-            throw std::runtime_error("Error, could not create ProxyReader");
-        
-        RTT::TaskContext *clientTask = getClientTask();
-        clientTask->addPort(*localPort);
-        port->connectTo(localPort);
-    }
-    RTT::FlowStatus read(T &sample, bool copy_old_data = true)
-    {
-        return localPort->read(sample, copy_old_data);
-    };
-};
-
-template<typename T>
-class ProxyWriter
-{
-    RTT::OutputPort<T> *localPort;
-public:
-    ProxyWriter(RTT::base::InputPortInterface *port): localPort(dynamic_cast<RTT::OutputPort<T> * >(port->antiClone()))
-    {
-        if(!localPort)
-            throw std::runtime_error("Error, could not create ProxyWriter");
-        
-        RTT::TaskContext *clientTask = getClientTask();
-        clientTask->addPort(*localPort);
-        localPort->connectTo(port);
-    }
-
-    void write(const T &sample)
-    {
-        localPort->write(sample);
-    };
-};
-
 class ProxyPortBase
 {
 protected:
