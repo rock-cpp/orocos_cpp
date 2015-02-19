@@ -7,6 +7,8 @@ rock_library(orocos_cpp
         ConfigurationHelper.cpp
         TransformerHelper.cpp
         Spawner.cpp
+        NameService.cpp
+        CorbaNameService.cpp
         ProxyPort.cpp
     HEADERS 
         corba.hh
@@ -16,6 +18,8 @@ rock_library(orocos_cpp
         ConfigurationHelper.hpp
         TransformerHelper.hpp
         Spawner.hpp
+        NameService.hpp
+        CorbaNameService.hpp
     DEPS_PKGCONFIG
         rtt_typelib-${OROCOS_TARGET}
         orocos-rtt-${OROCOS_TARGET}
