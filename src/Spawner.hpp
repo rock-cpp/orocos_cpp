@@ -4,15 +4,23 @@
 #include <unistd.h>
 #include <string>
 #include <vector>
+#include <base/Time.hpp>
+#include "NameService.hpp"
 
 class Spawner
 {
+    std::string logDir;
+    
+    //list of tasks that were spawned, but are not yet reachable.
+    std::vector<std::string> notReadyList;
+    
+    NameService *nameService;
+    
 public:
     class ProcessHandle
     {
         mutable bool isRunning;
         pid_t pid;
-        
         void redirectOutput(const std::string &filename);
     public:
         ProcessHandle(const std::string& cmd, const std::vector<std::string> &args, bool redirectOutput, const std::string &logDir);
@@ -20,8 +28,6 @@ public:
         void sendSigTerm() const;
         void sendSigKill() const;
     };
-    
-    std::string logDir;
     
 public:
     /**
@@ -55,6 +61,28 @@ public:
      * @return false if any process died
      * */
     bool checkAllProcesses();
+
+    /**
+     * This method checks if all spawned tasks registered 
+     * at the nameservice. 
+     * */
+    bool allReady();
+    
+    /**
+     * Waits up to the given timeout for all tasks, to
+     * be connectable via the nameservice.
+     * Will throw an runtime error if not all tasks could
+     * be reached.
+     * */
+    void waitUntilAllReady(const base::Time &timeout);
+    
+    /**
+     * This method adds a task lookup name, to the list of
+     * processes that are checked by allReady(). This is
+     * needed as a workaround, as we don't known the name
+     * of the tasks int the deployment case.
+     * */
+    void addReadyCandidate(const std::string &name);
     
     /**
      * This method first sends a sigterm to all processes

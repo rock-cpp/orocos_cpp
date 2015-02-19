@@ -13,6 +13,7 @@
 #include <fcntl.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
+#include "CorbaNameService.hpp"
 
 Spawner::ProcessHandle::ProcessHandle(const std::string& cmd, const std::vector< std::string >& args, bool redirectOutputv, const std::string &logDir) : isRunning(true)
 {
@@ -130,7 +131,8 @@ Spawner::Spawner()
         i++;
     }
 
-    
+    nameService = new CorbaNameService();
+    nameService->connect();
 }
 
 Spawner::ProcessHandle &Spawner::spawnTask(const std::string& cmp1, const std::string& as, bool redirectOutput)
@@ -176,6 +178,8 @@ Spawner::ProcessHandle &Spawner::spawnTask(const std::string& cmp1, const std::s
 
     handles.push_back(handle);
     
+    notReadyList.push_back(taskName);
+    
     return *handle;
 }
 
@@ -204,6 +208,50 @@ bool Spawner::checkAllProcesses()
     }
     return allOk;
 }
+
+bool Spawner::allReady()
+{
+    auto it = notReadyList.begin();
+    for(;it != notReadyList.end(); it++)
+    {
+        if(nameService->isRegistered(*it))
+        {
+            it = notReadyList.erase(it);
+        }
+        
+        if(it == notReadyList.end())
+            break;
+    }
+    
+    return notReadyList.empty();
+}
+
+void Spawner::waitUntilAllReady(const base::Time& timeout)
+{
+    base::Time start = base::Time::now();
+    while(!allReady())
+    {
+        usleep(10000);
+        
+        if(base::Time::now() - start > timeout)
+        {
+            std::cout << "Spawner::waitUntilAllReady: Error the tasks :" << std::endl;
+            for(const std::string &name: notReadyList)
+            {
+                std::cout << "    " << name << std::endl;
+            }
+            std::cout << "did not register at nameservice" << std::endl;
+            killAll();
+            throw std::runtime_error("Spawner::waitUntilAllReady: Error timeout while waiting for tasks to register at nameservice");
+        }
+    }
+}
+
+void Spawner::addReadyCandidate(const std::string& name)
+{
+    notReadyList.push_back(name);
+}
+
 
 void Spawner::killAll()
 {
