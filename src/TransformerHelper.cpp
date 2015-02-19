@@ -29,12 +29,16 @@ TransformerHelper::TransformerHelper(const smurf::Robot& robotConfiguration): co
 
 bool TransformerHelper::configureTransformer(RTT::TaskContext* task)
 {
-    RTT::OperationInterfacePart *op = task->getOperation("getNeededTransformations");
-
+    const std::string opName("getNeededTransformations");
+    
     //test if the task acutally uses the transformer
-    if(!op)
+    if(!task->provides()->hasOperation(opName))
         //does not, we take this as successfully configured
         return true;
+    
+    
+    RTT::OperationInterfacePart *op = task->getOperation(opName);
+
     
     RTT::OperationCaller< ::std::vector< ::base::samples::RigidBodyState >() >  caller(op);
 
