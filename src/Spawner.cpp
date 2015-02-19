@@ -127,6 +127,7 @@ Spawner::Spawner()
     while(boost::filesystem::exists(logDir))
     {
         logDir = base + "." + boost::lexical_cast<std::string>(i);
+        i++;
     }
 
     
