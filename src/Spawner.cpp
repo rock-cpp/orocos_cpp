@@ -12,8 +12,9 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <boost/lexical_cast.hpp>
+#include <boost/filesystem.hpp>
 
-Spawner::ProcessHandle::ProcessHandle(const std::string& cmd, const std::vector< std::string >& args, bool redirectOutputv) : isRunning(true)
+Spawner::ProcessHandle::ProcessHandle(const std::string& cmd, const std::vector< std::string >& args, bool redirectOutputv, const std::string &logDir) : isRunning(true)
 {
     pid = fork();
     
@@ -29,7 +30,12 @@ Spawner::ProcessHandle::ProcessHandle(const std::string& cmd, const std::vector<
     //child, redirect output
     if(redirectOutputv)
     {
-        redirectOutput(cmd + "-" + boost::lexical_cast<std::string>(getpid()) + ".txt");
+        //check if directory exists, and create if not
+        if(!boost::filesystem::exists(logDir))
+        {
+            boost::filesystem::create_directory(logDir);
+        }
+        redirectOutput(logDir + "/" + cmd + "-" + boost::lexical_cast<std::string>(getpid()) + ".txt");
     }
     
     //do the exec
@@ -110,6 +116,21 @@ void Spawner::ProcessHandle::sendSigTerm() const
     }
 }
 
+Spawner::Spawner()
+{
+    base::Time curTime = base::Time::now();
+    logDir = curTime.toString(base::Time::Seconds, "%Y%m%d-%H%M");
+
+    //use other directory if log dir already exists
+    std::string base = logDir;
+    int i = 1;
+    while(boost::filesystem::exists(logDir))
+    {
+        logDir = base + "." + boost::lexical_cast<std::string>(i);
+    }
+
+    
+}
 
 Spawner::ProcessHandle &Spawner::spawnTask(const std::string& cmp1, const std::string& as, bool redirectOutput)
 {
@@ -150,7 +171,7 @@ Spawner::ProcessHandle &Spawner::spawnTask(const std::string& cmp1, const std::s
         args.push_back(defaultDeploymentName  + "_Logger:" + taskName + "_Logger");
     }
     
-    ProcessHandle *handle = new ProcessHandle(defaultDeploymentName, args, redirectOutput);
+    ProcessHandle *handle = new ProcessHandle(defaultDeploymentName, args, redirectOutput, logDir);
 
     handles.push_back(handle);
     
@@ -161,7 +182,7 @@ Spawner::ProcessHandle& Spawner::spawnDeployment(const std::string& dplName, boo
 {
     //FIXME check if executable exists
 
-    ProcessHandle *handle = new ProcessHandle(dplName, std::vector<std::string>(), redirectOutput);
+    ProcessHandle *handle = new ProcessHandle(dplName, std::vector<std::string>(), redirectOutput, logDir);
 
     handles.push_back(handle);
     

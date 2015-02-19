@@ -15,12 +15,20 @@ public:
         
         void redirectOutput(const std::string &filename);
     public:
-        ProcessHandle(const std::string& cmd, const std::vector<std::string> &args, bool redirectOutput);
+        ProcessHandle(const std::string& cmd, const std::vector<std::string> &args, bool redirectOutput, const std::string &logDir);
         bool alive() const;
         void sendSigTerm() const;
         void sendSigKill() const;
     };
+    
+    std::string logDir;
+    
 public:
+    /**
+     * Default constructor
+     * */
+    Spawner();
+    
     /**
      * This method spawns a default deployment matching the given componente description.
      * If a second argument is given, the task will be renamed to the given name.
