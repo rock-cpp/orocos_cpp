@@ -10,4 +10,5 @@
   <depend package="rtt" />
   <depend package="rtt_typelib" />
   <depend package="tools/smurf" />
+  <depend package="drivers/transformer" />
 </package>
