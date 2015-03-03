@@ -14,7 +14,6 @@
 #include <vector>
 #include <string>
 #include "TaskContextC.h"
-#include <rtt/transports/corba/TaskContextProxy.hpp>
 #include <boost/thread/mutex.hpp>
 
 namespace corba

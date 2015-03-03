@@ -6,6 +6,8 @@
 #define TOPIC "TaskContexts"    
 
 #include "corba_name_service_client.hh"
+#include <rtt/transports/corba/ApplicationServer.hpp>
+
 using namespace corba;
 
 NameServiceClient::NameServiceClient(std::string name_service_ip,std::string name_service_port):
