@@ -40,6 +40,9 @@ rock_executable(proxyTest main2.cpp
 rock_executable(config main3.cpp
     DEPS orocos_cpp)
 
+rock_executable(nameservice main4.cpp
+    DEPS orocos_cpp)
+
 # target_link_libraries(listAll rtt-typekit-gnulinux)
 
 # orogen_pkg_check_modules(base_TYPEKIT REQUIRED base-typekit-gnulinux)
