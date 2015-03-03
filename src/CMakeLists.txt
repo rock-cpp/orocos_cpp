@@ -6,6 +6,7 @@ rock_library(orocos_cpp
         corba_name_service_client.cc
         ConfigurationHelper.cpp
         TransformerHelper.cpp
+        LoggingHelper.cpp
         Spawner.cpp
         NameService.cpp
         CorbaNameService.cpp
@@ -15,6 +16,7 @@ rock_library(orocos_cpp
         corba_name_service_client.hh
         ConfigurationHelper.hpp
         TransformerHelper.hpp
+        LoggingHelper.hpp
         Spawner.hpp
         NameService.hpp
         CorbaNameService.hpp
@@ -28,6 +30,7 @@ rock_library(orocos_cpp
         yaml-cpp
         transformer
         smurf
+        logger-proxies
     DEPS_PLAIN 
         Boost_SYSTEM Boost_FILESYSTEM Boost_THREAD
     )

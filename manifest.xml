@@ -11,4 +11,5 @@
   <depend package="rtt_typelib" />
   <depend package="tools/smurf" />
   <depend package="drivers/transformer" />
+  <depend package="tools/logger" />
 </package>

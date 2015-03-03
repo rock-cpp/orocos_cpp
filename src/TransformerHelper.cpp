@@ -36,10 +36,7 @@ bool TransformerHelper::configureTransformer(RTT::TaskContext* task)
         //does not, we take this as successfully configured
         return true;
     
-    
     RTT::OperationInterfacePart *op = task->getOperation(opName);
-
-    
     RTT::OperationCaller< ::std::vector< ::base::samples::RigidBodyState >() >  caller(op);
 
     ::std::vector< ::base::samples::RigidBodyState > neededTransforms = caller();
