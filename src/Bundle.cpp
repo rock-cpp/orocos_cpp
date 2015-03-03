@@ -11,17 +11,19 @@ Bundle * Bundle::instance;
 
 Bundle::Bundle()
 {
-    activeBundle = getenv("ROCK_BUNDLE");
-    if(activeBundle.empty())
+    const char *activeBundleC = getenv("ROCK_BUNDLE");
+    if(!activeBundleC)
     {
         throw std::runtime_error("Error, no active bundle configured. Please use 'rock-bundle-default' to set one.");
     }
-    
-    std::string paths = getenv("ROCK_BUNDLE_PATH");
-    if(paths.empty())
+    activeBundle = activeBundleC;
+
+    const char *pathsC = getenv("ROCK_BUNDLE_PATH");
+    if(!pathsC)
     {
         throw std::runtime_error("Internal Error, no bundle path found.");
     }
+    std::string paths = pathsC;
     
     boost::char_separator<char> sep(":");
     boost::tokenizer<boost::char_separator<char> > tokens(paths, sep);
