@@ -1,6 +1,7 @@
 find_package( Boost COMPONENTS thread system filesystem)
 rock_library(orocos_cpp
     SOURCES 
+        Bundle.cpp
         corba.cc
         corba_name_service_client.cc
         ConfigurationHelper.cpp
@@ -9,6 +10,7 @@ rock_library(orocos_cpp
         NameService.cpp
         CorbaNameService.cpp
     HEADERS 
+        Bundle.hpp
         corba.hh
         corba_name_service_client.hh
         ConfigurationHelper.hpp
