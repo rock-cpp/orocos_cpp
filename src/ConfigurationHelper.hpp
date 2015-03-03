@@ -58,10 +58,8 @@ public:
 class ConfigurationHelper
 {
     std::map<std::string, Configuration> subConfigs;
-    std::string bundlePath;
 public:
-    void setBundlePath(const std::string &path);
-    
+
     bool applyConfig(const std::string &configFilePath, RTT::TaskContext *context, const std::vector<std::string> &names);
     bool applyConfig(RTT::TaskContext *context, const std::vector<std::string> &names);
     bool applyConfig(RTT::TaskContext *context, const std::string &conf1);

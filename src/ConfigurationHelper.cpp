@@ -8,6 +8,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <rtt/OperationCaller.hpp>
+#include "Bundle.hpp"
 
 ComplexConfigValue::ComplexConfigValue(): ConfigValue(COMPLEX)
 {
@@ -801,11 +802,6 @@ bool ConfigurationHelper::mergeConfig(const std::vector< std::string >& names, C
     return true;
 }
 
-void ConfigurationHelper::setBundlePath(const std::string& path)
-{
-    bundlePath = path;
-}
-
 bool ConfigurationHelper::applyConfig(const std::string& configFilePath, RTT::TaskContext* context, const std::vector< std::string >& names)
 {
     loadConfigFile(configFilePath);
@@ -834,8 +830,7 @@ bool ConfigurationHelper::applyConfig(const std::string& configFilePath, RTT::Ta
 
 bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const std::vector< std::string >& names)
 {
-    if(bundlePath.empty())
-        throw std::runtime_error("Error, no bundle path set");
+    Bundle &bundle(Bundle::getInstance());
     
     //we need to figure out the model name first
     RTT::OperationInterfacePart *op = context->getOperation("getModelName");
@@ -845,7 +840,10 @@ bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const std::vect
     RTT::OperationCaller< ::std::string() >  caller(op);
     std::string modelName = caller();
     
-    return applyConfig(bundlePath + "/config/orogen/" + modelName + ".yml", context, names);
+    if(modelName.empty())
+        throw std::runtime_error("ConfigurationHelper::applyConfig error, context did not give a valid model name (none at all)");
+    
+    return applyConfig(bundle.getConfigurationDirectory() + modelName + ".yml", context, names);
 }
 
 bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const std::string& conf1)
