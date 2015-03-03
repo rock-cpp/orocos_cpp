@@ -1,9 +1,9 @@
-#include "ProxyPort.hpp"
+#include <orocos_cpp_base/ProxyPort.hpp>
 #include <rtt/transports/corba/TaskContextProxy.hpp>
 #include <rtt/Property.hpp>
 #include "corba.hh"
 #include "corba_name_service_client.hh"
-#include "OrocosHelpers.hpp"
+#include <orocos_cpp_base/OrocosHelpers.hpp>
 
 class MirrorProxy: public RTT::corba::TaskContextProxy
 {

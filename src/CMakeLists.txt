@@ -3,24 +3,21 @@ rock_library(orocos_cpp
     SOURCES 
         corba.cc
         corba_name_service_client.cc
-        OrocosHelpers.cpp
         ConfigurationHelper.cpp
         TransformerHelper.cpp
         Spawner.cpp
         NameService.cpp
         CorbaNameService.cpp
-        ProxyPort.cpp
     HEADERS 
         corba.hh
         corba_name_service_client.hh
-        OrocosHelpers.hpp
-        ProxyPort.hpp
         ConfigurationHelper.hpp
         TransformerHelper.hpp
         Spawner.hpp
         NameService.hpp
         CorbaNameService.hpp
     DEPS_PKGCONFIG
+        orocos_cpp_base
         rtt_typelib-${OROCOS_TARGET}
         orocos-rtt-${OROCOS_TARGET}
         orocos-rtt-mqueue-${OROCOS_TARGET}
