@@ -14,6 +14,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
 #include "CorbaNameService.hpp"
+#include "Bundle.hpp"
 
 Spawner::ProcessHandle::ProcessHandle(const std::string& cmd, const std::vector< std::string >& args, bool redirectOutputv, const std::string &logDir) : isRunning(true)
 {
@@ -119,17 +120,8 @@ void Spawner::ProcessHandle::sendSigTerm() const
 
 Spawner::Spawner()
 {
-    base::Time curTime = base::Time::now();
-    logDir = curTime.toString(base::Time::Seconds, "%Y%m%d-%H%M");
-
-    //use other directory if log dir already exists
-    std::string base = logDir;
-    int i = 1;
-    while(boost::filesystem::exists(logDir))
-    {
-        logDir = base + "." + boost::lexical_cast<std::string>(i);
-        i++;
-    }
+    //log dir always exists if requested from bundle
+    logDir = Bundle::getInstance().getLogDirectory();
 
     nameService = new CorbaNameService();
     nameService->connect();
