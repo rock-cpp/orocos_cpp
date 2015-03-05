@@ -13,7 +13,7 @@ int main(int argc, char**argv)
     loadAllPluginsInDir("/home/scotch/coyote/install/lib/orocos/gnulinux/types/");
     loadAllPluginsInDir("/home/scotch/coyote/install/lib/orocos/types/");
 
-    Spawner spawner;
+    Spawner &spawner(Spawner::getInstace());
     
     spawner.spawnTask("hokuyo::Task", "hokuyo");
 
