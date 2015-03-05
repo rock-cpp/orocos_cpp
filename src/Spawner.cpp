@@ -15,8 +15,63 @@
 #include <boost/filesystem.hpp>
 #include "CorbaNameService.hpp"
 #include "Bundle.hpp"
+#include <signal.h>
+
 Spawner *Spawner::instance;
 
+struct sigaction originalSignalHandler[SIGTERM];
+
+void shutdownHandler(int signum, siginfo_t *info, void *data);
+
+void restoreSignalHandler(int signum)
+{
+    if(sigaction(signum, originalSignalHandler + signum, nullptr))
+    {
+        throw std::runtime_error("Error, failed to reregister original signal handler");
+    }    
+}
+
+void setSignalHandler(int signum)
+{
+    struct sigaction act;
+
+    act.sa_sigaction = shutdownHandler;
+    
+    /* The SA_SIGINFO flag tells sigaction() to use the sa_sigaction field, not sa_handler. */
+    act.sa_flags = SA_SIGINFO;
+    
+    if(sigaction(signum, &act, originalSignalHandler + signum))
+    {
+        throw std::runtime_error("Error, failed to register signal handler");
+    }
+}
+
+void shutdownHandler(int signum, siginfo_t *info, void *data)
+{
+    std::cout << "Shutdown: trying to kill all childs" << std::endl;
+    
+    Spawner::getInstace().killAll();
+    std::cout << "Done " << std::endl;
+
+    restoreSignalHandler(signum);
+    raise(signum);
+    
+}
+
+Spawner::Spawner()
+{
+    //log dir always exists if requested from bundle
+    logDir = Bundle::getInstance().getLogDirectory();
+
+    nameService = new CorbaNameService();
+    nameService->connect();
+
+    setSignalHandler(SIGINT);
+    setSignalHandler(SIGQUIT);
+    setSignalHandler(SIGABRT);
+    setSignalHandler(SIGSEGV);
+    setSignalHandler(SIGTERM);
+}
 
 Spawner& Spawner::getInstace()
 {
@@ -82,7 +137,9 @@ bool Spawner::ProcessHandle::alive() const
     pid_t ret = waitpid(pid, &status, WNOHANG);
     
     if(ret < 0 )
-        throw std::runtime_error("WaitPid failed ");
+    {
+        throw std::runtime_error(std::string("WaitPid failed ") + strerror(errno));
+    }
     
     if(!status)
     {
@@ -131,14 +188,7 @@ void Spawner::ProcessHandle::sendSigTerm() const
     }
 }
 
-Spawner::Spawner()
-{
-    //log dir always exists if requested from bundle
-    logDir = Bundle::getInstance().getLogDirectory();
 
-    nameService = new CorbaNameService();
-    nameService->connect();
-}
 
 Spawner::ProcessHandle &Spawner::spawnTask(const std::string& cmp1, const std::string& as, bool redirectOutput)
 {
