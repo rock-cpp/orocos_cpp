@@ -741,12 +741,18 @@ bool ConfigurationHelper::applyConfToProperty(RTT::TaskContext* context, const s
             
     if(typelibTransport->readDataSource(*ds, handle))
     {
-//         typelibTransport->refreshTypelibSample(handle);
+        //we need to do this, in case that it is an opaque
+        typelibTransport->refreshTypelibSample(handle);
     }
 
     if(!applyConfOnTyplibValue(dest, value))
         return false;
     
+
+    //we modified the typlib samples, so we need to trigger the opaque
+    //function here, to generate an updated orocos sample
+    typelibTransport->refreshOrocosSample(handle);
+
     //write value back
     typelibTransport->writeDataSource(*ds, handle);
     
