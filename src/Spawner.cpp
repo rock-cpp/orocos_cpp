@@ -15,6 +15,19 @@
 #include <boost/filesystem.hpp>
 #include "CorbaNameService.hpp"
 #include "Bundle.hpp"
+Spawner *Spawner::instance;
+
+
+Spawner& Spawner::getInstace()
+{
+    if(!instance)
+    {
+        instance = new Spawner();
+    }
+    
+    return *instance;
+}
+
 
 Spawner::ProcessHandle::ProcessHandle(const std::string& cmd, const std::vector< std::string >& args, bool redirectOutputv, const std::string &logDir) : isRunning(true)
 {

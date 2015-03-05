@@ -16,6 +16,13 @@ class Spawner
     
     NameService *nameService;
     
+    /**
+     * Default constructor
+     * */
+    Spawner();    
+
+    static Spawner *instance;
+    
 public:
     class ProcessHandle
     {
@@ -28,12 +35,14 @@ public:
         void sendSigTerm() const;
         void sendSigKill() const;
     };
-    
+
 public:
+    
     /**
-     * Default constructor
+     * Singleton pattern, returns the ONE instance of
+     * the spawner.
      * */
-    Spawner();
+    static Spawner &getInstace();
     
     /**
      * This method spawns a default deployment matching the given componente description.
