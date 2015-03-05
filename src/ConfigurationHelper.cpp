@@ -604,8 +604,27 @@ bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
     switch(value.getType().getCategory())
     {
         case Typelib::Type::Array:
-            std::cout << "Warning, array is not supported " << std::endl;
-            break;
+        {
+            const ArrayConfigValue &arrayConfig = dynamic_cast<const ArrayConfigValue &>(conf);
+            const Typelib::Array &array = dynamic_cast<const Typelib::Array &>(value.getType());
+            const Typelib::Type &indirect = array.getIndirection();
+            
+            size_t arraySize = array.getDimension();
+            
+            if(arrayConfig.values.size() != arraySize)
+            {
+                std::cout << "Error: Array " << arrayConfig.name << " of properties has different size than array in config file" << std::endl;
+                return false;
+            }
+            
+            for(size_t i = 0;i < arraySize; i++)
+            {
+                size_t offset =  indirect.getSize() * i;
+                Typelib::Value v( reinterpret_cast<uint8_t *>(value.getData()) + offset , indirect);
+                applyConfOnTyplibValue(v, *(arrayConfig.values[i]));
+            }
+        }
+        break;
         case Typelib::Type::Compound:
         {
             const Typelib::Compound &comp = dynamic_cast<const Typelib::Compound &>(value.getType());
