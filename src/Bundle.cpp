@@ -68,7 +68,7 @@ bool Bundle::createLogDirectory()
         i++;
     }
 
-    if(!boost::filesystem::create_directory(logDir))
+    if(!boost::filesystem::create_directories(logDir))
     {
         throw std::runtime_error("Failed to create log directory :" + logDir);
     }
