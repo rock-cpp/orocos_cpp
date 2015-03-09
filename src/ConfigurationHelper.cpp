@@ -621,7 +621,8 @@ bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
             {
                 size_t offset =  indirect.getSize() * i;
                 Typelib::Value v( reinterpret_cast<uint8_t *>(value.getData()) + offset , indirect);
-                applyConfOnTyplibValue(v, *(arrayConfig.values[i]));
+                if(!applyConfOnTyplibValue(v, *(arrayConfig.values[i])))
+                    return false;
             }
         }
         break;
@@ -645,7 +646,8 @@ bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
                 
                 cpx.values.erase(it->getName());
                 
-                applyConfOnTyplibValue(fieldValue, *curConf);
+                if(!applyConfOnTyplibValue(fieldValue, *curConf))
+                    return false;
             }
             if(!cpx.values.empty())
             {
@@ -698,7 +700,10 @@ bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
                         //TODO check, this may be a memory leak
                         Typelib::Value v(new uint8_t[indirect.getSize()], indirect);
                         
-                        applyConfOnTyplibValue(v, *(*it));
+                        if(!applyConfOnTyplibValue(v, *(*it)))
+                        {
+                            return false;
+                        }
                         
                         cont.push(value.getData(), v);
                     }
@@ -709,7 +714,7 @@ bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
             return applyConfOnTypelibEnum(value, dynamic_cast<const SimpleConfigValue &>(conf));
             break;
         case Typelib::Type::Numeric:
-            applyConfOnTypelibNumeric(value, dynamic_cast<const SimpleConfigValue &>(conf));
+            return applyConfOnTypelibNumeric(value, dynamic_cast<const SimpleConfigValue &>(conf));
             break;
         case Typelib::Type::Opaque:
             std::cout << "Warning, opaque is not supported" << std::endl;
