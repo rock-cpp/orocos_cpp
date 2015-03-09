@@ -483,7 +483,14 @@ bool applyConfOnTypelibEnum(Typelib::Value &value, const SimpleConfigValue& conf
         for(const std::pair<std::string, int> &v : myenum->values())
         {
             if(!v.first.empty())
-                std::cout << v.first.substr(1, v.first.size()) << std::endl;
+            {
+                if(v.first.at(0) == ':')
+                    enumName = v.first.substr(1, v.first.size());
+                else
+                    enumName = v.first;
+
+                std::cout << enumName << std::endl;
+            }
         }
         return false;
     }
