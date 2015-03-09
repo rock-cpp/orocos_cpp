@@ -467,8 +467,12 @@ bool applyConfOnTypelibEnum(Typelib::Value &value, const SimpleConfigValue& conf
         return false;
     }
     
-    //values are given as RUBY constants. We need to remove the ':' in front of them
-    std::string enumName = conf.value.substr(1, conf.value.size());
+    //values are sometimes given as RUBY constants. We need to remove the ':' in front of them
+    std::string enumName;
+    if(conf.value.at(0) == ':')
+        enumName = conf.value.substr(1, conf.value.size());
+    else
+        enumName = conf.value;
     
     std::map<std::string, int>::const_iterator it = myenum->values().find(enumName);
     
