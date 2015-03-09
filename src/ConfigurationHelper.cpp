@@ -463,6 +463,11 @@ bool applyConfOnTypelibEnum(Typelib::Value &value, const SimpleConfigValue& conf
 
     std::map<std::string, int>::const_iterator it = myenum->values().find(conf.value);
     
+    //values are given as RUBY constants. We need to remove the ':' in front of them
+    std::string enumName = conf.value.substr(1, conf.value.size());
+    
+    std::map<std::string, int>::const_iterator it = myenum->values().find(enumName);
+    
     if(it == myenum->values().end())
     {
         std::cout << "Error : " << conf.value << " is not a valid enum name " << std::endl;
