@@ -461,7 +461,11 @@ bool applyConfOnTypelibEnum(Typelib::Value &value, const SimpleConfigValue& conf
 {
     const Typelib::Enum *myenum = dynamic_cast<const Typelib::Enum *>(&(value.getType()));
 
-    std::map<std::string, int>::const_iterator it = myenum->values().find(conf.value);
+    if(conf.value.empty())
+    {
+        std::cout << "Error, given enum is an empty string" << std::endl;
+        return false;
+    }
     
     //values are given as RUBY constants. We need to remove the ':' in front of them
     std::string enumName = conf.value.substr(1, conf.value.size());
@@ -471,6 +475,12 @@ bool applyConfOnTypelibEnum(Typelib::Value &value, const SimpleConfigValue& conf
     if(it == myenum->values().end())
     {
         std::cout << "Error : " << conf.value << " is not a valid enum name " << std::endl;
+        std::cout << "Valid enum names :" << std::endl;
+        for(const std::pair<std::string, int> &v : myenum->values())
+        {
+            if(!v.first.empty())
+                std::cout << v.first.substr(1, v.first.size()) << std::endl;
+        }
         return false;
     }
     
