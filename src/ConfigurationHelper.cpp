@@ -706,6 +706,7 @@ bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
             }
             break;
         case Typelib::Type::Enum:
+            return applyConfOnTypelibEnum(value, dynamic_cast<const SimpleConfigValue &>(conf));
             break;
         case Typelib::Type::Numeric:
             applyConfOnTypelibNumeric(value, dynamic_cast<const SimpleConfigValue &>(conf));
