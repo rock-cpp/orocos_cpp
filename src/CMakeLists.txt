@@ -8,6 +8,7 @@ rock_library(orocos_cpp
         Spawner.cpp
         NameService.cpp
         CorbaNameService.cpp
+        Deployment.cpp
     HEADERS 
         Bundle.hpp
         ConfigurationHelper.hpp
@@ -16,6 +17,7 @@ rock_library(orocos_cpp
         Spawner.hpp
         NameService.hpp
         CorbaNameService.hpp
+        Deployment.hpp
     DEPS_PKGCONFIG
         orocos_cpp_base
         rtt_typelib-${OROCOS_TARGET}
