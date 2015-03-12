@@ -8,7 +8,7 @@ class LoggingHelper
     const int DEFAULT_LOG_BUFFER_SIZE;
 public:
     LoggingHelper();
-    bool logAllPorts(RTT::TaskContext *context, const std::vector<std::string> excludeList = std::vector<std::string>());
+    bool logAllPorts(RTT::TaskContext *context,  const std::string &loggerName, const std::vector<std::string> excludeList = std::vector<std::string>());
     bool logAllTask();
 };
 

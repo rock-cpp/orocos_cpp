@@ -24,13 +24,10 @@ bool LoggingHelper::logAllTask()
     
 }
 
-
-bool LoggingHelper::logAllPorts(RTT::TaskContext* context, const std::vector< std::string > excludeList)
+bool LoggingHelper::logAllPorts(RTT::TaskContext* context, const std::string& loggerName, const std::vector< std::string > excludeList)
 {
     std::string taskName = context->getName();
     
-    std::string loggerName = taskName + "_Logger";
-
     std::cout << "Tryingt to get Proxy for " << loggerName << std::endl;
 
     logger::proxies::Logger *logger;
@@ -39,7 +36,7 @@ bool LoggingHelper::logAllPorts(RTT::TaskContext* context, const std::vector< st
         logger = new logger::proxies::Logger(loggerName, false);
     } catch (...)
     {
-        return false;
+        throw std::runtime_error("Error, could not contact the logger " + loggerName);
     }
     
     std::cout << "Managed to get Proxy for " << loggerName << std::endl;
@@ -102,9 +99,12 @@ bool LoggingHelper::logAllPorts(RTT::TaskContext* context, const std::vector< st
         outPort->connectTo(loggerPort, RTT::ConnPolicy::buffer(DEFAULT_LOG_BUFFER_SIZE));
     }
  
+    if(logger->isRunning())
+        return true;
+
     Bundle &bundle(Bundle::getInstance());
-    logger->file.set(bundle.getLogDirectory() + "/" + taskName + ".0.log");
- 
+    logger->file.set(bundle.getLogDirectory() + "/" + taskName + ".0.log"); 
+    
     if(!logger->configure())
     {
         std::cout << "Failed to configure logger" << std::endl;
