@@ -163,6 +163,10 @@ const std::string Deployment::getLoggerName() const
     auto it = renameMap.find(loggerName);
     if(it == renameMap.end())
         throw std::runtime_error("Internal Error, logger name could not be found");
+    
+    if(it->second.empty())
+        return it->first;
+    
     return it->second;
 }
 
