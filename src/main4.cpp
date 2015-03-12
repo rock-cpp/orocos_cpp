@@ -24,7 +24,7 @@ int main(int argc, char **argv)
         std::cout << "Got TaskContext " << taksName << std::endl;
         
         RTT::TaskContext *context = ns.getTaskContext(taksName);
-        lh.logAllPorts(context);
+//         lh.logAllPorts(context);
         
 //         RTT::TaskContext *context = ns.getTaskContext(taksName);
 //         if(context)

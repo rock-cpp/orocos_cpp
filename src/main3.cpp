@@ -17,8 +17,6 @@ int main(int argc, char**argv)
     
     spawner.spawnTask("hokuyo::Task", "hokuyo");
 
-    spawner.addReadyCandidate("foo");
-    
     spawner.waitUntilAllReady(base::Time::fromSeconds(2.0));
 
 //     std::cout << "All ready" << std::endl;
