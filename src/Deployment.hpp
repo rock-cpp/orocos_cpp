@@ -29,7 +29,7 @@ public:
     /**
      * Returns the name of the deployment
      * */
-    const std::string &getName();
+    const std::string &getName() const;
     
     /**
      * Returns the task names, after renaming.

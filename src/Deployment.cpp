@@ -86,7 +86,7 @@ bool Deployment::loadPkgConfigFile(const std::string& name)
     return true;
 }
 
-const std::string& Deployment::getName()
+const std::string& Deployment::getName() const
 {
     return deploymentName;
 }
