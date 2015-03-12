@@ -2,26 +2,59 @@
 
 #include <rtt/transports/corba/TaskContextProxy.hpp>
 #include <rtt/OperationCaller.hpp>
+#include <rtt/types/TypekitRepository.hpp>
+#include <rtt/plugin/PluginLoader.hpp>
 #include <logger/proxies/Logger.hpp>
 #include "CorbaNameService.hpp"
 #include "Bundle.hpp"
+#include "Spawner.hpp"
 
 LoggingHelper::LoggingHelper() : DEFAULT_LOG_BUFFER_SIZE(100)
 {
 
 }
 
-bool LoggingHelper::logAllTask()
+bool LoggingHelper::logAllTasks()
 {
-    CorbaNameService nameService;
-    nameService.connect();
+    Spawner &spawner(Spawner::getInstace());
     
-    nameService.getRegisteredTasks();
+    std::vector<const Deployment *> depls = spawner.getRunningDeployments();
     
-    //FAIL I can't iterate over all ports, because we are missing the typekits.
+    RTT::plugin::PluginLoader loader;
+
+    if(!RTT::types::TypekitRepository::hasTypekit("rtt-types"))
+        OrocosHelpers::loadTypekitAndTransports("rtt-types");
+    
+    for(const Deployment *dpl: depls)
+    {
+        //load all needed typekits
+        for(const std::string &tk: dpl->getNeededTypekits())
+        {
+            if(!RTT::types::TypekitRepository::hasTypekit("/orogen/" + tk))
+            {
+                
+                std::cout << "Warning, we are missing the typekit " << tk << " loading it " << std::endl;
+                OrocosHelpers::loadTypekitAndTransports(tk);
+            }
+
+            if(!RTT::types::TypekitRepository::hasTypekit("/orogen/" + tk))
+            {
+                std::cout << "Load failed" << std::endl;
+            }
+        }
+        
+        for(const std::string &task: dpl->getTaskNames())
+        {
+            //don't log the logger :-)
+            if(task == dpl->getLoggerName())
+                continue;
+            
+            RTT::corba::TaskContextProxy *proxy = RTT::corba::TaskContextProxy::Create(task, false);
+            logAllPorts(proxy, dpl->getLoggerName());
+        }
+    }
     
     return false;
-    
 }
 
 bool LoggingHelper::logAllPorts(RTT::TaskContext* context, const std::string& loggerName, const std::vector< std::string > excludeList)
