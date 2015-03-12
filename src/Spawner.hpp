@@ -37,6 +37,7 @@ public:
         
         const Deployment &getDeployment() const;
         bool alive() const;
+        void sendSigInt() const;
         void sendSigTerm() const;
         void sendSigKill() const;
     };
@@ -106,6 +107,11 @@ public:
      * did not happen, it will send a sigkill and return.
      * */
     void killAll();
+    
+    /**
+     * This method sends a sigterm to all child processes.
+     * */
+    void sendSigTerm();
     
     /**
      * Returns a vector of all deployments, that are currently running.

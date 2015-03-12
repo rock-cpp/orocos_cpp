@@ -191,6 +191,14 @@ void Spawner::ProcessHandle::sendSigKill() const
     }
 }
 
+void Spawner::ProcessHandle::sendSigInt() const
+{
+    if(kill(pid, SIGINT))
+    {
+         std::cout << "Error sending of SIGINT to pid " << pid << " failed:" << strerror(errno) << std::endl;
+    }
+}
+
 void Spawner::ProcessHandle::sendSigTerm() const
 {
     if(kill(pid, SIGTERM))
@@ -310,7 +318,8 @@ void Spawner::killAll()
     {
         if(handle->alive())
         {
-            handle->sendSigTerm();
+            //we send a sigint here, as this should trigger a clean shutdown
+            handle->sendSigInt();
         }
     }
     
@@ -342,6 +351,15 @@ void Spawner::killAll()
                 handle->sendSigKill();
             }
         }
+    }
+}
+
+void Spawner::sendSigTerm()
+{
+    //ask all processes to terminate
+    for(ProcessHandle *handle : handles)
+    {
+        handle->sendSigTerm();
     }
 }
 
