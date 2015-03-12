@@ -63,6 +63,7 @@ bool Deployment::loadPkgConfigFile(const std::string& name)
     {
         renameMap[task] = std::string();
         originalTasks.push_back(task);
+        tasks.push_back(task);
         
         std::string loggerString("_Logger");
         if(task.length() > loggerString.length() && task.substr(task.length() - loggerString.length(), task.length()) == loggerString)
