@@ -6,6 +6,7 @@
 #include <vector>
 #include <base/Time.hpp>
 #include "NameService.hpp"
+#include "Deployment.hpp"
 
 class Spawner
 {
@@ -29,8 +30,12 @@ public:
         mutable bool isRunning;
         pid_t pid;
         void redirectOutput(const std::string &filename);
+        
+        Deployment *deployment;
     public:
-        ProcessHandle(const std::string& cmd, const std::vector<std::string> &args, bool redirectOutput, const std::string &logDir);
+        ProcessHandle(Deployment *deployment, bool redirectOutput, const std::string &logDir);
+        
+        const Deployment &getDeployment() const;
         bool alive() const;
         void sendSigTerm() const;
         void sendSigKill() const;
@@ -57,13 +62,23 @@ public:
     
     /**
      * This method spawns a process that executes the deployment
-     * with the given name. This method will throw is any error
+     * with the given name. This method will throw if any error
      * occures.
      * 
      * @arg dplName Name of the deployment executable that should be started
      * @return  A Process handle, which may be used to request the process status
      * */
     ProcessHandle &spawnDeployment(const std::string &dplName, bool redirectOutput = true);
+
+    /**
+     * This method spawns a process that executes the given 
+     * deployment. This method will throw if any error
+     * occures.
+     * 
+     * @arg dplName The deployment that should be started. The ownership of the deployment will be taken over by the spawner.
+     * @return  A Process handle, which may be used to request the process status
+     * */
+    ProcessHandle &spawnDeployment(Deployment *deployment, bool redirectOutput = true);
     
     /**
      * This method checks if all spawened processes are still alive
@@ -86,19 +101,17 @@ public:
     void waitUntilAllReady(const base::Time &timeout);
     
     /**
-     * This method adds a task lookup name, to the list of
-     * processes that are checked by allReady(). This is
-     * needed as a workaround, as we don't known the name
-     * of the tasks int the deployment case.
-     * */
-    void addReadyCandidate(const std::string &name);
-    
-    /**
      * This method first sends a sigterm to all processes
      * and waits for the processes to terminate. If this
      * did not happen, it will send a sigkill and return.
      * */
     void killAll();
+    
+    /**
+     * Returns a vector of all deployments, that are currently running.
+     * */
+    std::vector<const Deployment *> getRunningDeployments();
+    
 private:
     
     std::vector<ProcessHandle *> handles;

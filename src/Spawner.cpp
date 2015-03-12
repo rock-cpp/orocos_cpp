@@ -84,8 +84,14 @@ Spawner& Spawner::getInstace()
 }
 
 
-Spawner::ProcessHandle::ProcessHandle(const std::string& cmd, const std::vector< std::string >& args, bool redirectOutputv, const std::string &logDir) : isRunning(true)
+Spawner::ProcessHandle::ProcessHandle(Deployment *deploment, bool redirectOutputv, const std::string &logDir) : isRunning(true), deployment(deploment)
 {
+    std::string cmd;
+    std::vector< std::string > args;
+    
+    if(!deployment->getExecString(cmd, args))
+        throw std::runtime_error("Error, could not get parameters to start deployment " + deployment->getName() );
+    
     pid = fork();
     
     if(pid < 0)
@@ -103,7 +109,7 @@ Spawner::ProcessHandle::ProcessHandle(const std::string& cmd, const std::vector<
         //check if directory exists, and create if not
         if(!boost::filesystem::exists(logDir))
         {
-            boost::filesystem::create_directory(logDir);
+            throw std::runtime_error("Error, log directory '" + logDir + "' does not exist, but it should !");
         }
         redirectOutput(logDir + "/" + cmd + "-" + boost::lexical_cast<std::string>(getpid()) + ".txt");
     }
@@ -172,6 +178,11 @@ bool Spawner::ProcessHandle::alive() const
     return isRunning;
 }
 
+const Deployment& Spawner::ProcessHandle::getDeployment() const
+{
+    return *deployment;
+}
+
 void Spawner::ProcessHandle::sendSigKill() const
 {
     if(kill(pid, SIGKILL))
@@ -201,52 +212,42 @@ Spawner::ProcessHandle &Spawner::spawnTask(const std::string& cmp1, const std::s
     }
     
     std::string moduleName = cmp1.substr(0, pos);
-    
-    std::cout << "module name " << moduleName << std::endl;
-
     std::string taskModelName = cmp1.substr(pos + 2, cmp1.size()) ;
-    
-    std::cout << "task model name " << taskModelName << std::endl;
-    
     std::string defaultDeploymentName = "orogen_default_" + moduleName + "__" + taskModelName;
     
-    std::cout << "executable name " << defaultDeploymentName << std::endl;
-    
-    //FIXME check if executable exists
+    Deployment *dpl = new Deployment(defaultDeploymentName);
 
     std::string taskName = as;
     std::vector<std::string> args;
     
-    if(taskName.empty())
+    if(!taskName.empty())
     {
-        taskName = defaultDeploymentName;
+        dpl->renameTask(defaultDeploymentName, taskName);
+        dpl->renameTask(defaultDeploymentName  + "_Logger", taskName + "_Logger");
     }
-    else
-    {
-        args.push_back("--rename");
-        args.push_back(defaultDeploymentName + ":" + taskName);
-        args.push_back("--rename");
-        args.push_back(defaultDeploymentName  + "_Logger:" + taskName + "_Logger");
-    }
-    
-    ProcessHandle *handle = new ProcessHandle(defaultDeploymentName, args, redirectOutput, logDir);
 
-    handles.push_back(handle);
+    return spawnDeployment(dpl, redirectOutput);
+}
+
+Spawner::ProcessHandle& Spawner::spawnDeployment(Deployment* deployment, bool redirectOutput)
+{
+    ProcessHandle *handle = new ProcessHandle(deployment, redirectOutput, logDir);
     
-    notReadyList.push_back(taskName);
+    handles.push_back(handle);
+
+    for(const std::string &task: deployment->getTaskNames())
+    {
+        notReadyList.push_back(task);
+    }
     
     return *handle;
 }
 
 Spawner::ProcessHandle& Spawner::spawnDeployment(const std::string& dplName, bool redirectOutput)
 {
-    //FIXME check if executable exists
+    Deployment *deploment = new Deployment(dplName);
 
-    ProcessHandle *handle = new ProcessHandle(dplName, std::vector<std::string>(), redirectOutput, logDir);
-
-    handles.push_back(handle);
-    
-    return *handle;
+    return spawnDeployment(deploment, redirectOutput);
 }
 
 bool Spawner::checkAllProcesses()
@@ -301,12 +302,6 @@ void Spawner::waitUntilAllReady(const base::Time& timeout)
         }
     }
 }
-
-void Spawner::addReadyCandidate(const std::string& name)
-{
-    notReadyList.push_back(name);
-}
-
 
 void Spawner::killAll()
 {
@@ -370,6 +365,18 @@ void Spawner::ProcessHandle::redirectOutput(const std::string& filename)
         std::cout << "Error, could not redirect cerr to " << filename << std::endl;
         return;
     }
+}
+
+std::vector< const Deployment* > Spawner::getRunningDeployments()
+{
+    std::vector< const Deployment* > ret;
+    ret.reserve(handles.size());
+    for(ProcessHandle *handle: handles)
+    {
+        ret.push_back(&(handle->getDeployment()));
+    }
+    
+    return ret;
 }
 
 
