@@ -103,6 +103,7 @@ bool LoggingHelper::logAllPorts(RTT::TaskContext* context, const std::string& lo
             {
                 outPorts.push_back(outPort);
             }
+            continue;
         }
         
         
@@ -112,7 +113,8 @@ bool LoggingHelper::logAllPorts(RTT::TaskContext* context, const std::string& lo
             std::cout << "logAllPorts: Error, failed to create port " << name << std::endl;
             return false;
         }
-            
+
+        outPorts.push_back(outPort);
     }
 
     logger->synchronize();
@@ -129,7 +131,10 @@ bool LoggingHelper::logAllPorts(RTT::TaskContext* context, const std::string& lo
         }
         loggerPort->disconnect();
         
-        outPort->connectTo(loggerPort, RTT::ConnPolicy::buffer(DEFAULT_LOG_BUFFER_SIZE));
+        if(!outPort->connectTo(loggerPort, RTT::ConnPolicy::buffer(DEFAULT_LOG_BUFFER_SIZE)))
+        {
+            throw std::runtime_error("Error, could not connect port to logger");
+        }
     }
  
     if(logger->isRunning())
