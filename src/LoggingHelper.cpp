@@ -30,14 +30,14 @@ bool LoggingHelper::logAllTasks()
         //load all needed typekits
         for(const std::string &tk: dpl->getNeededTypekits())
         {
-            if(!RTT::types::TypekitRepository::hasTypekit("/orogen/" + tk))
+            if(!RTT::types::TypekitRepository::hasTypekit(tk))
             {
                 
                 std::cout << "Warning, we are missing the typekit " << tk << " loading it " << std::endl;
                 OrocosHelpers::loadTypekitAndTransports(tk);
             }
 
-            if(!RTT::types::TypekitRepository::hasTypekit("/orogen/" + tk))
+            if(!RTT::types::TypekitRepository::hasTypekit(tk))
             {
                 std::cout << "Load failed" << std::endl;
             }
