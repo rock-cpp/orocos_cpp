@@ -2,6 +2,7 @@
 #include <boost/tokenizer.hpp>
 #include <boost/filesystem.hpp>
 #include <fstream>
+#include <iostream>
 #include <orocos_cpp_base/OrocosHelpers.hpp>
 
 Deployment::Deployment(const std::string& name) : deploymentName(name)
