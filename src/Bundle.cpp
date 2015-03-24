@@ -52,6 +52,7 @@ Bundle::Bundle()
     }
     
     configDir = activeBundlePath + "/config/orogen/";
+    dataDir = activeBundlePath + "/data/";
 }
 
 bool Bundle::createLogDirectory()
@@ -106,4 +107,25 @@ const std::string& Bundle::getLogDirectory()
         createLogDirectory();
     
     return logDir;
+}
+
+const std::string& Bundle::getDataDirectory()
+{
+    return dataDir;
+}
+
+std::string Bundle::findFile(const std::string& relativePath)
+{
+    std::string curPath = activeBundlePath + "/" + relativePath;
+    if(boost::filesystem::exists(curPath))
+        return curPath;
+    
+    for(const std::string &bp: bundlePaths)
+    {
+        curPath = bp + "/" + relativePath;
+        if(boost::filesystem::exists(curPath))
+            return curPath;
+    }
+    
+    throw std::runtime_error("Bundle::findFile : Error, could not find file " + relativePath);
 }
