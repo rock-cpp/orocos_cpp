@@ -17,6 +17,7 @@ private:
     
     std::string logDir;
     std::string configDir;
+    std::string dataDir;
     
     /**
      * This function creates a log directory 
@@ -45,6 +46,13 @@ public:
      * */
     const std::string &getConfigurationDirectory();
     
+    /**
+     * Returns the path to the directory 
+     * containing the data files.
+     * */
+    const std::string &getDataDirectory();
+    
+    std::string findFile(const std::string &relativePath);
 };
 
 #endif // BUNDLE_H
