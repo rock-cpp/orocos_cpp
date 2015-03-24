@@ -57,6 +57,61 @@ bool LoggingHelper::logAllTasks()
     return false;
 }
 
+bool LoggingHelper::logOnlyEnabledTasks(std::map<std::string, bool> loggingEnabledTaskMap)
+{
+    Spawner &spawner(Spawner::getInstace());
+    
+    std::vector<const Deployment *> depls = spawner.getRunningDeployments();
+    
+    RTT::plugin::PluginLoader loader;
+
+    if(!RTT::types::TypekitRepository::hasTypekit("rtt-types"))
+        OrocosHelpers::loadTypekitAndTransports("rtt-types");
+    
+    for(const Deployment *dpl: depls)
+    {
+        //load all needed typekits
+        for(const std::string &tk: dpl->getNeededTypekits())
+        {
+            if(!RTT::types::TypekitRepository::hasTypekit(tk))
+            {
+                
+                std::cout << "Warning, we are missing the typekit " << tk << " loading it " << std::endl;
+                OrocosHelpers::loadTypekitAndTransports(tk);
+            }
+
+            if(!RTT::types::TypekitRepository::hasTypekit(tk))
+            {
+                std::cout << "Load failed" << std::endl;
+            }
+        }
+        
+        for(const std::string &task: dpl->getTaskNames())
+        {
+            //don't log the logger :-)
+            if(task == dpl->getLoggerName())
+                continue;
+			
+			if(loggingEnabledTaskMap.find(task) != loggingEnabledTaskMap.end() && loggingEnabledTaskMap[task])
+			{
+				RTT::corba::TaskContextProxy *proxy = RTT::corba::TaskContextProxy::Create(task, false);
+				logAllPorts(proxy, dpl->getLoggerName());
+			}
+			else if(loggingEnabledTaskMap.find(task) != loggingEnabledTaskMap.end() && !loggingEnabledTaskMap[task])
+			{
+				std::cout << "Logging for task " << task << " not enabled." << std::endl;
+			}
+			else 
+			{
+				std::cout << "Task: " << task << " is not in the map. Please check your config." << std::endl;
+			}
+        }
+    }
+    
+    return false;
+}
+
+
 bool LoggingHelper::logAllPorts(RTT::TaskContext* givenContext, const std::string& loggerName, const std::vector< std::string > excludeList, bool loadTypekits)
 {
     RTT::TaskContext* context = givenContext;
