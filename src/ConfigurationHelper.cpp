@@ -10,6 +10,10 @@
 #include <rtt/OperationCaller.hpp>
 #include "Bundle.hpp"
 
+#include <algorithm>
+#include <string>  
+#include <limits>
+
 ComplexConfigValue::ComplexConfigValue(): ConfigValue(COMPLEX)
 {
 
@@ -453,6 +457,30 @@ bool applyValue<int8_t>(Typelib::Value &value, const SimpleConfigValue& conf)
         std::cout << "Error, could not set value " << conf.value << " on property " << conf.name << " Bad lexical cast : " << bc.what() << std::endl;
         std::cout << " Target Type " << value.getType().getName() << std::endl;
         return false;
+    }
+    return true;
+}
+
+template <>
+bool applyValue<double>(Typelib::Value &value, const SimpleConfigValue& conf)
+{
+    double *val = static_cast<double *>(value.getData());
+    std::string  copy = conf.value;
+    std::transform(copy.begin(), copy.end(), copy.begin(), ::tolower);
+    if (copy.find("nan") != std::string::npos) {
+	*val = std::numeric_limits<double>::quiet_NaN();
+    } 
+    else 
+    {
+      try {
+	  *val = boost::lexical_cast<double>(conf.value);
+      } 
+      catch (boost::bad_lexical_cast bc)
+      {
+	  std::cout << "Error, could not set value " << conf.value << " on property " << conf.name << " Bad lexical cast : " << bc.what() << std::endl;
+	  std::cout << " Target Type " << value.getType().getName() << std::endl;
+	  return false;
+      }
     }
     return true;
 }
