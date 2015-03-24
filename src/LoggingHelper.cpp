@@ -50,19 +50,38 @@ bool LoggingHelper::logAllTasks()
                 continue;
             
             RTT::corba::TaskContextProxy *proxy = RTT::corba::TaskContextProxy::Create(task, false);
-            logAllPorts(proxy, dpl->getLoggerName());
+            logAllPorts(proxy, dpl->getLoggerName(),  std::vector< std::string >(), false);
         }
     }
     
     return false;
 }
 
-bool LoggingHelper::logAllPorts(RTT::TaskContext* context, const std::string& loggerName, const std::vector< std::string > excludeList)
+bool LoggingHelper::logAllPorts(RTT::TaskContext* givenContext, const std::string& loggerName, const std::vector< std::string > excludeList, bool loadTypekits)
 {
+    RTT::TaskContext* context = givenContext;
     std::string taskName = context->getName();
     
     std::cout << "Tryingt to get Proxy for " << loggerName << std::endl;
 
+    if(loadTypekits)
+    {
+        OrocosHelpers::loadTypekitAndTransports("rtt-types");
+
+        RTT::OperationCaller<std::string ()> getModelName(context->getOperation("getModelName"));
+        std::string modelName = getModelName();
+        std::string componentName = modelName.substr(0, modelName.find_first_of(':'));
+        
+        std::vector<std::string> neededTks = OrocosHelpers::getNeededTypekits(componentName);
+        for(const std::string &tk: neededTks)
+        {
+            OrocosHelpers::loadTypekitAndTransports(tk);
+        }
+        
+        //ugly, but only way I see to ensure that all ports get created
+        context = RTT::corba::TaskContextProxy::Create(taskName, false);
+    }
+    
     logger::proxies::Logger *logger;
     
     try{
@@ -71,7 +90,7 @@ bool LoggingHelper::logAllPorts(RTT::TaskContext* context, const std::string& lo
     {
         throw std::runtime_error("Error, could not contact the logger " + loggerName);
     }
-    
+
     std::cout << "Managed to get Proxy for " << loggerName << std::endl;
     
     auto ports = context->ports()->getPorts();
@@ -153,6 +172,11 @@ bool LoggingHelper::logAllPorts(RTT::TaskContext* context, const std::string& lo
     {
         std::cout << "Failed to start logger for " + taskName << std::endl;
         return false;
+    }
+ 
+    if(givenContext != context)
+    {
+        delete context;
     }
  
     return true;
