@@ -1,6 +1,4 @@
 #include <iostream>
-#include "corba.hh"
-#include "corba_name_service_client.hh"
 #include <rtt/Activity.hpp>
 #include <rtt/transports/corba/TaskContextProxy.hpp>
 
@@ -27,9 +25,6 @@ int main(int argc, char** argv)
 //     RTT::types::TypekitRepository::Import(new RTT::corba::CorbaLibPlugin);
 //     RTT::types::TypekitRepository::Import(new RTT::mqueue::MQLibPlugin);
     
-    loadAllPluginsInDir("/home/scotch/coyote/install/lib/orocos/gnulinux/types/");
-    
-    loadAllPluginsInDir("/home/scotch/coyote/install/lib/orocos/types/");
 //     RTT::plugin::PluginLoader::Instance()->loadLibrary();
     
 //     RTT::types::TypekitRepository::Import( new orogen_typekits::proxytestTypekitPlugin );
