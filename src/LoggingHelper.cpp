@@ -14,7 +14,7 @@ LoggingHelper::LoggingHelper() : DEFAULT_LOG_BUFFER_SIZE(100)
 
 }
 
-bool LoggingHelper::logAllTasks()
+bool LoggingHelper::logTasks(std::map<std::string, bool> loggingEnabledTaskMap, bool logAll)
 {
     Spawner &spawner(Spawner::getInstace());
     
@@ -49,62 +49,19 @@ bool LoggingHelper::logAllTasks()
             if(task == dpl->getLoggerName())
                 continue;
             
-            RTT::corba::TaskContextProxy *proxy = RTT::corba::TaskContextProxy::Create(task, false);
-            logAllPorts(proxy, dpl->getLoggerName(),  std::vector< std::string >(), false);
-        }
-    }
-    
-    return false;
-}
-
-bool LoggingHelper::logOnlyEnabledTasks(std::map<std::string, bool> loggingEnabledTaskMap)
-{
-    Spawner &spawner(Spawner::getInstace());
-    
-    std::vector<const Deployment *> depls = spawner.getRunningDeployments();
-    
-    RTT::plugin::PluginLoader loader;
-
-    if(!RTT::types::TypekitRepository::hasTypekit("rtt-types"))
-        OrocosHelpers::loadTypekitAndTransports("rtt-types");
-    
-    for(const Deployment *dpl: depls)
-    {
-        //load all needed typekits
-        for(const std::string &tk: dpl->getNeededTypekits())
-        {
-            if(!RTT::types::TypekitRepository::hasTypekit(tk))
+            if(logAll || (loggingEnabledTaskMap.find(task) != loggingEnabledTaskMap.end() && loggingEnabledTaskMap[task]))
             {
-                
-                std::cout << "Warning, we are missing the typekit " << tk << " loading it " << std::endl;
-                OrocosHelpers::loadTypekitAndTransports(tk);
+                RTT::corba::TaskContextProxy *proxy = RTT::corba::TaskContextProxy::Create(task, false);
+                logAllPorts(proxy, dpl->getLoggerName(),  std::vector< std::string >(), false);
             }
-
-            if(!RTT::types::TypekitRepository::hasTypekit(tk))
+            else if(loggingEnabledTaskMap.find(task) != loggingEnabledTaskMap.end() && !loggingEnabledTaskMap[task])
             {
-                std::cout << "Load failed" << std::endl;
+                std::cout << "Logging for task " << task << " not enabled." << std::endl;
             }
-        }
-        
-        for(const std::string &task: dpl->getTaskNames())
-        {
-            //don't log the logger :-)
-            if(task == dpl->getLoggerName())
-                continue;
-			
-			if(loggingEnabledTaskMap.find(task) != loggingEnabledTaskMap.end() && loggingEnabledTaskMap[task])
-			{
-				RTT::corba::TaskContextProxy *proxy = RTT::corba::TaskContextProxy::Create(task, false);
-				logAllPorts(proxy, dpl->getLoggerName());
-			}
-			else if(loggingEnabledTaskMap.find(task) != loggingEnabledTaskMap.end() && !loggingEnabledTaskMap[task])
-			{
-				std::cout << "Logging for task " << task << " not enabled." << std::endl;
-			}
-			else 
-			{
-				std::cout << "Task: " << task << " is not in the map. Please check your config." << std::endl;
-			}
+            else 
+            {
+                std::cout << "Task: " << task << " is not in the map. Please check your config." << std::endl;
+            }
         }
     }
     

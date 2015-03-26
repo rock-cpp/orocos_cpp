@@ -9,8 +9,7 @@ class LoggingHelper
 public:
     LoggingHelper();
     bool logAllPorts(RTT::TaskContext *context,  const std::string &loggerName, const std::vector<std::string> excludeList = std::vector<std::string>(), bool loadTypekits = true);
-    bool logAllTasks();
-	bool logOnlyEnabledTasks(std::map<std::string, bool> loggingEnabledTaskMap);
+    bool logTasks(std::map<std::string, bool> loggingEnabledTaskMap, bool logAll);
 };
 
 #endif // LOGGINGHELPER_H
