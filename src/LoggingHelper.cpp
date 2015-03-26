@@ -14,7 +14,13 @@ LoggingHelper::LoggingHelper() : DEFAULT_LOG_BUFFER_SIZE(100)
 
 }
 
-bool LoggingHelper::logTasks(std::map<std::string, bool> loggingEnabledTaskMap, bool logAll)
+bool LoggingHelper::logTasks()
+{
+    return logTasks(std::map<std::string, bool>(), true);
+}
+
+
+bool LoggingHelper::logTasks(const std::map<std::string, bool> &loggingEnabledTaskMap, bool logAll)
 {
     Spawner &spawner(Spawner::getInstace());
     
@@ -49,18 +55,23 @@ bool LoggingHelper::logTasks(std::map<std::string, bool> loggingEnabledTaskMap, 
             if(task == dpl->getLoggerName())
                 continue;
             
-            if(logAll || (loggingEnabledTaskMap.find(task) != loggingEnabledTaskMap.end() && loggingEnabledTaskMap[task]))
+            if(logAll)
             {
                 RTT::corba::TaskContextProxy *proxy = RTT::corba::TaskContextProxy::Create(task, false);
                 logAllPorts(proxy, dpl->getLoggerName(),  std::vector< std::string >(), false);
             }
-            else if(loggingEnabledTaskMap.find(task) != loggingEnabledTaskMap.end() && !loggingEnabledTaskMap[task])
+            else
             {
-                std::cout << "Logging for task " << task << " not enabled." << std::endl;
-            }
-            else 
-            {
-                std::cout << "Task: " << task << " is not in the map. Please check your config." << std::endl;
+                auto it = loggingEnabledTaskMap.find(task);
+                if(it != loggingEnabledTaskMap.end() && it->second)
+                {
+                    RTT::corba::TaskContextProxy *proxy = RTT::corba::TaskContextProxy::Create(task, false);
+                    logAllPorts(proxy, dpl->getLoggerName(),  std::vector< std::string >(), false);
+                }
+                else
+                {
+                    std::cout << "Logging for task " << task << " not enabled." << std::endl;
+                }
             }
         }
     }
