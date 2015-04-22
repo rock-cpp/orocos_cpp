@@ -8,6 +8,7 @@
 #include "CorbaNameService.hpp"
 #include "Bundle.hpp"
 #include "Spawner.hpp"
+#include "PluginHelper.hpp"
 
 LoggingHelper::LoggingHelper() : DEFAULT_LOG_BUFFER_SIZE(100)
 {
@@ -29,7 +30,7 @@ bool LoggingHelper::logTasks(const std::map<std::string, bool> &loggingEnabledTa
     RTT::plugin::PluginLoader loader;
 
     if(!RTT::types::TypekitRepository::hasTypekit("rtt-types"))
-        OrocosHelpers::loadTypekitAndTransports("rtt-types");
+        PluginHelper::loadTypekitAndTransports("rtt-types");
     
     for(const Deployment *dpl: depls)
     {
@@ -40,7 +41,7 @@ bool LoggingHelper::logTasks(const std::map<std::string, bool> &loggingEnabledTa
             {
                 
                 std::cout << "Warning, we are missing the typekit " << tk << " loading it " << std::endl;
-                OrocosHelpers::loadTypekitAndTransports(tk);
+                PluginHelper::loadTypekitAndTransports(tk);
             }
 
             if(!RTT::types::TypekitRepository::hasTypekit(tk))
@@ -89,16 +90,16 @@ bool LoggingHelper::logAllPorts(RTT::TaskContext* givenContext, const std::strin
 
     if(loadTypekits)
     {
-        OrocosHelpers::loadTypekitAndTransports("rtt-types");
+        PluginHelper::loadTypekitAndTransports("rtt-types");
 
         RTT::OperationCaller<std::string ()> getModelName(context->getOperation("getModelName"));
         std::string modelName = getModelName();
         std::string componentName = modelName.substr(0, modelName.find_first_of(':'));
         
-        std::vector<std::string> neededTks = OrocosHelpers::getNeededTypekits(componentName);
+        std::vector<std::string> neededTks = PluginHelper::getNeededTypekits(componentName);
         for(const std::string &tk: neededTks)
         {
-            OrocosHelpers::loadTypekitAndTransports(tk);
+            PluginHelper::loadTypekitAndTransports(tk);
         }
         
         //ugly, but only way I see to ensure that all ports get created

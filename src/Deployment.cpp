@@ -3,7 +3,7 @@
 #include <boost/filesystem.hpp>
 #include <fstream>
 #include <iostream>
-#include <orocos_cpp_base/OrocosHelpers.hpp>
+#include "PkgConfigHelper.hpp"
 
 Deployment::Deployment(const std::string& name) : deploymentName(name)
 {
@@ -49,7 +49,7 @@ bool Deployment::loadPkgConfigFile(const std::string& name)
     pkgConfigFields.push_back("deployed_tasks");
     std::vector<std::string> pkgConfigValues;
 
-    if(!OrocosHelpers::parsePkgConfig("/orogen-" + name + ".pc", pkgConfigFields, pkgConfigValues))
+    if(!PkgConfigHelper::parsePkgConfig("/orogen-" + name + ".pc", pkgConfigFields, pkgConfigValues))
         throw std::runtime_error("Error, could not finde pkg-config file for deployment " + name );
 
     

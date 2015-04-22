@@ -3,15 +3,15 @@
 #include <rtt/transports/corba/TaskContextServer.hpp>
 
 #include "Spawner.hpp"
-#include <orocos_cpp_base/OrocosHelpers.hpp>
 #include "TransformerHelper.hpp"
+#include "PluginHelper.hpp"
 
 int main(int argc, char**argv)
 {
     RTT::corba::TaskContextServer::InitOrb(argc, argv);
 
-    loadAllPluginsInDir("/home/scotch/coyote/install/lib/orocos/gnulinux/types/");
-    loadAllPluginsInDir("/home/scotch/coyote/install/lib/orocos/types/");
+    PluginHelper::loadAllPluginsInDir("/home/scotch/coyote/install/lib/orocos/gnulinux/types/");
+    PluginHelper::loadAllPluginsInDir("/home/scotch/coyote/install/lib/orocos/types/");
 
     Spawner &spawner(Spawner::getInstace());
     

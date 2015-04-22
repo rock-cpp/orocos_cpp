@@ -1,16 +1,16 @@
 #include "CorbaNameService.hpp"
 #include <rtt/TaskContext.hpp>
-#include <orocos_cpp_base/OrocosHelpers.hpp>
 #include <rtt/internal/ConnectionManager.hpp>
 #include "LoggingHelper.hpp"
 #include "Bundle.hpp"
+#include "PluginHelper.hpp"
 
 int main(int argc, char **argv)
 {
     Bundle &bundle(Bundle::getInstance());
 
-    loadAllPluginsInDir("/home/scotch/coyote/install/lib/orocos/gnulinux/types/");
-    loadAllPluginsInDir("/home/scotch/coyote/install/lib/orocos/types/");
+    PluginHelper::loadAllPluginsInDir("/home/scotch/coyote/install/lib/orocos/gnulinux/types/");
+    PluginHelper::loadAllPluginsInDir("/home/scotch/coyote/install/lib/orocos/types/");
     
     CorbaNameService ns;
     ns.connect();

@@ -9,6 +9,8 @@ rock_library(orocos_cpp
         NameService.cpp
         CorbaNameService.cpp
         Deployment.cpp
+        PkgConfigHelper.cpp
+        PluginHelper.cpp
     HEADERS 
         Bundle.hpp
         ConfigurationHelper.hpp
@@ -18,6 +20,8 @@ rock_library(orocos_cpp
         NameService.hpp
         CorbaNameService.hpp
         Deployment.hpp
+        PkgConfigHelper.hpp
+        PluginHelper.hpp
     DEPS_PKGCONFIG
         orocos_cpp_base
         rtt_typelib-${OROCOS_TARGET}

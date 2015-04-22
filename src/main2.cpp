@@ -1,7 +1,7 @@
 #include <orocos_cpp_base/ProxyPort.hpp>
 #include <rtt/transports/corba/TaskContextProxy.hpp>
 #include <rtt/Property.hpp>
-#include <orocos_cpp_base/OrocosHelpers.hpp>
+#include "PluginHelper.hpp"
 
 class MirrorProxy: public RTT::corba::TaskContextProxy
 {
@@ -21,9 +21,9 @@ public:
 
 int main(int argc, char**argv)
 {
-    loadAllPluginsInDir("/home/scotch/coyote/install/lib/orocos/gnulinux/types/");
+    PluginHelper::loadAllPluginsInDir("/home/scotch/coyote/install/lib/orocos/gnulinux/types/");
     
-    loadAllPluginsInDir("/home/scotch/coyote/install/lib/orocos/types/");
+    PluginHelper::loadAllPluginsInDir("/home/scotch/coyote/install/lib/orocos/types/");
 
 //     std::cout << "Plugin load done" << std::endl;
 //     MirrorProxy *mirrorProxy;
