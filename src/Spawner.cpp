@@ -50,9 +50,13 @@ void shutdownHandler(int signum, siginfo_t *info, void *data)
 {
     std::cout << "Shutdown: trying to kill all childs" << std::endl;
     
-    Spawner::getInstace().killAll();
-    std::cout << "Done " << std::endl;
-
+    try {
+        Spawner::getInstace().killAll();
+        std::cout << "Done " << std::endl;
+    } catch (...)
+    {
+        std::cout << "Error, during killall" << std::endl;
+    }
     restoreSignalHandler(signum);
     raise(signum);
     
