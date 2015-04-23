@@ -2,10 +2,16 @@
 #define PLUGINHELPER_H
 
 #include <vector>
+#include <map>
 #include <string>
 
 class PluginHelper
 {
+private:
+    /**
+     * Cache for the needed typekits.
+     */
+    static std::map<std::string, std::vector<std::string> > componentToTypeKitsMap;
 public:
     static void loadAllPluginsInDir(const std::string &path);
 

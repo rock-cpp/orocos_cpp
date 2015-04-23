@@ -11,8 +11,14 @@
 #define xstr(s) str(s)
 #define str(s) #s
 
+std::map<std::string, std::vector<std::string> > PluginHelper::componentToTypeKitsMap;
+
 std::vector< std::string > PluginHelper::getNeededTypekits(const std::string& componentName)
 {
+    auto it = componentToTypeKitsMap.find(componentName);
+    if(it != componentToTypeKitsMap.end())
+        return it->second;
+    
     //first we load the typekit
     std::vector<std::string> pkgConfigFields;
     pkgConfigFields.push_back("typekits");
@@ -29,6 +35,8 @@ std::vector< std::string > PluginHelper::getNeededTypekits(const std::string& co
     {
         ret.push_back(tk);
     }
+    
+    componentToTypeKitsMap[componentName] = ret;
     
     return ret;
 }
