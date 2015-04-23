@@ -14,6 +14,8 @@
 #include <string>  
 #include <limits>
 
+#include "PluginHelper.hpp"
+
 ComplexConfigValue::ComplexConfigValue(): ConfigValue(COMPLEX)
 {
 
@@ -913,6 +915,9 @@ bool ConfigurationHelper::applyConfig(const std::string& configFilePath, RTT::Ta
     return true;
 }
 
+#include <rtt/transports/corba/TaskContextProxy.hpp>
+#include <rtt/types/TypekitRepository.hpp>
+
 bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const std::vector< std::string >& names)
 {
     Bundle &bundle(Bundle::getInstance());
@@ -924,11 +929,33 @@ bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const std::vect
     
     RTT::OperationCaller< ::std::string() >  caller(op);
     std::string modelName = caller();
+    std::string componentName = modelName.substr(0, modelName.find_first_of(':'));
+    
+    std::vector<std::string> neededTks = PluginHelper::getNeededTypekits(componentName);
+    bool syncNeeded = false;
+    for(const std::string &tk: neededTks)
+    {
+        if(RTT::types::TypekitRepository::hasTypekit(tk))
+            continue;
+        
+        syncNeeded = true;
+        PluginHelper::loadTypekitAndTransports(tk);
+    }
+
+    if(syncNeeded)
+    {
+        context = RTT::corba::TaskContextProxy::Create(context->getName(), false);
+    }
     
     if(modelName.empty())
         throw std::runtime_error("ConfigurationHelper::applyConfig error, context did not give a valid model name (none at all)");
     
-    return applyConfig(bundle.getConfigurationDirectory() + modelName + ".yml", context, names);
+    bool ret = applyConfig(bundle.getConfigurationDirectory() + modelName + ".yml", context, names);
+    
+    if(syncNeeded)
+        delete context;
+        
+    return ret;
 }
 
 bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const std::string& conf1)
