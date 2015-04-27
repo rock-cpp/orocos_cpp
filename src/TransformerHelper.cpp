@@ -4,6 +4,7 @@
 #include <smurf/Smurf.hpp>
 
 #include <transformer/Transformer.hpp>
+#include <transformer/BroadcastTypes.hpp>
 #include <rtt/transports/corba/TaskContextProxy.hpp>
 
 class TransformationProvider : public transformer::TransformationElement
@@ -37,9 +38,9 @@ bool TransformerHelper::configureTransformer(RTT::TaskContext* task)
         return true;
     
     RTT::OperationInterfacePart *op = task->getOperation(opName);
-    RTT::OperationCaller< ::std::vector< ::base::samples::RigidBodyState >() >  caller(op);
+    RTT::OperationCaller< ::std::vector< transformer::TransformationDescription >() >  caller(op);
 
-    ::std::vector< ::base::samples::RigidBodyState > neededTransforms = caller();
+    ::std::vector< transformer::TransformationDescription > neededTransforms = caller();
     
     transformer::TransformationTree tree;
     
@@ -68,7 +69,7 @@ bool TransformerHelper::configureTransformer(RTT::TaskContext* task)
         return false;
     }
     
-    for( const base::samples::RigidBodyState &rbs : neededTransforms)
+    for( const transformer::TransformationDescription &rbs : neededTransforms)
     {
         std::vector<transformer::TransformationElement *> result;
         if(!tree.getTransformationChain(rbs.sourceFrame, rbs.targetFrame, result))
