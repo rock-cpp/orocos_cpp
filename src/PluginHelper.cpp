@@ -11,10 +11,14 @@
 #define xstr(s) str(s)
 #define str(s) #s
 
-std::map<std::string, std::vector<std::string> > PluginHelper::componentToTypeKitsMap;
 
 std::vector< std::string > PluginHelper::getNeededTypekits(const std::string& componentName)
 {
+    /**
+     * Cache for the needed typekits.
+     */
+    static std::map<std::string, std::vector<std::string> > componentToTypeKitsMap;
+
     auto it = componentToTypeKitsMap.find(componentName);
     if(it != componentToTypeKitsMap.end())
         return it->second;
