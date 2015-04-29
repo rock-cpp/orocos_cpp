@@ -89,7 +89,7 @@ bool PluginHelper::loadTypekitAndTransports(const std::string& componentName)
 
     RTT::plugin::PluginLoader &loader(*RTT::plugin::PluginLoader::Instance());
 
-    if(componentName == "rtt-types")
+    if(componentName == "rtt-types" || componentName == "orocos" )
     {
         //special case, rtt does not follow the convention below
         if(!PkgConfigHelper::parsePkgConfig("orocos-rtt-" xstr(OROCOS_TARGET) ".pc", pkgConfigFields, pkgConfigValues))
