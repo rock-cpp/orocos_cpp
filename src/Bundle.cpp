@@ -31,24 +31,19 @@ Bundle::Bundle()
     for(const std::string &path : tokens)
     {
         bundlePaths.push_back(path);
+        
+        std::string candidate = path + "/" + activeBundle;
+        
+        if(boost::filesystem::exists(candidate))
+        {
+            activeBundlePath = candidate;
+        }
     }
     
-    for(const std::string &path : bundlePaths)
+    if(activeBundlePath.empty())
     {
-        boost::char_separator<char> sep("/");
-        boost::tokenizer<boost::char_separator<char> > tokens(path, sep);
-        
-        std::string last;
-        for(const std::string &token: tokens)
-        {
-            last = token;
-        }
-        if(last == activeBundle)
-        {
-            std::cout << "Found active bundle path : " << path << std::endl;
-            activeBundlePath = path;
-            break;
-        }
+        std::cout << pathsC << " active bundle " << activeBundleC << std::endl; 
+        throw std::runtime_error("Error, could not determine bundle path");
     }
     
     configDir = activeBundlePath + "/config/orogen/";
