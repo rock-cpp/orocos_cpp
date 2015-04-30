@@ -10,6 +10,6 @@
   <depend package="rtt" />
   <depend package="rtt_typelib" />
   <depend package="tools/smurf" />
-  <depend package="drivers/transformer" />
+  <depend package="drivers/orogen/transformer" />
   <depend package="tools/logger" />
 </package>
