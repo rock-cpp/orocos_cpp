@@ -7,8 +7,9 @@
 #include <base/Time.hpp>
 #include "NameService.hpp"
 #include "Deployment.hpp"
+#include <boost/noncopyable.hpp>
 
-class Spawner
+class Spawner : public boost::noncopyable
 {
     std::string logDir;
     
