@@ -379,6 +379,7 @@ bool ConfigurationHelper::loadConfigFile(const std::string& pathStr)
                 {
                     if(!parseStringBuffer(curConfig, buffer))
                         return false;
+                    buffer.clear();
                     subConfigs.insert(std::make_pair(curConfig.name, curConfig));
                 }
                 
