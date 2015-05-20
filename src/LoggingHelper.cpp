@@ -60,6 +60,7 @@ bool LoggingHelper::logTasks(const std::map<std::string, bool> &loggingEnabledTa
             {
                 RTT::corba::TaskContextProxy *proxy = RTT::corba::TaskContextProxy::Create(task, false);
                 logAllPorts(proxy, dpl->getLoggerName(),  std::vector< std::string >(), false);
+                delete proxy;
             }
             else
             {
@@ -68,6 +69,7 @@ bool LoggingHelper::logTasks(const std::map<std::string, bool> &loggingEnabledTa
                 {
                     RTT::corba::TaskContextProxy *proxy = RTT::corba::TaskContextProxy::Create(task, false);
                     logAllPorts(proxy, dpl->getLoggerName(),  std::vector< std::string >(), false);
+                    delete proxy;
                 }
                 else
                 {
@@ -202,6 +204,8 @@ bool LoggingHelper::logAllPorts(RTT::TaskContext* givenContext, const std::strin
     {
         delete context;
     }
+ 
+    delete logger;
  
     return true;
 }
