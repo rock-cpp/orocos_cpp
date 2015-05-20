@@ -23,8 +23,6 @@ class Spawner : public boost::noncopyable
      * */
     Spawner();    
 
-    static Spawner *instance;
-    
 public:
     class ProcessHandle
     {

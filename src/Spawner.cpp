@@ -17,8 +17,6 @@
 #include "Bundle.hpp"
 #include <signal.h>
 
-Spawner *Spawner::instance;
-
 struct sigaction originalSignalHandler[SIGTERM];
 
 void shutdownHandler(int signum, siginfo_t *info, void *data);
@@ -79,6 +77,8 @@ Spawner::Spawner()
 
 Spawner& Spawner::getInstace()
 {
+    static Spawner *instance = nullptr;
+    
     if(!instance)
     {
         instance = new Spawner();
