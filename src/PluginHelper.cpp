@@ -133,3 +133,20 @@ bool PluginHelper::loadTypekitAndTransports(const std::string& componentName)
     
     return true;
 }
+
+//This method loads all typkits required for a task model.
+bool PluginHelper::loadAllTypekitsForModel(const std::string &modelName){
+	std::string componentName = modelName.substr(0, modelName.find_first_of(':'));
+
+	std::vector<std::string> neededTks = PluginHelper::getNeededTypekits(componentName);
+	bool retVal = false;
+	for(const std::string &tk: neededTks)
+	{
+	    if(RTT::types::TypekitRepository::hasTypekit(tk))
+	        continue;
+
+	    retVal = true;
+	    PluginHelper::loadTypekitAndTransports(tk);
+	}
+	return retVal;
+}

@@ -901,19 +901,9 @@ bool ConfigurationHelper::applyConfig(const std::string& configFilePath, RTT::Ta
         return false;
     }
     
-    
-    std::map<std::string, ConfigValue *>::const_iterator propIt;
-    for(propIt = config.values.begin(); propIt != config.values.end(); propIt++)
-    {
-        if(!applyConfToProperty(context, propIt->first, *(propIt->second)))
-        {
-            std::cout << "ERROR configuration of " << propIt->first << " failed" << std::endl;
-            throw std::runtime_error("ERROR configuration of "  + propIt->first + " failed for context " + context->getName());
-            return false;
-        }
-    }
+    //finally apply:
+    return setConfig(config,context);
 
-    return true;
 }
 
 #include <rtt/transports/corba/TaskContextProxy.hpp>
@@ -930,18 +920,8 @@ bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const std::vect
     
     RTT::OperationCaller< ::std::string() >  caller(op);
     std::string modelName = caller();
-    std::string componentName = modelName.substr(0, modelName.find_first_of(':'));
-    
-    std::vector<std::string> neededTks = PluginHelper::getNeededTypekits(componentName);
-    bool syncNeeded = false;
-    for(const std::string &tk: neededTks)
-    {
-        if(RTT::types::TypekitRepository::hasTypekit(tk))
-            continue;
-        
-        syncNeeded = true;
-        PluginHelper::loadTypekitAndTransports(tk);
-    }
+
+    bool syncNeeded = PluginHelper::loadAllTypekitsForModel(modelName);
 
     if(syncNeeded)
     {
@@ -995,5 +975,21 @@ bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const std::stri
     configs.push_back(conf4);
     
     return applyConfig(context, configs);
+}
+
+//finanlly set the config values.
+bool ConfigurationHelper::setConfig(const Configuration &conf, RTT::TaskContext *context){
+    std::map<std::string, ConfigValue *>::const_iterator propIt;
+    for(propIt = conf.values.begin(); propIt != conf.values.end(); propIt++)
+    {
+        if(!applyConfToProperty(context, propIt->first, *(propIt->second)))
+        {
+            std::cout << "ERROR configuration of " << propIt->first << " failed" << std::endl;
+            throw std::runtime_error("ERROR configuration of "  + propIt->first + " failed for context " + context->getName());
+            return false;
+        }
+    }
+
+    return true;
 }
 
