@@ -110,7 +110,9 @@ bool CorbaNameService::isRegistered(const std::string& taskName)
 {
     if(CORBA::is_nil(orb))
     {
-        throw std::runtime_error("CorbaNameService::Error, called getTaskContext() without connection " );
+    	//reinitialization because corba::orb_var init is called on every dynamic library load (error!)
+    	connect();
+//        throw std::runtime_error("CorbaNameService::Error, called getTaskContext() without connection " );
     }
 
     CosNaming::Name serverName;
