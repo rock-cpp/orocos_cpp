@@ -993,3 +993,13 @@ bool ConfigurationHelper::setConfig(const Configuration &conf, RTT::TaskContext 
     return true;
 }
 
+//set a configuration derived from a given YAML String
+bool ConfigurationHelper::applyConfigString(RTT::TaskContext *context, const std::string &configYamlString){
+	Configuration config;
+	bool retVal = false;
+	retVal = parseStringBuffer(config,configYamlString);
+	if(retVal)
+		retVal = setConfig(config,context);
+
+	return retVal;
+}
