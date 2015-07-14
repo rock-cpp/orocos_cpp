@@ -186,7 +186,7 @@ bool LoggingHelper::logAllPorts(RTT::TaskContext* givenContext, const std::strin
         return true;
 
     Bundle &bundle(Bundle::getInstance());
-    logger->file.set(bundle.getLogDirectory() + "/" + taskName + ".0.log"); 
+    logger->file.set(bundle.getLogDirectory() + "/" + loggerName + ".0.log"); 
     
     if(!logger->configure())
     {
