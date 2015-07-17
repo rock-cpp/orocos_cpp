@@ -116,7 +116,10 @@ bool TransformerHelper::configureTransformer(RTT::TaskContext* task)
                 throw std::runtime_error("Error, task " + prov->providerName + " has not port named '" + prov->portName + "'");
                 return false;
             }
-            port->connectTo(dynamicTransformsPort, conPolicy);
+            if(!port->connectTo(dynamicTransformsPort, conPolicy))
+            {
+                throw std::runtime_error("Error, could not connect " + prov->providerName + "." + prov->portName + " to " + task->getName() + "." + dynamicTransformsPort->getName() );
+            }
         }
     }
     
