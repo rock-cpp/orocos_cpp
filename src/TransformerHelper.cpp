@@ -81,6 +81,13 @@ bool TransformerHelper::configureTransformer(RTT::TaskContext* task)
 
         for(const transformer::TransformationElement *elem: result)
         {
+            const transformer::InverseTransformationElement *inv = dynamic_cast<const transformer::InverseTransformationElement *>(elem);
+            if(inv)
+            {
+                elem = inv->getElement();
+            }
+            
+            std::cout << "   " << elem->getSourceFrame() << "2" << elem->getTargetFrame() << std::endl;
             const TransformationProvider *prov = dynamic_cast<const TransformationProvider *>(elem);
             if(!prov)
             {
