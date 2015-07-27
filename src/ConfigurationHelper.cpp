@@ -922,7 +922,13 @@ bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const std::vect
     std::string modelName = caller();
 
     bool syncNeeded = PluginHelper::loadAllTypekitsForModel(modelName);
-
+    
+    //this is not a prox, we don't need to sync
+    if(!dynamic_cast<RTT::corba::TaskContextProxy *>(context))
+    {
+        syncNeeded = false;
+    }
+    
     if(syncNeeded)
     {
         context = RTT::corba::TaskContextProxy::Create(context->getName(), false);
