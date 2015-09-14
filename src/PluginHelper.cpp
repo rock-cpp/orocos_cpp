@@ -12,6 +12,7 @@
 #define xstr(s) str(s)
 #define str(s) #s
 
+using namespace orocoscpp;
 
 std::vector< std::string > PluginHelper::getNeededTypekits(const std::string& componentName)
 {

@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+namespace orocoscpp{
+
 class PkgConfigHelper
 {
 public:
@@ -22,4 +24,5 @@ public:
     static bool solveString(std::string &input, const std::string &replace, const std::string &by);
 };
 
+}//end of namespace
 #endif // PKGCONFIGHELPER_H

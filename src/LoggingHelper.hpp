@@ -3,6 +3,8 @@
 
 #include <rtt/TaskContext.hpp>
 
+namespace orocoscpp{
+
 class LoggingHelper
 {
     const int DEFAULT_LOG_BUFFER_SIZE;
@@ -13,4 +15,5 @@ public:
     bool logTasks();
 };
 
+}//end of namespace
 #endif // LOGGINGHELPER_H

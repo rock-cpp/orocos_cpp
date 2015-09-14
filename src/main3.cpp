@@ -8,6 +8,7 @@
 
 int main(int argc, char**argv)
 {
+	using namespace orocoscpp;
     RTT::corba::TaskContextServer::InitOrb(argc, argv);
 
     PluginHelper::loadAllPluginsInDir("/home/scotch/coyote/install/lib/orocos/gnulinux/types/");

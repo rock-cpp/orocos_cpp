@@ -9,6 +9,8 @@
 #include "Deployment.hpp"
 #include <boost/noncopyable.hpp>
 
+namespace orocoscpp{
+
 class Spawner : public boost::noncopyable
 {
     std::string logDir;
@@ -121,5 +123,6 @@ private:
     
     std::vector<ProcessHandle *> handles;
 };
+}//end of namespace.
 
 #endif // SPAWNER_H

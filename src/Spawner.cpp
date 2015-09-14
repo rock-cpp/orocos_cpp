@@ -17,6 +17,8 @@
 #include "Bundle.hpp"
 #include <signal.h>
 
+using namespace orocoscpp;
+
 struct sigaction originalSignalHandler[SIGTERM];
 
 void shutdownHandler(int signum, siginfo_t *info, void *data);

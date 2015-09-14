@@ -21,9 +21,9 @@ public:
 
 int main(int argc, char**argv)
 {
-    PluginHelper::loadAllPluginsInDir("/home/scotch/coyote/install/lib/orocos/gnulinux/types/");
+    orocoscpp::PluginHelper::loadAllPluginsInDir("/home/scotch/coyote/install/lib/orocos/gnulinux/types/");
     
-    PluginHelper::loadAllPluginsInDir("/home/scotch/coyote/install/lib/orocos/types/");
+    orocoscpp::PluginHelper::loadAllPluginsInDir("/home/scotch/coyote/install/lib/orocos/types/");
 
 //     std::cout << "Plugin load done" << std::endl;
 //     MirrorProxy *mirrorProxy;

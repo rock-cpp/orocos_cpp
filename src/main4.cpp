@@ -7,7 +7,8 @@
 
 int main(int argc, char **argv)
 {
-    Bundle &bundle(Bundle::getInstance());
+	using namespace orocoscpp;
+//    Bundle &bundle(Bundle::getInstance());
 
     PluginHelper::loadAllPluginsInDir("/home/scotch/coyote/install/lib/orocos/gnulinux/types/");
     PluginHelper::loadAllPluginsInDir("/home/scotch/coyote/install/lib/orocos/types/");
@@ -23,7 +24,7 @@ int main(int argc, char **argv)
     {
         std::cout << "Got TaskContext " << taksName << std::endl;
         
-        RTT::TaskContext *context = ns.getTaskContext(taksName);
+//        RTT::TaskContext *context = ns.getTaskContext(taksName);
 //         lh.logAllPorts(context);
         
 //         RTT::TaskContext *context = ns.getTaskContext(taksName);

@@ -5,6 +5,8 @@
 #include <iostream>
 #include "PkgConfigHelper.hpp"
 
+using namespace orocoscpp;
+
 Deployment::Deployment(const std::string& name) : deploymentName(name)
 {
     loadPkgConfigFile(name);

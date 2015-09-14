@@ -16,6 +16,8 @@
 
 #include "PluginHelper.hpp"
 
+using namespace orocoscpp;
+
 ComplexConfigValue::ComplexConfigValue(): ConfigValue(COMPLEX)
 {
 

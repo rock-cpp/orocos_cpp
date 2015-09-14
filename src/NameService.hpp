@@ -9,6 +9,8 @@ namespace RTT
     class TaskContext;
 };
 
+namespace orocoscpp{
+
 class NameService
 {
 public:
@@ -24,5 +26,7 @@ public:
     
     virtual RTT::TaskContext *getTaskContext(const std::string &taskName) = 0;
 };
+
+}//end of namespace
 
 #endif // NAMESERVICE_H

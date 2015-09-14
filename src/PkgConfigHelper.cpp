@@ -4,6 +4,8 @@
 #include <boost/tokenizer.hpp>
 #include <fstream>
 
+using namespace orocoscpp;
+
 bool PkgConfigHelper::solveString(std::string &input, const std::string &replace, const std::string &by)
 {
     size_t start_pos = input.find(replace);

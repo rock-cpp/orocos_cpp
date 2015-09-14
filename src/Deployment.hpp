@@ -6,6 +6,8 @@
 #include <map>
 #include <boost/noncopyable.hpp>
 
+namespace orocoscpp{
+
 class Deployment : public boost::noncopyable
 {
 private:
@@ -66,4 +68,5 @@ public:
     
 };
 
+} //end of namespace
 #endif // DEPLOYMENT_H

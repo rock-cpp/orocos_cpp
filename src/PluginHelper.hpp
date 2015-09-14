@@ -5,6 +5,8 @@
 #include <map>
 #include <string>
 
+namespace orocoscpp{
+
 class PluginHelper
 {
 private:
@@ -34,5 +36,5 @@ public:
      * */
     static std::vector<std::string> getNeededTypekits(const std::string &componentName);
 };
-
+}//end of namespace
 #endif // PLUGINHELPER_H

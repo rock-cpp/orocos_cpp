@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+namespace orocoscpp{
+
 class Bundle
 {
 private:
@@ -54,5 +56,7 @@ public:
     
     std::string findFile(const std::string &relativePath);
 };
+
+}//end of namespace
 
 #endif // BUNDLE_H

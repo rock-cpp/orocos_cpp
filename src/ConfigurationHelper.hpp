@@ -3,6 +3,7 @@
 
 #include <rtt/TaskContext.hpp>
 
+namespace orocoscpp{
 
 class ConfigValue
 {
@@ -87,5 +88,7 @@ private:
     bool applyConfToProperty(RTT::TaskContext* context, const std::string &propertyName, const ConfigValue &value);
     bool parseStringBuffer(Configuration &curConfig, const std::string &buffer);
 };
+
+}//end of namespace
 
 #endif // CONFIGURATIONHELPER_H

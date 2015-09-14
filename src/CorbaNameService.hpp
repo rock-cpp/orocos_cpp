@@ -4,6 +4,8 @@
 #include "NameService.hpp"
 #include <rtt/transports/corba/ApplicationServer.hpp>
 
+namespace orocoscpp{
+
 class CorbaNameService : public NameService, protected RTT::corba::ApplicationServer
 {
 public:
@@ -20,4 +22,5 @@ private:
     CosNaming::NamingContext_var rootContext;
 };
 
+}//end of namespace
 #endif // CORBANAMESERVICE_H

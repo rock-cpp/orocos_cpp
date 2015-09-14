@@ -4,6 +4,8 @@
 #include <rtt/TaskContext.hpp>
 #include <smurf/Smurf.hpp>
 
+namespace orocoscpp{
+
 class TransformerHelper
 {
 private:
@@ -19,4 +21,5 @@ public:
     void setConnectionPolicy(RTT::ConnPolicy &policy);
 };
 
+}//end of namespace
 #endif // TRANSFORMERHELPER_H

@@ -7,6 +7,8 @@
 #include <transformer/BroadcastTypes.hpp>
 #include <rtt/transports/corba/TaskContextProxy.hpp>
 
+using namespace orocoscpp;
+
 class TransformationProvider : public transformer::TransformationElement
 {
 public:
