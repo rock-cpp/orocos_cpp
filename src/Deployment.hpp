@@ -6,7 +6,8 @@
 #include <map>
 #include <boost/noncopyable.hpp>
 
-namespace orocoscpp{
+namespace orocos_cpp
+{
 
 class Deployment : public boost::noncopyable
 {

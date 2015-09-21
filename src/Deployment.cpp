@@ -5,7 +5,7 @@
 #include <iostream>
 #include "PkgConfigHelper.hpp"
 
-using namespace orocoscpp;
+using namespace orocos_cpp;
 
 Deployment::Deployment(const std::string& name) : deploymentName(name)
 {

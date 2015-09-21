@@ -5,9 +5,10 @@
 #include "Bundle.hpp"
 #include "PluginHelper.hpp"
 
+using namespace orocos_cpp;
+
 int main(int argc, char **argv)
 {
-	using namespace orocoscpp;
 //    Bundle &bundle(Bundle::getInstance());
 
     PluginHelper::loadAllPluginsInDir("/home/scotch/coyote/install/lib/orocos/gnulinux/types/");

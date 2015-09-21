@@ -5,7 +5,8 @@
 #include <map>
 #include <string>
 
-namespace orocoscpp{
+namespace orocos_cpp
+{
 
 class PluginHelper
 {

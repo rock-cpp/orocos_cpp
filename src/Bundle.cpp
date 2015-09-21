@@ -7,7 +7,7 @@
 #include <iostream>
 #include <base/Time.hpp>
 
-using namespace orocoscpp;
+using namespace orocos_cpp;
 
 Bundle * Bundle::instance;
 

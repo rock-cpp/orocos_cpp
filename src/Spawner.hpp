@@ -9,7 +9,8 @@
 #include "Deployment.hpp"
 #include <boost/noncopyable.hpp>
 
-namespace orocoscpp{
+namespace orocos_cpp
+{
 
 class Spawner : public boost::noncopyable
 {

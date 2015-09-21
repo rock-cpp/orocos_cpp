@@ -4,7 +4,8 @@
 #include <string>
 #include <vector>
 
-namespace orocoscpp{
+namespace orocos_cpp
+{
 
 class Bundle
 {

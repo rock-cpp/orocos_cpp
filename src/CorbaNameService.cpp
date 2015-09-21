@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <iostream>
 
-using namespace orocoscpp;
+using namespace orocos_cpp;
 
 CorbaNameService::CorbaNameService(std::string name_service_ip, std::string name_service_port) : ip(name_service_ip), port(name_service_port)
 {

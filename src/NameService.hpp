@@ -9,7 +9,8 @@ namespace RTT
     class TaskContext;
 };
 
-namespace orocoscpp{
+namespace orocos_cpp
+{
 
 class NameService
 {

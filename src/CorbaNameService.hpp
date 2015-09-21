@@ -4,7 +4,8 @@
 #include "NameService.hpp"
 #include <rtt/transports/corba/ApplicationServer.hpp>
 
-namespace orocoscpp{
+namespace orocos_cpp
+{
 
 class CorbaNameService : public NameService, protected RTT::corba::ApplicationServer
 {

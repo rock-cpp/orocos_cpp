@@ -3,7 +3,8 @@
 
 #include <rtt/TaskContext.hpp>
 
-namespace orocoscpp{
+namespace orocos_cpp
+{
 
 class LoggingHelper
 {

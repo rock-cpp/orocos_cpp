@@ -4,7 +4,8 @@
 #include <rtt/TaskContext.hpp>
 #include <smurf/Smurf.hpp>
 
-namespace orocoscpp{
+namespace orocos_cpp
+{
 
 class TransformerHelper
 {

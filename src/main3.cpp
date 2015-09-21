@@ -6,9 +6,10 @@
 #include "TransformerHelper.hpp"
 #include "PluginHelper.hpp"
 
+using namespace orocos_cpp;
+
 int main(int argc, char**argv)
 {
-	using namespace orocoscpp;
     RTT::corba::TaskContextServer::InitOrb(argc, argv);
 
     PluginHelper::loadAllPluginsInDir("/home/scotch/coyote/install/lib/orocos/gnulinux/types/");

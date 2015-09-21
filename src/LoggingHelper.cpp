@@ -10,7 +10,7 @@
 #include "Spawner.hpp"
 #include "PluginHelper.hpp"
 
-using namespace orocoscpp;
+using namespace orocos_cpp;
 
 LoggingHelper::LoggingHelper() : DEFAULT_LOG_BUFFER_SIZE(100)
 {

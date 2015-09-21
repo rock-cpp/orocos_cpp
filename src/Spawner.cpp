@@ -17,7 +17,7 @@
 #include "Bundle.hpp"
 #include <signal.h>
 
-using namespace orocoscpp;
+using namespace orocos_cpp;
 
 struct sigaction originalSignalHandler[SIGTERM];
 

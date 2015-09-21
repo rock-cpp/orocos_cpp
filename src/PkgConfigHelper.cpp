@@ -4,7 +4,7 @@
 #include <boost/tokenizer.hpp>
 #include <fstream>
 
-using namespace orocoscpp;
+using namespace orocos_cpp;
 
 bool PkgConfigHelper::solveString(std::string &input, const std::string &replace, const std::string &by)
 {
