@@ -14,6 +14,8 @@
 #include <string>  
 #include <limits>
 
+#include <boost/algorithm/string/regex.hpp>
+
 #include "PluginHelper.hpp"
 
 using namespace orocos_cpp;
@@ -726,14 +728,19 @@ bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
                 if(cont.kind() == "/std/string")
                 {
                     const SimpleConfigValue &sconf = dynamic_cast<const SimpleConfigValue &>(conf);
-                    size_t chars = sconf.value.size();
+
+                    //apply variable resolving before further processing:
+                    std::string enhVal = ConfigurationHelper::applyStringVariableInsertions(sconf.value);
+//                    size_t chars = sconf.value.size();
+                    size_t chars = enhVal.size();
                     
                     cont.init(value.getData());
                     
                     const Typelib::Type &indirect = cont.getIndirection();
                     for(size_t i = 0; i < chars; i++)
                     {
-                        Typelib::Value singleChar((void *)( sconf.value.c_str() + i), indirect);
+                        //Typelib::Value singleChar((void *)( sconf.value.c_str() + i), indirect);
+                    	Typelib::Value singleChar((void *)( enhVal.c_str() + i), indirect);
                         cont.push(value.getData(), singleChar);
                     }
                     break;
@@ -1008,6 +1015,46 @@ bool ConfigurationHelper::applyConfigString(RTT::TaskContext *context, const std
 	retVal = parseStringBuffer(config,configYamlString);
 	if(retVal)
 		retVal = setConfig(config,context);
+
+	return retVal;
+}
+
+//replacing variables in strings (such as file paths).
+std::string ConfigurationHelper::applyStringVariableInsertions(const std::string &val){
+
+	std::string retVal = "";
+    std::vector<std::string> items;
+    //parsing begin and end of code block
+    boost::algorithm::split_regex(items, val, boost::regex("<%[=\\s]*|[\\s%]*>"));
+
+    for(auto &elem: items){
+    	//searching for keywords we want to support (ENV or BUNDLES)
+    	if(elem.find("ENV") != std::string::npos){
+    		//replace environment variables:
+    		std::vector<std::string> variables;
+    		boost::algorithm::split_regex(variables, elem, boost::regex("ENV[\\[\\(] ?['\"]?|['\"]? ?[\\]\\)]"));
+    		for(auto &var: variables){
+    			if(var.empty()){
+    				continue;
+    			}
+    			//add variable to output string:
+    			retVal += std::getenv(var.c_str());
+    		}
+    	}else if(elem.find("BUNDLES") != std::string::npos){
+    		//if bundles search for path in the bundles. The path is given as parameter for BUNDLES:
+    		std::vector<std::string> variables;
+    		boost::algorithm::split_regex(variables, elem, boost::regex("BUNDLES[\\[\\(] ?['\"]?|['\"]? ?[\\]\\)]"));
+    		for(auto &val: variables){
+    			if(val.empty())
+    				continue;
+    		    retVal += Bundle::getInstance().findFile(val);
+    		}
+    	}else{
+    		retVal += elem;
+    	}
+    }
+
+//	std::cout << "Returning String: '" << retVal << "'" << std::endl;
 
 	return retVal;
 }

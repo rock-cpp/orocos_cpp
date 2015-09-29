@@ -37,6 +37,9 @@ rock_library(orocos_cpp
         Boost_SYSTEM Boost_FILESYSTEM Boost_THREAD
     )
 
+find_package(Boost COMPONENTS regex)
+target_link_libraries(orocos_cpp ${Boost_LIBRARIES})
+
 rock_executable(listAll Main.cpp
     DEPS orocos_cpp)
 

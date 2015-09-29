@@ -76,6 +76,8 @@ public:
      * @returns boolean value, true on success, false on fail.
      */
     bool applyConfigString(RTT::TaskContext *context, const std::string &configYamlString);
+
+    static std::string applyStringVariableInsertions(const std::string &val);
 private:
     /**
      * Finnaly apply the config values.
