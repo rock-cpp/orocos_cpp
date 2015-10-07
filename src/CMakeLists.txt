@@ -1,4 +1,4 @@
-find_package( Boost COMPONENTS thread system filesystem)
+find_package( Boost COMPONENTS thread system filesystem regex)
 rock_library(orocos_cpp
     SOURCES 
         Bundle.cpp
@@ -34,11 +34,8 @@ rock_library(orocos_cpp
         smurf
         logger-proxies
     DEPS_PLAIN 
-        Boost_SYSTEM Boost_FILESYSTEM Boost_THREAD
+        Boost_SYSTEM Boost_FILESYSTEM Boost_REGEX Boost_THREAD
     )
-
-find_package(Boost COMPONENTS regex)
-target_link_libraries(orocos_cpp ${Boost_LIBRARIES})
 
 rock_executable(listAll Main.cpp
     DEPS orocos_cpp)
