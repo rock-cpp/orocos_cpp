@@ -15,6 +15,7 @@ rock_library(orocos_cpp
         YAMLConfiguration.cpp
     HEADERS 
         Bundle.hpp
+        Configuration.hpp
         ConfigurationHelper.hpp
         TransformerHelper.hpp
         LoggingHelper.hpp
@@ -24,6 +25,7 @@ rock_library(orocos_cpp
         Deployment.hpp
         PkgConfigHelper.hpp
         PluginHelper.hpp
+        YAMLConfiguration.hpp
     DEPS_PKGCONFIG
         orocos_cpp_base
         rtt_typelib-${OROCOS_TARGET}
