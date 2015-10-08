@@ -79,7 +79,7 @@ public:
     ~Configuration();
     
     void print();
-    bool fromYaml(const std::string &yml);
+    bool fillFromYaml(const std::string &yml);
     bool merge(const Configuration &other);
     
     const std::string &getName() const;

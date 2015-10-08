@@ -1,132 +1,22 @@
 #include "ConfigurationHelper.hpp"
-
-#include <yaml-cpp/yaml.h>
-#include <fstream>
 #include <rtt/types/TypeInfo.hpp>
 #include <rtt/typelib/TypelibMarshaller.hpp>
 #include <rtt/base/DataSourceBase.hpp>
+#include <rtt/transports/corba/TaskContextProxy.hpp>
+#include <rtt/types/TypekitRepository.hpp>
 
 #include <boost/lexical_cast.hpp>
 #include <rtt/OperationCaller.hpp>
 #include "Bundle.hpp"
-
-#include <algorithm>
 #include <string>  
 #include <limits>
 
-#include <boost/algorithm/string/regex.hpp>
-
 #include "PluginHelper.hpp"
+#include "YAMLConfiguration.hpp"
 
 using namespace orocos_cpp;
 
-#include "YAMLConfiguration.hpp"
 
-bool ConfigurationHelper::parseStringBuffer(Configuration &curConfig, const std::string& buffer)
-{
-    std::stringstream fin(buffer);
-    YAML::Parser parser(fin);
-
-    YAML::Node doc;
-    
-    while(parser.GetNextDocument(doc)) {
-
-        if(doc.Type() != YAML::NodeType::Map)
-        {
-            std::cout << "Error, configurations section should only contain yml maps" << std::endl;
-            return false;
-        }
-        
-        if(doc.Type() == YAML::NodeType::Map)
-        {
-            if(!insetMapIntoArray(doc, curConfig))
-            {
-                std::cout << "Warning, could not parse config" << std::endl;
-            }
-        }
-    }
-    
-    return true;
-}
-
-#include <boost/filesystem.hpp>
-
-bool ConfigurationHelper::loadConfigFile(const std::string& pathStr)
-{
-    using namespace boost::filesystem;
-    
-    path path(pathStr);
-
-    if(!exists(path))
-    {
-        throw std::runtime_error(std::string("Error, could not find config file ") + path.c_str());
-    }
-    
-    subConfigs.clear();
-
-    //as this is non standard yml, we need to load and parse the config file first
-    std::ifstream fin(path.c_str());
-    std::string line;
-    
-    std::string buffer;
-    
-    Configuration curConfig("dummy");
-    bool hasConfig = false;
-
-    
-    while(std::getline(fin, line))
-    {
-        if(line.size() >= 3 && line.at(0) == '-'  && line.at(1) == '-'  && line.at(2) == '-' )
-        {
-            //found new subsection
-//             std::cout << "found subsection " << line << std::endl;
-            
-            std::string searched("--- name:");
-            if(!line.compare(0, searched.size(), searched))
-            {
-
-                if(hasConfig)
-                {
-                    if(!parseStringBuffer(curConfig, buffer))
-                        return false;
-                    buffer.clear();
-                    subConfigs.insert(std::make_pair(curConfig.getName(), curConfig));
-                }
-                
-                hasConfig = true;
-                
-                curConfig = Configuration(line.substr(searched.size(), line.size()));
-
-//                 std::cout << "Found new configuration " << curConfig.name << std::endl;
-            } else
-            {
-                std::cout << "Error, sections must begin with '--- name:<SectionName>'" << std::endl;
-                return false;
-            }
-
-        } else
-        {
-            //line belongs to the last detected section, add it to the buffer
-            buffer.append(line);
-            buffer.append("\n");
-        }
-    }
-    
-    if(hasConfig)
-    {
-        if(!parseStringBuffer(curConfig, buffer))
-            return false;
-        subConfigs.insert(std::make_pair(curConfig.getName(), curConfig));
-    }
-
-//     for(std::map<std::string, Configuration>::const_iterator it = subConfigs.begin(); it != subConfigs.end(); it++)
-//     {
-//         std::cout << "Cur conf \"" << it->first << "\"" << std::endl;
-//         displayConfiguration(it->second);
-//     }
-    
-    return true;
-}
 
 template <typename T>
 bool applyValue(Typelib::Value &value, const SimpleConfigValue& conf)
@@ -437,18 +327,13 @@ bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
                 {
                     const SimpleConfigValue &sconf = dynamic_cast<const SimpleConfigValue &>(conf);
 
-                    //apply variable resolving before further processing:
-                    std::string enhVal = ConfigurationHelper::applyStringVariableInsertions(sconf.getValue());
-//                    size_t chars = sconf.value.size();
-                    size_t chars = enhVal.size();
-                    
+                    size_t chars = sconf.getValue().size();
                     cont.init(value.getData());
                     
                     const Typelib::Type &indirect = cont.getIndirection();
                     for(size_t i = 0; i < chars; i++)
                     {
-                        //Typelib::Value singleChar((void *)( sconf.value.c_str() + i), indirect);
-                    	Typelib::Value singleChar((void *)( enhVal.c_str() + i), indirect);
+                    	Typelib::Value singleChar((void *)( sconf.getValue().c_str() + i), indirect);
                         cont.push(value.getData(), singleChar);
                     }
                     break;
@@ -605,9 +490,27 @@ bool ConfigurationHelper::mergeConfig(const std::vector< std::string >& names, C
     return true;
 }
 
+bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const Configuration& config)
+{
+    std::map<std::string, ConfigValue *>::const_iterator propIt;
+    for(propIt = config.getValues().begin(); propIt != config.getValues().end(); propIt++)
+    {
+        if(!applyConfToProperty(context, propIt->first, *(propIt->second)))
+        {
+            std::cout << "ERROR configuration of " << propIt->first << " failed" << std::endl;
+            throw std::runtime_error("ERROR configuration of "  + propIt->first + " failed for context " + context->getName());
+            return false;
+        }
+    }
+
+    return true;    
+}
+
+
 bool ConfigurationHelper::applyConfig(const std::string& configFilePath, RTT::TaskContext* context, const std::vector< std::string >& names)
 {
-    loadConfigFile(configFilePath);
+    YAMLConfigParser parser;
+    parser.loadConfigFile(configFilePath, subConfigs);
     
     Configuration config("Merged");
     if(!mergeConfig(names, config))
@@ -617,12 +520,9 @@ bool ConfigurationHelper::applyConfig(const std::string& configFilePath, RTT::Ta
     }
     
     //finally apply:
-    return setConfig(config,context);
+    return applyConfig(context, config);
 
 }
-
-#include <rtt/transports/corba/TaskContextProxy.hpp>
-#include <rtt/types/TypekitRepository.hpp>
 
 bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const std::vector< std::string >& names)
 {
@@ -696,71 +596,4 @@ bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const std::stri
     configs.push_back(conf4);
     
     return applyConfig(context, configs);
-}
-
-//finanlly set the config values.
-bool ConfigurationHelper::setConfig(const Configuration &conf, RTT::TaskContext *context){
-    std::map<std::string, ConfigValue *>::const_iterator propIt;
-    for(propIt = conf.getValues().begin(); propIt != conf.getValues().end(); propIt++)
-    {
-        if(!applyConfToProperty(context, propIt->first, *(propIt->second)))
-        {
-            std::cout << "ERROR configuration of " << propIt->first << " failed" << std::endl;
-            throw std::runtime_error("ERROR configuration of "  + propIt->first + " failed for context " + context->getName());
-            return false;
-        }
-    }
-
-    return true;
-}
-
-//set a configuration derived from a given YAML String
-bool ConfigurationHelper::applyConfigString(RTT::TaskContext *context, const std::string &configYamlString){
-	Configuration config("");
-	bool retVal = false;
-	retVal = parseStringBuffer(config,configYamlString);
-	if(retVal)
-		retVal = setConfig(config,context);
-
-	return retVal;
-}
-
-//replacing variables in strings (such as file paths).
-std::string ConfigurationHelper::applyStringVariableInsertions(const std::string &val){
-
-	std::string retVal = "";
-    std::vector<std::string> items;
-    //parsing begin and end of code block
-    boost::algorithm::split_regex(items, val, boost::regex("<%[=\\s]*|[\\s%]*>"));
-
-    for(auto &elem: items){
-    	//searching for keywords we want to support (ENV or BUNDLES)
-    	if(elem.find("ENV") != std::string::npos){
-    		//replace environment variables:
-    		std::vector<std::string> variables;
-    		boost::algorithm::split_regex(variables, elem, boost::regex("ENV[\\[\\(] ?['\"]?|['\"]? ?[\\]\\)]"));
-    		for(auto &var: variables){
-    			if(var.empty()){
-    				continue;
-    			}
-    			//add variable to output string:
-    			retVal += std::getenv(var.c_str());
-    		}
-    	}else if(elem.find("BUNDLES") != std::string::npos){
-    		//if bundles search for path in the bundles. The path is given as parameter for BUNDLES:
-    		std::vector<std::string> variables;
-    		boost::algorithm::split_regex(variables, elem, boost::regex("BUNDLES[\\[\\(] ?['\"]?|['\"]? ?[\\]\\)]"));
-    		for(auto &val: variables){
-    			if(val.empty())
-    				continue;
-    		    retVal += Bundle::getInstance().findFile(val);
-    		}
-    	}else{
-    		retVal += elem;
-    	}
-    }
-
-//	std::cout << "Returning String: '" << retVal << "'" << std::endl;
-
-	return retVal;
 }
