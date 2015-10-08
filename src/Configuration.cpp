@@ -227,7 +227,12 @@ const std::string& Configuration::getName() const
     return name;
 }
 
-
+bool Configuration::fillFromYaml(const std::string& yml)
+{
+    values.clear();
+    YAMLConfigParser parser;
+    return parser.parseYAML(*this, parser.applyStringVariableInsertions(yml));
+}
 
 bool Configuration::merge(const Configuration& other)
 {
