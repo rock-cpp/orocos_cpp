@@ -20,301 +20,7 @@
 
 using namespace orocos_cpp;
 
-ComplexConfigValue::ComplexConfigValue(): ConfigValue(COMPLEX)
-{
-
-}
-
-bool ComplexConfigValue::merge(const ConfigValue* other)
-{
-    if(other->type != COMPLEX)
-        return false;
-
-    if(name != other->name)
-    {
-        throw std::runtime_error("Internal Error, merge between mismatching value");
-    }
-
-    const ComplexConfigValue *cother = dynamic_cast<const ComplexConfigValue *>(other);
-    
-    for(std::map<std::string, ConfigValue *>::const_iterator it = cother->values.begin(); it != cother->values.end(); it++)
-    {
-        std::map<std::string, ConfigValue *>::iterator entry = values.find(it->first);
-        if(entry != values.end())
-        {
-            if(!entry->second->merge(it->second))
-                return false;
-        }
-        else
-        {
-            values.insert(*it);
-        }
-    }    
-    return true;
-}
-
-ArrayConfigValue::ArrayConfigValue(): ConfigValue(ARRAY)
-{
-
-}
-
-bool ArrayConfigValue::merge(const ConfigValue* other)
-{
-    if(other->type != ARRAY)
-        return false;
-
-    if(name != other->name)
-    {
-        throw std::runtime_error("Internal Error, merge between mismatching value");
-    }
-    
-    const ArrayConfigValue *aother = dynamic_cast<const ArrayConfigValue *>(other);
-    
-    //we only support direct overwrite by index
-    for(size_t i = 0; i < aother->values.size(); i++)
-    {
-        if(i < values.size())
-        {
-            values[i] = aother->values[i];
-        }
-        else
-        {
-            values.push_back(aother->values[i]);
-        }
-    }
-    
-    return true;
-}
-
-
-SimpleConfigValue::SimpleConfigValue(): ConfigValue(SIMPLE)
-{
-
-}
-
-bool SimpleConfigValue::merge(const ConfigValue* other)
-{
-    if(other->type != SIMPLE)
-        return false;
-    
-    if(name != other->name)
-    {
-        throw std::runtime_error("Internal Error, merge between mismatching value");
-    }
-    
-    const SimpleConfigValue *sother = dynamic_cast<const SimpleConfigValue *>(other);
-    value = sother->value;
-    
-    return true;
-}
-
-ConfigValue::ConfigValue(Type t) : type(t)
-{
-    
-}
-
-ConfigValue::~ConfigValue()
-{
-
-}
-
-
-void displayMap(const YAML::Node &map, int level = 0);
-
-void printNode(const YAML::Node &node, int level = 0)
-{
-    for(int i = 0; i < level; i++)
-        std::cout << "  ";
-
-    switch(node.Type())
-    {
-        case YAML::NodeType::Scalar:
-        {
-            std::string value;
-            if(node.GetScalar(value))
-            {
-                std::cout << "a Scalar: "<< value << std::endl;
-            }
-            else
-                std::cout << "a Scalar: without value " << std::endl;
-        }
-            break;
-        case YAML::NodeType::Sequence:
-            std::cout << "a Sequence: " << node.Tag() << std::endl;
-            break;
-        case YAML::NodeType::Map:
-            std::cout << "a Map: " << node.Tag() << std::endl;
-            displayMap(node, level + 1);
-            break;
-        case YAML::NodeType::Null:
-            break;
-    }
-}
-
-ConfigValue *getConfigValue(const YAML::Node &node);
-
-bool insetMapIntoArray(const YAML::Node &map, std::map<std::string, ConfigValue *> &array)
-{
-    for(YAML::Iterator it = map.begin(); it != map.end(); it++)
-    {
-        std::string memberName;
-        it.first() >> memberName;
-//         std::cout << "Name : " << memberName << std::endl;
-        ConfigValue *val = getConfigValue(it.second());
-        
-        if(!val)
-        {
-            std::cout << "Warning, could not get config value for " << memberName << std::endl;
-            continue;
-        }
-        
-        val->name = memberName;
-
-        array.insert(std::make_pair(memberName, val));
-    }
-    return !array.empty();
-}
-
-ComplexConfigValue *getMap(const YAML::Node &map)
-{
-    ComplexConfigValue *mapValue = new ComplexConfigValue;
-    if(!insetMapIntoArray(map, mapValue->values))
-    {
-        delete mapValue;
-        return NULL;
-    }
-
-    return mapValue;
-}
-
-ConfigValue *getConfigValue(const YAML::Node &node)
-{
-    switch(node.Type())
-    {
-        case YAML::NodeType::Scalar:
-        {
-            std::string value;
-            if(node.GetScalar(value))
-            {
-//                 std::cout << "a Scalar: "<< value << std::endl;
-                SimpleConfigValue *conf = new SimpleConfigValue;
-                conf->value = value;
-                return conf;
-            }
-            else
-                std::cout << "a Scalar: without value " << std::endl;
-        }
-            break;
-        case YAML::NodeType::Sequence:
-//             std::cout << "a Sequence: " << node.Tag() << std::endl;
-            {
-                ArrayConfigValue *values = new ArrayConfigValue();
-                for(YAML::Iterator it = node.begin(); it != node.end(); it++)
-                {
-                    ConfigValue *curConf = getConfigValue(*it);
-                    
-                    values->values.push_back(curConf);
-                }
-                return values;
-            }
-            break;
-        case YAML::NodeType::Map:
-        {
-//             std::cout << "a Map: " << node.Tag() << std::endl;
-            ComplexConfigValue *mapValue = new ComplexConfigValue;
-            if(!insetMapIntoArray(node, mapValue->values))
-            {
-                delete mapValue;
-                return NULL;
-            }
-            return mapValue;
-            break;
-        }
-        case YAML::NodeType::Null:
-            std::cout << "NULL" << std::endl;
-            break;
-    }
-    return NULL;
-}
-
-void displayMap(const YAML::Node &map, int level)
-{
-    for(YAML::Iterator it = map.begin(); it != map.end(); it++)
-    {
-        for(int i = 0; i < level; i++)
-            std::cout << "  ";
-        
-        std::string value;
-        it.first() >> value;
-        std::cout << "Value of first " << value << std::endl;
-        printNode(it.second(), level + 1);
-    }
-    
-}
-
-void displayConfig(ConfigValue *val, int level)
-{
-    for(int i = 0; i < level; i++)
-        std::cout << "  ";
-    switch(val->type)
-    {
-        case ConfigValue::SIMPLE:
-        {
-            SimpleConfigValue *s = dynamic_cast<SimpleConfigValue *>(val);
-            std::cout << s->name << " : " << s->value << std::endl;
-        }
-            break;
-        case ConfigValue::COMPLEX:
-        {
-            ComplexConfigValue *c = dynamic_cast<ComplexConfigValue *>(val);
-            std::cout << val->name << ":" << std::endl;
-            for(std::map<std::string, ConfigValue *>::const_iterator it = c->values.begin(); it != c->values.end(); it++)
-            {
-                displayConfig(it->second, level + 1);
-            }
-        }
-        break;
-        case ConfigValue::ARRAY:
-        {
-            ArrayConfigValue *a = dynamic_cast<ArrayConfigValue *>(val);
-            assert(a);
-            std::cout << val->name << ":" << std::endl;
-            for(std::vector<ConfigValue *>::const_iterator it = a->values.begin(); it != a->values.end(); it++)
-            {
-                displayConfig(*it, level + 1);
-            }
-        }
-        break;
-    }
-}
-
-void displayConfiguration(const Configuration &conf)
-{
-    std::cout << "Configuration name is : " << conf.name << std::endl;
-    for(std::map<std::string, ConfigValue *>::const_iterator it = conf.values.begin(); it != conf.values.end(); it++)
-    {
-        displayConfig(it->second, 1);
-    }
-}
-
-bool Configuration::merge(const Configuration& other)
-{
-    for(std::map<std::string, ConfigValue *>::const_iterator it = other.values.begin(); it != other.values.end(); it++)
-    {
-        std::map<std::string, ConfigValue *>::iterator entry = values.find(it->first);
-        if(entry != values.end())
-        {
-            if(!entry->second->merge(it->second))
-                return false;
-        }
-        else
-        {
-            values.insert(*it);
-        }
-    }
-    
-    return true;
-}
+#include "YAMLConfiguration.hpp"
 
 bool ConfigurationHelper::parseStringBuffer(Configuration &curConfig, const std::string& buffer)
 {
@@ -333,7 +39,7 @@ bool ConfigurationHelper::parseStringBuffer(Configuration &curConfig, const std:
         
         if(doc.Type() == YAML::NodeType::Map)
         {
-            if(!insetMapIntoArray(doc, curConfig.values))
+            if(!insetMapIntoArray(doc, curConfig))
             {
                 std::cout << "Warning, could not parse config" << std::endl;
             }
@@ -364,7 +70,7 @@ bool ConfigurationHelper::loadConfigFile(const std::string& pathStr)
     
     std::string buffer;
     
-    Configuration curConfig;
+    Configuration curConfig("dummy");
     bool hasConfig = false;
 
     
@@ -384,13 +90,12 @@ bool ConfigurationHelper::loadConfigFile(const std::string& pathStr)
                     if(!parseStringBuffer(curConfig, buffer))
                         return false;
                     buffer.clear();
-                    subConfigs.insert(std::make_pair(curConfig.name, curConfig));
+                    subConfigs.insert(std::make_pair(curConfig.getName(), curConfig));
                 }
                 
                 hasConfig = true;
                 
-                curConfig.name = line.substr(searched.size(), line.size());
-                curConfig.values.clear();
+                curConfig = Configuration(line.substr(searched.size(), line.size()));
 
 //                 std::cout << "Found new configuration " << curConfig.name << std::endl;
             } else
@@ -411,7 +116,7 @@ bool ConfigurationHelper::loadConfigFile(const std::string& pathStr)
     {
         if(!parseStringBuffer(curConfig, buffer))
             return false;
-        subConfigs.insert(std::make_pair(curConfig.name, curConfig));
+        subConfigs.insert(std::make_pair(curConfig.getName(), curConfig));
     }
 
 //     for(std::map<std::string, Configuration>::const_iterator it = subConfigs.begin(); it != subConfigs.end(); it++)
@@ -428,10 +133,10 @@ bool applyValue(Typelib::Value &value, const SimpleConfigValue& conf)
 {
     T *val = static_cast<T *>(value.getData());
     try {
-        *val = boost::lexical_cast<T>(conf.value);
+        *val = boost::lexical_cast<T>(conf.getValue());
     } catch (boost::bad_lexical_cast bc)
     {
-        std::cout << "Error, could not set value " << conf.value << " on property " << conf.name << " Bad lexical cast : " << bc.what() << std::endl;
+        std::cout << "Error, could not set value " << conf.getValue() << " on property " << conf.getName() << " Bad lexical cast : " << bc.what() << std::endl;
         std::cout << " Target Type " << value.getType().getName() << std::endl;
         return false;
     }
@@ -443,10 +148,10 @@ bool applyValue<uint8_t>(Typelib::Value &value, const SimpleConfigValue& conf)
 {
     uint8_t *val = static_cast<uint8_t *>(value.getData());
     try {
-        *val = boost::numeric_cast<uint8_t>(boost::lexical_cast<unsigned int>(conf.value));
+        *val = boost::numeric_cast<uint8_t>(boost::lexical_cast<unsigned int>(conf.getValue()));
     } catch (boost::bad_lexical_cast bc)
     {
-        std::cout << "Error, could not set value " << conf.value << " on property " << conf.name << " Bad lexical cast : " << bc.what() << std::endl;
+        std::cout << "Error, could not set value " << conf.getValue() << " on property " << conf.getName() << " Bad lexical cast : " << bc.what() << std::endl;
         std::cout << " Target Type " << value.getType().getName() << std::endl;
         return false;
     }
@@ -458,10 +163,10 @@ bool applyValue<int8_t>(Typelib::Value &value, const SimpleConfigValue& conf)
 {
     int8_t *val = static_cast<int8_t *>(value.getData());
     try {
-        *val = boost::numeric_cast<int8_t>(boost::lexical_cast<int>(conf.value));
+        *val = boost::numeric_cast<int8_t>(boost::lexical_cast<int>(conf.getValue()));
     } catch (boost::bad_lexical_cast bc)
     {
-        std::cout << "Error, could not set value " << conf.value << " on property " << conf.name << " Bad lexical cast : " << bc.what() << std::endl;
+        std::cout << "Error, could not set value " << conf.getValue() << " on property " << conf.getName() << " Bad lexical cast : " << bc.what() << std::endl;
         std::cout << " Target Type " << value.getType().getName() << std::endl;
         return false;
     }
@@ -472,7 +177,7 @@ template <>
 bool applyValue<double>(Typelib::Value &value, const SimpleConfigValue& conf)
 {
     double *val = static_cast<double *>(value.getData());
-    std::string  copy = conf.value;
+    std::string  copy = conf.getValue();
     std::transform(copy.begin(), copy.end(), copy.begin(), ::tolower);
     if (copy.find("nan") != std::string::npos) {
 	*val = std::numeric_limits<double>::quiet_NaN();
@@ -480,11 +185,11 @@ bool applyValue<double>(Typelib::Value &value, const SimpleConfigValue& conf)
     else 
     {
       try {
-	  *val = boost::lexical_cast<double>(conf.value);
+	  *val = boost::lexical_cast<double>(conf.getValue());
       } 
       catch (boost::bad_lexical_cast bc)
       {
-	  std::cout << "Error, could not set value " << conf.value << " on property " << conf.name << " Bad lexical cast : " << bc.what() << std::endl;
+	  std::cout << "Error, could not set value " << conf.getValue() << " on property " << conf.getName() << " Bad lexical cast : " << bc.what() << std::endl;
 	  std::cout << " Target Type " << value.getType().getName() << std::endl;
 	  return false;
       }
@@ -496,7 +201,7 @@ bool applyConfOnTypelibEnum(Typelib::Value &value, const SimpleConfigValue& conf
 {
     const Typelib::Enum *myenum = dynamic_cast<const Typelib::Enum *>(&(value.getType()));
 
-    if(conf.value.empty())
+    if(conf.getValue().empty())
     {
         std::cout << "Error, given enum is an empty string" << std::endl;
         return false;
@@ -504,16 +209,16 @@ bool applyConfOnTypelibEnum(Typelib::Value &value, const SimpleConfigValue& conf
     
     //values are sometimes given as RUBY constants. We need to remove the ':' in front of them
     std::string enumName;
-    if(conf.value.at(0) == ':')
-        enumName = conf.value.substr(1, conf.value.size());
+    if(conf.getValue().at(0) == ':')
+        enumName = conf.getValue().substr(1, conf.getValue().size());
     else
-        enumName = conf.value;
+        enumName = conf.getValue();
     
     std::map<std::string, int>::const_iterator it = myenum->values().find(enumName);
     
     if(it == myenum->values().end())
     {
-        std::cout << "Error : " << conf.value << " is not a valid enum name " << std::endl;
+        std::cout << "Error : " << conf.getValue() << " is not a valid enum name " << std::endl;
         std::cout << "Valid enum names :" << std::endl;
         for(const std::pair<std::string, int> &v : myenum->values())
         {
@@ -581,20 +286,17 @@ bool applyConfOnTypelibNumeric(Typelib::Value &value, const SimpleConfigValue& c
             }
             break;
         case Typelib::Numeric::UInt:
+        {
             //HACK typelib encodes bools as unsigned integer. Brrrrr
-            std::string lowerCase = conf.value;
+            std::string lowerCase = conf.getValue();
             std::transform(lowerCase.begin(), lowerCase.end(), lowerCase.begin(), ::tolower);
             if(lowerCase == "true")
             {
-                SimpleConfigValue co2 = conf;
-                co2.value = "1";
-                return applyConfOnTypelibNumeric(value, co2);
+                return applyConfOnTypelibNumeric(value, SimpleConfigValue("1"));
             }
             if(lowerCase == "false")
             {
-                SimpleConfigValue co2 = conf;
-                co2.value = "0";
-                return applyConfOnTypelibNumeric(value, co2);
+                return applyConfOnTypelibNumeric(value, SimpleConfigValue("0"));
             }
             
             switch(num->getSize())
@@ -616,6 +318,10 @@ bool applyConfOnTypelibNumeric(Typelib::Value &value, const SimpleConfigValue& c
                     return false;
                     break;
             }
+        }
+            break;
+        case Typelib::Numeric::NumberOfValidCategories:
+            throw std::runtime_error("Internal Error: Got invalid Category");
             break;
     }
     return true;
@@ -672,9 +378,9 @@ bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
             
             size_t arraySize = array.getDimension();
             
-            if(arrayConfig.values.size() != arraySize)
+            if(arrayConfig.getValues().size() != arraySize)
             {
-                std::cout << "Error: Array " << arrayConfig.name << " of properties has different size than array in config file" << std::endl;
+                std::cout << "Error: Array " << arrayConfig.getName() << " of properties has different size than array in config file" << std::endl;
                 return false;
             }
             
@@ -682,7 +388,7 @@ bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
             {
                 size_t offset =  indirect.getSize() * i;
                 Typelib::Value v( reinterpret_cast<uint8_t *>(value.getData()) + offset , indirect);
-                if(!applyConfOnTyplibValue(v, *(arrayConfig.values[i])))
+                if(!applyConfOnTyplibValue(v, *(arrayConfig.getValues()[i])))
                     return false;
             }
         }
@@ -691,12 +397,14 @@ bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
         {
             const Typelib::Compound &comp = dynamic_cast<const Typelib::Compound &>(value.getType());
             Typelib::Compound::FieldList::const_iterator it = comp.getFields().begin();
-            ComplexConfigValue cpx = dynamic_cast<const ComplexConfigValue &>(conf);
+            const ComplexConfigValue &cpx = dynamic_cast<const ComplexConfigValue &>(conf);
+            auto confValues = cpx.getValues();
+            
             for(;it != comp.getFields().end(); it++)
             {
-                std::map<std::string, ConfigValue *>::const_iterator confIt = cpx.values.find(it->getName());
+                std::map<std::string, ConfigValue *>::const_iterator confIt = confValues.find(it->getName());
                 Typelib::Value fieldValue(((uint8_t *) value.getData()) + it->getOffset(), it->getType());
-                if(confIt == cpx.values.end())
+                if(confIt == confValues.end())
                 {
                     //even if we don't configure this one, we still need to initialize it
                     initTyplibValueRecusive(fieldValue);
@@ -705,15 +413,15 @@ bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
 
                 ConfigValue *curConf = confIt->second;
                 
-                cpx.values.erase(it->getName());
+                confValues.erase(confIt);
                 
                 if(!applyConfOnTyplibValue(fieldValue, *curConf))
                     return false;
             }
-            if(!cpx.values.empty())
+            if(!confValues.empty())
             {
                 std::cout << "Error :" << std::endl;
-                for(std::map<std::string, ConfigValue *>::const_iterator it = cpx.values.begin(); it != cpx.values.end();it++)
+                for(std::map<std::string, ConfigValue *>::const_iterator it = confValues.begin(); it != confValues.end();it++)
                 {
                     std::cout << "  " << it->first << std::endl;
                 }
@@ -730,7 +438,7 @@ bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
                     const SimpleConfigValue &sconf = dynamic_cast<const SimpleConfigValue &>(conf);
 
                     //apply variable resolving before further processing:
-                    std::string enhVal = ConfigurationHelper::applyStringVariableInsertions(sconf.value);
+                    std::string enhVal = ConfigurationHelper::applyStringVariableInsertions(sconf.getValue());
 //                    size_t chars = sconf.value.size();
                     size_t chars = enhVal.size();
                     
@@ -747,9 +455,9 @@ bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
                 }
                 else
                 {
-                    if(conf.type != ConfigValue::ARRAY)
+                    if(conf.getType() != ConfigValue::ARRAY)
                     {
-                        std::cout << "Error, YAML representation << " << conf.name << " of type " << value.getType().getName() << " is not an array " << std::endl;
+                        std::cout << "Error, YAML representation << " << conf.getName() << " of type " << value.getType().getName() << " is not an array " << std::endl;
                         std::cout << "Error, got container in property, but config value is not an array " << std::endl;
                         return false;
                     }
@@ -758,15 +466,13 @@ bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
                     const Typelib::Type &indirect = cont.getIndirection();
                     cont.init(value.getData());
 
-                    std::vector<ConfigValue *>::const_iterator it = array.values.begin();
-
-                    for(; it != array.values.end(); it++)
+                    for(const ConfigValue *val: array.getValues())
                     {
                         
                         //TODO check, this may be a memory leak
                         Typelib::Value v(new uint8_t[indirect.getSize()], indirect);
                         
-                        if(!applyConfOnTyplibValue(v, *(*it)))
+                        if(!applyConfOnTyplibValue(v, *(val)))
                         {
                             return false;
                         }
@@ -903,7 +609,7 @@ bool ConfigurationHelper::applyConfig(const std::string& configFilePath, RTT::Ta
 {
     loadConfigFile(configFilePath);
     
-    Configuration config;
+    Configuration config("Merged");
     if(!mergeConfig(names, config))
     {
         throw std::runtime_error("Error, merging of configuarations for context " + context->getName() + " failed ");
@@ -995,7 +701,7 @@ bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const std::stri
 //finanlly set the config values.
 bool ConfigurationHelper::setConfig(const Configuration &conf, RTT::TaskContext *context){
     std::map<std::string, ConfigValue *>::const_iterator propIt;
-    for(propIt = conf.values.begin(); propIt != conf.values.end(); propIt++)
+    for(propIt = conf.getValues().begin(); propIt != conf.getValues().end(); propIt++)
     {
         if(!applyConfToProperty(context, propIt->first, *(propIt->second)))
         {
@@ -1010,7 +716,7 @@ bool ConfigurationHelper::setConfig(const Configuration &conf, RTT::TaskContext 
 
 //set a configuration derived from a given YAML String
 bool ConfigurationHelper::applyConfigString(RTT::TaskContext *context, const std::string &configYamlString){
-	Configuration config;
+	Configuration config("");
 	bool retVal = false;
 	retVal = parseStringBuffer(config,configYamlString);
 	if(retVal)

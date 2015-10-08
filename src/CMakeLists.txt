@@ -2,6 +2,7 @@ find_package( Boost COMPONENTS thread system filesystem regex)
 rock_library(orocos_cpp
     SOURCES 
         Bundle.cpp
+        Configuration.cpp
         ConfigurationHelper.cpp
         TransformerHelper.cpp
         LoggingHelper.cpp
@@ -11,6 +12,7 @@ rock_library(orocos_cpp
         Deployment.cpp
         PkgConfigHelper.cpp
         PluginHelper.cpp
+        YAMLConfiguration.cpp
     HEADERS 
         Bundle.hpp
         ConfigurationHelper.hpp

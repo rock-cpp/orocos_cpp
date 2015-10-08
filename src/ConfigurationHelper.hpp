@@ -2,60 +2,10 @@
 #define CONFIGURATIONHELPER_H
 
 #include <rtt/TaskContext.hpp>
+#include "Configuration.hpp"
 
 namespace orocos_cpp
 {
-
-class ConfigValue
-{
-public:
-    enum Type {
-        SIMPLE,
-        COMPLEX,
-        ARRAY,
-    };
-    
-    enum Type type;
-    std::string name;
-    
-    virtual bool merge(const ConfigValue *other) = 0;
-    
-protected:
-    ConfigValue(enum Type);
-    virtual ~ConfigValue();
-};
-
-class SimpleConfigValue : public ConfigValue
-{
-public:
-    virtual bool merge(const ConfigValue* other);
-    SimpleConfigValue();
-    std::string value;
-};
-
-class ComplexConfigValue : public ConfigValue
-{
-public:
-    virtual bool merge(const ConfigValue* other);
-    ComplexConfigValue();
-    std::map<std::string, ConfigValue *> values;
-};
-
-class ArrayConfigValue : public ConfigValue
-{
-public:
-    virtual bool merge(const ConfigValue* other);
-    ArrayConfigValue();
-    std::vector<ConfigValue *> values;
-};
-
-class Configuration
-{
-public:
-    std::string name;
-    bool merge(const Configuration &other);
-    std::map<std::string, ConfigValue *> values;
-};
 
 class ConfigurationHelper
 {
