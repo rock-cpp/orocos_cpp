@@ -214,8 +214,14 @@ bool YAMLConfigParser::loadConfigFile(const std::string& pathStr, std::map<std::
 
                 if(hasConfig)
                 {
-                    if(!parseYAML(curConfig, applyStringVariableInsertions(buffer)))
+                    try {
+                        if(!parseYAML(curConfig, applyStringVariableInsertions(buffer)))
+                            return false;
+                    } catch (std::runtime_error &e)
+                    {
+                        std::cout << "Error loading config file " << pathStr << std::endl << "    " << e.what() << std::endl;
                         return false;
+                    }
                     buffer.clear();
                     subConfigs.insert(std::make_pair(curConfig.getName(), curConfig));
                 }
@@ -241,8 +247,14 @@ bool YAMLConfigParser::loadConfigFile(const std::string& pathStr, std::map<std::
     
     if(hasConfig)
     {
-        if(!parseYAML(curConfig, applyStringVariableInsertions(buffer)))
+        try {
+            if(!parseYAML(curConfig, applyStringVariableInsertions(buffer)))
+                return false;
+        } catch (std::runtime_error &e)
+        {
+                        std::cout << "Error loading config file " << pathStr << std::endl << "    " << e.what() << std::endl;
             return false;
+        }
         subConfigs.insert(std::make_pair(curConfig.getName(), curConfig));
     }
 
