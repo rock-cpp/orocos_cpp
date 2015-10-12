@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <memory>
 
 namespace orocos_cpp
 {
@@ -16,7 +17,7 @@ public:
         ARRAY,
     };
     
-    virtual bool merge(const ConfigValue *other) = 0;
+    virtual bool merge(std::shared_ptr<ConfigValue> other) = 0;
     
     const std::string &getName() const;
     const Type &getType() const;
@@ -39,7 +40,7 @@ public:
     SimpleConfigValue(const std::string &value);
     virtual ~SimpleConfigValue();
     virtual void print(int level = 0) const;
-    virtual bool merge(const ConfigValue* other);
+    virtual bool merge(std::shared_ptr<ConfigValue> other);
     
     const std::string &getValue() const;
 private:
@@ -52,11 +53,11 @@ public:
     ComplexConfigValue();
     virtual ~ComplexConfigValue();
     virtual void print(int level = 0) const;
-    virtual bool merge(const ConfigValue* other);
-    const std::map<std::string, ConfigValue *> &getValues() const;
-    void addValue(const std::string &name, ConfigValue *value);
+    virtual bool merge(std::shared_ptr<ConfigValue> other);
+    const std::map<std::string, std::shared_ptr<ConfigValue>> &getValues() const;
+    void addValue(const std::string &name, std::shared_ptr<ConfigValue> value);
 private:
-    std::map<std::string, ConfigValue *> values;
+    std::map<std::string, std::shared_ptr<ConfigValue>> values;
 };
 
 class ArrayConfigValue : public ConfigValue
@@ -65,11 +66,11 @@ public:
     ArrayConfigValue();
     virtual ~ArrayConfigValue();
     virtual void print(int level = 0) const;
-    virtual bool merge(const ConfigValue* other);
-    const std::vector<ConfigValue *> getValues() const;
-    void addValue(ConfigValue *value);
+    virtual bool merge(std::shared_ptr<ConfigValue> other);
+    const std::vector<std::shared_ptr<ConfigValue> > getValues() const;
+    void addValue(std::shared_ptr<ConfigValue> value);
 private:
-    std::vector<ConfigValue *> values;
+    std::vector<std::shared_ptr<ConfigValue> > values;
 };
 
 class Configuration
@@ -83,11 +84,11 @@ public:
     bool merge(const Configuration &other);
     
     const std::string &getName() const;
-    const std::map<std::string, ConfigValue *> &getValues() const;
-    void addValue(const std::string &name, ConfigValue *value);    
+    const std::map<std::string, std::shared_ptr<ConfigValue> > &getValues() const;
+    void addValue(const std::string &name, std::shared_ptr<ConfigValue> value);    
 private:
     std::string name;
-    std::map<std::string, ConfigValue *> values;
+    std::map<std::string, std::shared_ptr<ConfigValue> > values;
 };
 
 }

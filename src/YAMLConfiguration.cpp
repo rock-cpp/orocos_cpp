@@ -43,7 +43,7 @@ bool YAMLConfigParser::insetMapIntoArray(const YAML::Node& map, ComplexConfigVal
         std::string memberName;
         it.first() >> memberName;
 //         std::cout << "Name : " << memberName << std::endl;
-        ConfigValue *val = getConfigValue(it.second());
+        std::shared_ptr<ConfigValue> val = getConfigValue(it.second());
         
         if(!val)
         {
@@ -66,7 +66,7 @@ bool YAMLConfigParser::insetMapIntoArray(const YAML::Node &map, ArrayConfigValue
         std::string memberName;
         it.first() >> memberName;
 //         std::cout << "Name : " << memberName << std::endl;
-        ConfigValue *val = getConfigValue(it.second());
+        std::shared_ptr<ConfigValue> val = getConfigValue(it.second());
         
         if(!val)
         {
@@ -88,7 +88,7 @@ bool YAMLConfigParser::insetMapIntoArray(const YAML::Node& map, Configuration& c
         std::string memberName;
         it.first() >> memberName;
 //         std::cout << "Name : " << memberName << std::endl;
-        ConfigValue *val = getConfigValue(it.second());
+        std::shared_ptr<ConfigValue> val = getConfigValue(it.second());
         
         if(!val)
         {
@@ -104,7 +104,7 @@ bool YAMLConfigParser::insetMapIntoArray(const YAML::Node& map, Configuration& c
 
 }       
 
-ConfigValue *YAMLConfigParser::getConfigValue(const YAML::Node &node)
+std::shared_ptr<ConfigValue> YAMLConfigParser::getConfigValue(const YAML::Node &node)
 {
     switch(node.Type())
     {
@@ -114,7 +114,8 @@ ConfigValue *YAMLConfigParser::getConfigValue(const YAML::Node &node)
             if(node.GetScalar(value))
             {
 //                 std::cout << "a Scalar: "<< value << std::endl;
-                SimpleConfigValue *conf = new SimpleConfigValue(value);
+                std::shared_ptr<ConfigValue> conf;
+                conf.reset(new SimpleConfigValue(value));
                 return conf;
             }
             else
@@ -124,10 +125,10 @@ ConfigValue *YAMLConfigParser::getConfigValue(const YAML::Node &node)
         case YAML::NodeType::Sequence:
 //             std::cout << "a Sequence: " << node.Tag() << std::endl;
             {
-                ArrayConfigValue *values = new ArrayConfigValue();
+                std::shared_ptr<ArrayConfigValue> values = std::make_shared<ArrayConfigValue>();
                 for(YAML::Iterator it = node.begin(); it != node.end(); it++)
                 {
-                    ConfigValue *curConf = getConfigValue(*it);
+                    std::shared_ptr<ConfigValue> curConf = getConfigValue(*it);
                     
                     values->addValue(curConf);
                 }
@@ -137,11 +138,10 @@ ConfigValue *YAMLConfigParser::getConfigValue(const YAML::Node &node)
         case YAML::NodeType::Map:
         {
 //             std::cout << "a Map: " << node.Tag() << std::endl;
-            ComplexConfigValue *mapValue = new ComplexConfigValue;
+            std::shared_ptr<ComplexConfigValue> mapValue = std::make_shared<ComplexConfigValue>();
             if(!insetMapIntoArray(node, *mapValue))
             {
-                delete mapValue;
-                return NULL;
+                return std::shared_ptr<ConfigValue>();
             }
             return mapValue;
             break;
@@ -150,16 +150,15 @@ ConfigValue *YAMLConfigParser::getConfigValue(const YAML::Node &node)
             std::cout << "NULL" << std::endl;
             break;
     }
-    return NULL;
+    return nullptr;
 }
 
-ComplexConfigValue *YAMLConfigParser::getMap(const YAML::Node &map)
+std::shared_ptr<ComplexConfigValue> YAMLConfigParser::getMap(const YAML::Node &map)
 {
-    ComplexConfigValue *mapValue = new ComplexConfigValue;
+    std::shared_ptr<ComplexConfigValue> mapValue = std::make_shared<ComplexConfigValue>();
     if(!insetMapIntoArray(map, *mapValue))
     {
-        delete mapValue;
-        return NULL;
+        return nullptr;
     }
 
     return mapValue;

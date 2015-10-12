@@ -11,8 +11,6 @@ ComplexConfigValue::ComplexConfigValue(): ConfigValue(COMPLEX)
 
 ComplexConfigValue::~ComplexConfigValue()
 {
-    for(auto &it: values)
-        delete it.second;    
 }
 
 
@@ -22,13 +20,13 @@ void ComplexConfigValue::print(int level) const
         std::cout << "  ";
     
     std::cout << getName() << ":" << std::endl;
-    for(std::map<std::string, ConfigValue *>::const_iterator it = values.begin(); it != values.end(); it++)
+    for(const auto &it : values)
     {
-        it->second->print(level + 1);
+        it.second->print(level + 1);
     }
 }
 
-bool ComplexConfigValue::merge(const ConfigValue* other)
+bool ComplexConfigValue::merge(std::shared_ptr<ConfigValue> other)
 {
     if(other->getType() != COMPLEX)
         return false;
@@ -38,30 +36,31 @@ bool ComplexConfigValue::merge(const ConfigValue* other)
         throw std::runtime_error("Internal Error, merge between mismatching value");
     }
 
-    const ComplexConfigValue *cother = dynamic_cast<const ComplexConfigValue *>(other);
+    const ComplexConfigValue *cother = dynamic_cast<const ComplexConfigValue *>(other.get());
     
-    for(std::map<std::string, ConfigValue *>::const_iterator it = cother->values.begin(); it != cother->values.end(); it++)
+    for(const auto &it : cother->values)
     {
-        std::map<std::string, ConfigValue *>::iterator entry = values.find(it->first);
+        std::map<std::string, std::shared_ptr<ConfigValue> >::iterator entry = values.find(it.first);
         if(entry != values.end())
         {
-            if(!entry->second->merge(it->second))
+            if(!entry->second->merge(it.second))
                 return false;
         }
         else
         {
-            values.insert(*it);
+            values.insert(it);
         }
     }    
     return true;
 }
 
-void ComplexConfigValue::addValue(const std::string& name, ConfigValue* value)
+
+void ComplexConfigValue::addValue(const std::string &name, std::shared_ptr<ConfigValue> value)
 {
     values.insert(std::make_pair(name, value));
 }
 
-const std::map< std::string, ConfigValue* >& ComplexConfigValue::getValues() const
+const std::map< std::string, std::shared_ptr<ConfigValue> >& ComplexConfigValue::getValues() const
 {
     return values;
 }
@@ -74,16 +73,14 @@ ArrayConfigValue::ArrayConfigValue(): ConfigValue(ARRAY)
 
 ArrayConfigValue::~ArrayConfigValue()
 {
-    for(auto &it: values)
-        delete it;
 }
 
-void ArrayConfigValue::addValue(ConfigValue* value)
+void ArrayConfigValue::addValue(std::shared_ptr<ConfigValue> value)
 {
     values.push_back(value);
 }
 
-const std::vector< ConfigValue* > ArrayConfigValue::getValues() const
+const std::vector<std::shared_ptr<ConfigValue> > ArrayConfigValue::getValues() const
 {
     return values;
 }
@@ -94,13 +91,13 @@ void ArrayConfigValue::print(int level) const
         std::cout << "  ";
 
     std::cout << name << ":" << std::endl;
-    for(const ConfigValue *v : values)
+    for(const std::shared_ptr<ConfigValue> &v : values)
     {
         v->print(level + 1);
     }
 }
 
-bool ArrayConfigValue::merge(const ConfigValue* other)
+bool ArrayConfigValue::merge(std::shared_ptr< ConfigValue > other)
 {
     if(other->getType() != ARRAY)
         return false;
@@ -110,7 +107,7 @@ bool ArrayConfigValue::merge(const ConfigValue* other)
         throw std::runtime_error("Internal Error, merge between mismatching value");
     }
     
-    const ArrayConfigValue *aother = dynamic_cast<const ArrayConfigValue *>(other);
+    const ArrayConfigValue *aother = dynamic_cast<const ArrayConfigValue *>(other.get());
     
     //we only support direct overwrite by index
     for(size_t i = 0; i < aother->values.size(); i++)
@@ -151,7 +148,7 @@ void SimpleConfigValue::print(int level) const
     std::cout << name << " : " << value << std::endl;
 }
 
-bool SimpleConfigValue::merge(const ConfigValue* other)
+bool SimpleConfigValue::merge(const std::shared_ptr< ConfigValue > other)
 {
     if(other->getType() != SIMPLE)
         return false;
@@ -161,7 +158,7 @@ bool SimpleConfigValue::merge(const ConfigValue* other)
         throw std::runtime_error("Internal Error, merge between mismatching value");
     }
     
-    const SimpleConfigValue *sother = dynamic_cast<const SimpleConfigValue *>(other);
+    const SimpleConfigValue *sother = dynamic_cast<const SimpleConfigValue *>(other.get());
     value = sother->value;
     
     return true;
@@ -195,7 +192,7 @@ void ConfigValue::setName(const std::string& newName)
 void Configuration::print()
 {
     std::cout << "Configuration name is : " << name << std::endl;
-    for(std::map<std::string, ConfigValue *>::const_iterator it = values.begin(); it != values.end(); it++)
+    for(std::map<std::string, std::shared_ptr<ConfigValue> >::const_iterator it = values.begin(); it != values.end(); it++)
     {
         it->second->print(1);
     }
@@ -209,15 +206,17 @@ Configuration::Configuration(const std::string& name) : name(name)
 Configuration::~Configuration()
 {
     for(auto &it: values)
-        delete it.second;
+    {
+        it.second->print(1);
+    }
 }
 
-const std::map< std::string, ConfigValue* >& Configuration::getValues() const
+const std::map< std::string, std::shared_ptr<ConfigValue> >& Configuration::getValues() const
 {
     return values;
 }
 
-void Configuration::addValue(const std::string& name, ConfigValue* value)
+void Configuration::addValue(const std::string& name, std::shared_ptr<ConfigValue> value)
 {
     values.insert(std::make_pair(name, value));
 }
@@ -236,9 +235,9 @@ bool Configuration::fillFromYaml(const std::string& yml)
 
 bool Configuration::merge(const Configuration& other)
 {
-    for(std::map<std::string, ConfigValue *>::const_iterator it = other.values.begin(); it != other.values.end(); it++)
+    for(std::map<std::string, std::shared_ptr<ConfigValue> >::const_iterator it = other.values.begin(); it != other.values.end(); it++)
     {
-        std::map<std::string, ConfigValue *>::iterator entry = values.find(it->first);
+        std::map<std::string, std::shared_ptr<ConfigValue> >::iterator entry = values.find(it->first);
         if(entry != values.end())
         {
             if(!entry->second->merge(it->second))

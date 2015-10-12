@@ -292,7 +292,7 @@ bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
             
             for(;it != comp.getFields().end(); it++)
             {
-                std::map<std::string, ConfigValue *>::const_iterator confIt = confValues.find(it->getName());
+                std::map<std::string, std::shared_ptr<ConfigValue> >::const_iterator confIt = confValues.find(it->getName());
                 Typelib::Value fieldValue(((uint8_t *) value.getData()) + it->getOffset(), it->getType());
                 if(confIt == confValues.end())
                 {
@@ -301,7 +301,7 @@ bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
                     continue;
                 }
 
-                ConfigValue *curConf = confIt->second;
+                std::shared_ptr<ConfigValue> curConf = confIt->second;
                 
                 confValues.erase(confIt);
                 
@@ -311,7 +311,7 @@ bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
             if(!confValues.empty())
             {
                 std::cout << "Error :" << std::endl;
-                for(std::map<std::string, ConfigValue *>::const_iterator it = confValues.begin(); it != confValues.end();it++)
+                for(std::map<std::string, std::shared_ptr<ConfigValue> >::const_iterator it = confValues.begin(); it != confValues.end();it++)
                 {
                     std::cout << "  " << it->first << std::endl;
                 }
@@ -351,7 +351,7 @@ bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
                     const Typelib::Type &indirect = cont.getIndirection();
                     cont.init(value.getData());
 
-                    for(const ConfigValue *val: array.getValues())
+                    for(const std::shared_ptr<ConfigValue> val: array.getValues())
                     {
                         
                         //TODO check, this may be a memory leak
@@ -492,7 +492,7 @@ bool ConfigurationHelper::mergeConfig(const std::vector< std::string >& names, C
 
 bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const Configuration& config)
 {
-    std::map<std::string, ConfigValue *>::const_iterator propIt;
+    std::map<std::string, std::shared_ptr<ConfigValue> >::const_iterator propIt;
     for(propIt = config.getValues().begin(); propIt != config.getValues().end(); propIt++)
     {
         if(!applyConfToProperty(context, propIt->first, *(propIt->second)))
