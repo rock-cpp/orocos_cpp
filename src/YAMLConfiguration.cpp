@@ -1,6 +1,6 @@
 #include "YAMLConfiguration.hpp"
 #include <boost/filesystem.hpp>
-#include <boost/algorithm/string/regex.hpp>
+#include <boost/regex.hpp>
 #include "Bundle.hpp"
 #include <fstream>
 
@@ -296,39 +296,81 @@ bool YAMLConfigParser::parseYAML(Configuration& curConfig, const std::string& ya
 
 std::string YAMLConfigParser::applyStringVariableInsertions(const std::string& val)
 {
-    std::string retVal = "";
+    std::string retVal;
     std::vector<std::string> items;
-    //parsing begin and end of code block
-    boost::algorithm::split_regex(items, val, boost::regex("<%[=\\s]*|[\\s%]*>"));
-
-    for(auto &elem: items){
-        //searching for keywords we want to support (ENV or BUNDLES)
-        if(elem.find("ENV") != std::string::npos){
-                //replace environment variables:
-                std::vector<std::string> variables;
-                boost::algorithm::split_regex(variables, elem, boost::regex("ENV[\\[\\(] ?['\"]?|['\"]? ?[\\]\\)]"));
-                for(auto &var: variables){
-                        if(var.empty()){
-                                continue;
-                        }
-                        //add variable to output string:
-                        retVal += std::getenv(var.c_str());
-                }
-        }else if(elem.find("BUNDLES") != std::string::npos){
-                //if bundles search for path in the bundles. The path is given as parameter for BUNDLES:
-                std::vector<std::string> variables;
-                boost::algorithm::split_regex(variables, elem, boost::regex("BUNDLES[\\[\\(] ?['\"]?|['\"]? ?[\\]\\)]"));
-                for(auto &val: variables){
-                        if(val.empty())
-                                continue;
-                    retVal += Bundle::getInstance().findFile(val);
-                }
-        }else{
-                retVal += elem;
+    
+    boost::regex outerRegex("<%=?\\s*(.*?)\\s*%?>");
+    
+    //Note, this needs to be defined outside of the lambdas for regex_replace
+    //if this is not the case a reference to a stack varaiable is returned, 
+    //resulting in a segfault
+    std::string ret;
+    
+    auto innerReplace = [&](const boost::smatch &innerMatch) {
+        std::cout << "MAtch" << std::endl;
+        int i = 0;
+        for(const std::string &m: innerMatch)
+        {
+            std::cout << i <<  m << std::endl;
+            i++;
         }
+        
+        if(!innerMatch[3].str().empty() || !innerMatch[4].str().empty() )
+        {
+            std::string var;
+            if(innerMatch[3].str().empty())
+                var = innerMatch[4];
+            else
+                var = innerMatch[3];
+            
+            std::cout << "ENV" << std::endl;
+            char *envVal = std::getenv(var.c_str());
+            if(!envVal)
+                throw std::runtime_error("YAML Parser: Error, could not resolve environment variable " + var + " (from " + innerMatch[0] + ")");
+            //add variable to output string:
+            ret = envVal;
+            return ret;
+        }
+        
+        if(!innerMatch[6].str().empty() || !innerMatch[7].str().empty() )
+        {
+            std::cout << "BUNDLES" << std::endl;
+            std::string var;
+            if(innerMatch[6].str().empty())
+                var = innerMatch[7];
+            else
+                var = innerMatch[6];
+            
+            std::string file;
+            try{
+                file = Bundle::getInstance().findFile(var);
+            }
+            catch (...)
+            {
+            }
+            
+            if(!file.empty())
+                throw std::runtime_error("YAML Parser: Error, could not find file " + var + " (from " + innerMatch[0] + ")");
+            //add variable to output string:
+            ret = file;
+            return ret;
+        }
+        
+        throw std::runtime_error("YAML Parser: Error, could not evaluate statement: " + innerMatch[0]);
+    };
+    
+    retVal = boost::regex_replace(val, outerRegex, [&](const boost::smatch &match) {
+        if(match.size() <= 1)
+            throw std::runtime_error("YAMLConfigParser::Error empty <% > sequence");
+        
+        std::string innerMatcher("(\\[\\s*\"?(.*?)\"?\\s*\\]|\\(\\s*\"?(.*?)\"?\\s*\\))");
+        ret = boost::regex_replace(match[1].str(), boost::regex("(ENV" + innerMatcher + "|BUNDLES" + innerMatcher + ")"), innerReplace);
+        std::cout << "Replacing " << match[0] << " with " << ret << std::endl;
+        return ret;
     }
+    );
 
-//      std::cout << "Returning String: '" << retVal << "'" << std::endl;
+     std::cout << "Returning String: '" << retVal << "'" << std::endl;
 
     return retVal;
 }
