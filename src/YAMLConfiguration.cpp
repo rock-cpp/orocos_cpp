@@ -349,7 +349,7 @@ std::string YAMLConfigParser::applyStringVariableInsertions(const std::string& v
             {
             }
             
-            if(!file.empty())
+            if(file.empty())
                 throw std::runtime_error("YAML Parser: Error, could not find file " + var + " (from " + innerMatch[0] + ")");
             //add variable to output string:
             ret = file;
@@ -363,8 +363,10 @@ std::string YAMLConfigParser::applyStringVariableInsertions(const std::string& v
         if(match.size() <= 1)
             throw std::runtime_error("YAMLConfigParser::Error empty <% > sequence");
         
-        std::string innerMatcher("(\\[\\s*\"?(.*?)\"?\\s*\\]|\\(\\s*\"?(.*?)\"?\\s*\\))");
-        ret = boost::regex_replace(match[1].str(), boost::regex("(ENV" + innerMatcher + "|BUNDLES" + innerMatcher + ")"), innerReplace);
+        std::string in = boost::regex_replace(match[1].str(), boost::regex("#\\{(.*)?\\}"), "$1");
+        
+        std::string innerMatcher("(\\[\\s*(?:\"|\')?(.*?)(?:\"|\')?\\s*\\]|\\(\\s*(?:\"|\')?(.*?)(?:\"|\')?\\s*\\))");
+        ret = boost::regex_replace(in, boost::regex("(ENV" + innerMatcher + "|(?:BUNDLES|Bundles.find_file|Bundles.find_dir)" + innerMatcher + ")"), innerReplace);
         std::cout << "Replacing " << match[0] << " with " << ret << std::endl;
         return ret;
     }
