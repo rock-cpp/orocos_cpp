@@ -165,7 +165,7 @@ const std::string Deployment::getLoggerName() const
 {
     auto it = renameMap.find(loggerName);
     if(it == renameMap.end())
-        throw std::runtime_error("Internal Error, logger name could not be found for deployment " + deploymentName);
+        throw std::runtime_error("Internal Error, logger name could not be found for deployment " + deploymentName + ". Forgott the add_default_logger ?");
     
     if(it->second.empty())
         return it->first;
