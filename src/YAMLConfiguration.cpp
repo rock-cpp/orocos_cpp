@@ -307,14 +307,6 @@ std::string YAMLConfigParser::applyStringVariableInsertions(const std::string& v
     std::string ret;
     
     auto innerReplace = [&](const boost::smatch &innerMatch) {
-        std::cout << "MAtch" << std::endl;
-        int i = 0;
-        for(const std::string &m: innerMatch)
-        {
-            std::cout << i <<  m << std::endl;
-            i++;
-        }
-        
         if(!innerMatch[3].str().empty() || !innerMatch[4].str().empty() )
         {
             std::string var;
@@ -323,7 +315,6 @@ std::string YAMLConfigParser::applyStringVariableInsertions(const std::string& v
             else
                 var = innerMatch[3];
             
-            std::cout << "ENV" << std::endl;
             char *envVal = std::getenv(var.c_str());
             if(!envVal)
                 throw std::runtime_error("YAML Parser: Error, could not resolve environment variable " + var + " (from " + innerMatch[0] + ")");
@@ -334,7 +325,6 @@ std::string YAMLConfigParser::applyStringVariableInsertions(const std::string& v
         
         if(!innerMatch[6].str().empty() || !innerMatch[7].str().empty() )
         {
-            std::cout << "BUNDLES" << std::endl;
             std::string var;
             if(innerMatch[6].str().empty())
                 var = innerMatch[7];
@@ -367,12 +357,9 @@ std::string YAMLConfigParser::applyStringVariableInsertions(const std::string& v
         
         std::string innerMatcher("(\\[\\s*(?:\"|\')?(.*?)(?:\"|\')?\\s*\\]|\\(\\s*(?:\"|\')?(.*?)(?:\"|\')?\\s*\\))");
         ret = boost::regex_replace(in, boost::regex("(ENV" + innerMatcher + "|(?:BUNDLES|Bundles.find_file|Bundles.find_dir)" + innerMatcher + ")"), innerReplace);
-        std::cout << "Replacing " << match[0] << " with " << ret << std::endl;
         return ret;
     }
     );
-
-     std::cout << "Returning String: '" << retVal << "'" << std::endl;
 
     return retVal;
 }
