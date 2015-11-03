@@ -205,10 +205,6 @@ Configuration::Configuration(const std::string& name) : name(name)
 
 Configuration::~Configuration()
 {
-    for(auto &it: values)
-    {
-        it.second->print(1);
-    }
 }
 
 const std::map< std::string, std::shared_ptr<ConfigValue> >& Configuration::getValues() const
