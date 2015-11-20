@@ -5,6 +5,7 @@ rock_library(orocos_cpp
         Configuration.cpp
         ConfigurationHelper.cpp
         TransformerHelper.cpp
+        TypeRegistry.cpp
         LoggingHelper.cpp
         Spawner.cpp
         NameService.cpp
@@ -18,6 +19,7 @@ rock_library(orocos_cpp
         Configuration.hpp
         ConfigurationHelper.hpp
         TransformerHelper.hpp
+        TypeRegistry.hpp
         LoggingHelper.hpp
         Spawner.hpp
         NameService.hpp
