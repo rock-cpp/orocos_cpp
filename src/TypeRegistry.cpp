@@ -3,6 +3,9 @@
 #include <iostream>
 #include <fstream>
 
+namespace orocos_cpp 
+{
+
 TypeRegistry::TypeRegistry()
 {
 
@@ -67,4 +70,6 @@ bool TypeRegistry::getTypekitDefiningType(const std::string& typeName, std::stri
     typekitName = it->second;
     
     return true;
+}
+
 }
