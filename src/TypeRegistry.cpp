@@ -34,7 +34,7 @@ bool TypeRegistry::loadTypelist()
         if(f.substr(s-ending.size(), s) == ending)
         {
             std::string typeKitName = f.substr(0, s-ending.size());
-            std::cout << "TypeKit is " << typeKitName << std::endl;
+//             std::cout << "TypeKit is " << typeKitName << std::endl;
         
             std::ifstream in(it->path().string());
             if(in.bad())
@@ -51,7 +51,7 @@ bool TypeRegistry::loadTypelist()
                     continue;
 
                 std::string typeName = line.substr(0, e);
-                std::cout << "Adding " <<  typeName << " to TK " << typeKitName << std::endl;
+//                 std::cout << "Adding " <<  typeName << " to TK " << typeKitName << std::endl;
                 
                 typeToTypekit.insert(std::make_pair(typeName, typeKitName));
             }
