@@ -217,44 +217,6 @@ bool applyConfOnTypelibNumeric(Typelib::Value &value, const SimpleConfigValue& c
     return true;
 }
 
-bool initTyplibValueRecusive(Typelib::Value &value)
-{
-    switch(value.getType().getCategory())
-    {
-        case Typelib::Type::Array:
-            //nothing to do here (I think)
-            break;
-        case Typelib::Type::Compound:
-        {
-            const Typelib::Compound &comp = dynamic_cast<const Typelib::Compound &>(value.getType());
-            Typelib::Compound::FieldList::const_iterator it = comp.getFields().begin();
-            for(;it != comp.getFields().end(); it++)
-            {
-                Typelib::Value fieldValue(((uint8_t *) value.getData()) + it->getOffset(), it->getType());
-                initTyplibValueRecusive(fieldValue);
-            }
-        }
-            break;
-        case Typelib::Type::Container:
-            {
-                const Typelib::Container &cont = dynamic_cast<const Typelib::Container &>(value.getType());
-                cont.init(value.getData());
-            }
-            break;
-        case Typelib::Type::Enum:
-            break;
-        case Typelib::Type::Numeric:
-            break;
-        case Typelib::Type::Opaque:
-            break;
-        case Typelib::Type::Pointer:
-            break;
-        default:
-            std::cout << "Warning: Init on unknown is not supported" << std::endl;
-            break;
-    }
-    return true;    
-}
 
 bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
 {
@@ -297,7 +259,7 @@ bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
                 if(confIt == confValues.end())
                 {
                     //even if we don't configure this one, we still need to initialize it
-                    initTyplibValueRecusive(fieldValue);
+//                     initTyplibValueRecusive(fieldValue);
                     continue;
                 }
 
@@ -323,14 +285,12 @@ bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
         case Typelib::Type::Container:
             {
                 const Typelib::Container &cont = dynamic_cast<const Typelib::Container &>(value.getType());
+                const Typelib::Type &indirect = cont.getIndirection();
                 if(cont.kind() == "/std/string")
                 {
                     const SimpleConfigValue &sconf = dynamic_cast<const SimpleConfigValue &>(conf);
 
                     size_t chars = sconf.getValue().size();
-                    cont.init(value.getData());
-                    
-                    const Typelib::Type &indirect = cont.getIndirection();
                     for(size_t i = 0; i < chars; i++)
                     {
                     	Typelib::Value singleChar((void *)( sconf.getValue().c_str() + i), indirect);
@@ -348,14 +308,14 @@ bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
                     }
                     const ArrayConfigValue &array = dynamic_cast<const ArrayConfigValue &>(conf);
                     
-                    const Typelib::Type &indirect = cont.getIndirection();
-                    cont.init(value.getData());
 
                     for(const std::shared_ptr<ConfigValue> val: array.getValues())
                     {
                         
                         //TODO check, this may be a memory leak
                         Typelib::Value v(new uint8_t[indirect.getSize()], indirect);
+                        Typelib::init(v);
+                        Typelib::zero(v);
                         
                         if(!applyConfOnTyplibValue(v, *(val)))
                         {
