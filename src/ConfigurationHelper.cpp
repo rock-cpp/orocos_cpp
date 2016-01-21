@@ -285,6 +285,7 @@ bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
         case Typelib::Type::Container:
             {
                 const Typelib::Container &cont = dynamic_cast<const Typelib::Container &>(value.getType());
+                Typelib::zero(value);
                 const Typelib::Type &indirect = cont.getIndirection();
                 if(cont.kind() == "/std/string")
                 {
