@@ -11,6 +11,7 @@ class CorbaNameService : public NameService, protected RTT::corba::ApplicationSe
 {
 public:
     CorbaNameService(std::string name_service_ip="",std::string name_service_port = "");
+    virtual ~CorbaNameService() {};
     virtual bool connect();
     virtual std::vector< std::string > getRegisteredTasks();
     virtual bool isRegistered(const std::string& taskName);

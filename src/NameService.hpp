@@ -15,6 +15,7 @@ namespace orocos_cpp
 class NameService
 {
 public:
+    virtual ~NameService() {};
     /**
      * Connect to the name service
      * @return true on success, false on error
