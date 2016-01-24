@@ -7,14 +7,15 @@
 
 #include <boost/lexical_cast.hpp>
 #include <rtt/OperationCaller.hpp>
-#include "Bundle.hpp"
+#include <lib_config/Bundle.hpp>
 #include <string>  
 #include <limits>
 
 #include "PluginHelper.hpp"
-#include "YAMLConfiguration.hpp"
+#include <lib_config/YAMLConfiguration.hpp>
 
 using namespace orocos_cpp;
+using namespace libConfig;
 
 
 
@@ -347,7 +348,7 @@ bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
     return true;
 }
 
-bool ConfigurationHelper::applyConfToProperty(RTT::TaskContext* context, const std::string& propertyName, const ConfigValue& value)
+bool ConfigurationHelper::applyConfToProperty(RTT::TaskContext* context, const std::string& propertyName, const libConfig::ConfigValue& value)
 {
     RTT::base::PropertyBase *property = context->getProperty(propertyName);
     if(!property)

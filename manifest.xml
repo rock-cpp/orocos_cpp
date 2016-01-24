@@ -12,4 +12,5 @@
   <depend package="tools/smurf" />
   <depend package="drivers/orogen/transformer" />
   <depend package="tools/logger" />
+  <depend package="tools/lib_config" />
 </package>

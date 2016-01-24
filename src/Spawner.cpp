@@ -14,10 +14,11 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
 #include "CorbaNameService.hpp"
-#include "Bundle.hpp"
+#include <lib_config/Bundle.hpp>
 #include <signal.h>
 
 using namespace orocos_cpp;
+using namespace libConfig;
 
 struct sigaction originalSignalHandler[SIGTERM];
 

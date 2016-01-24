@@ -2,7 +2,7 @@
 #include <rtt/TaskContext.hpp>
 #include <rtt/internal/ConnectionManager.hpp>
 #include "LoggingHelper.hpp"
-#include "Bundle.hpp"
+#include <lib_config/Bundle.hpp>
 #include "PluginHelper.hpp"
 
 using namespace orocos_cpp;

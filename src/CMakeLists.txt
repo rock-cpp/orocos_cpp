@@ -1,8 +1,6 @@
 find_package( Boost COMPONENTS thread system filesystem regex)
 rock_library(orocos_cpp
     SOURCES 
-        Bundle.cpp
-        Configuration.cpp
         ConfigurationHelper.cpp
         TransformerHelper.cpp
         TypeRegistry.cpp
@@ -13,10 +11,7 @@ rock_library(orocos_cpp
         Deployment.cpp
         PkgConfigHelper.cpp
         PluginHelper.cpp
-        YAMLConfiguration.cpp
     HEADERS 
-        Bundle.hpp
-        Configuration.hpp
         ConfigurationHelper.hpp
         TransformerHelper.hpp
         TypeRegistry.hpp
@@ -27,7 +22,6 @@ rock_library(orocos_cpp
         Deployment.hpp
         PkgConfigHelper.hpp
         PluginHelper.hpp
-        YAMLConfiguration.hpp
     DEPS_PKGCONFIG
         orocos_cpp_base
         rtt_typelib-${OROCOS_TARGET}
@@ -39,6 +33,7 @@ rock_library(orocos_cpp
         transformer
         smurf
         logger-proxies
+        lib_config
     DEPS_PLAIN 
         Boost_SYSTEM Boost_FILESYSTEM Boost_REGEX Boost_THREAD
     )

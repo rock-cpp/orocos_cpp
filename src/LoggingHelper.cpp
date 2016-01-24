@@ -6,11 +6,12 @@
 #include <rtt/plugin/PluginLoader.hpp>
 #include <logger/proxies/Logger.hpp>
 #include "CorbaNameService.hpp"
-#include "Bundle.hpp"
+#include <lib_config/Bundle.hpp>
 #include "Spawner.hpp"
 #include "PluginHelper.hpp"
 
 using namespace orocos_cpp;
+using namespace libConfig;
 
 LoggingHelper::LoggingHelper() : DEFAULT_LOG_BUFFER_SIZE(100)
 {
