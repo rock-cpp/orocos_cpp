@@ -508,7 +508,12 @@ bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const std::vect
     
     if(syncNeeded)
     {
-        context = RTT::corba::TaskContextProxy::Create(context->getName(), false);
+        try {
+            context = RTT::corba::TaskContextProxy::Create(context->getName(), false);
+        } catch(...)
+        {
+            throw std::runtime_error("ConfigurationHelper::applyConfig: Error, could not create Proxy for " + context->getName());
+        }
     }
     
     if(modelName.empty())
