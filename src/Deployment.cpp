@@ -152,7 +152,7 @@ bool Deployment::getExecString(std::string& cmd, std::vector< std::string >& arg
     {
         if(!p.second.empty())
         {
-            std::cout << "Task " << p.first << " is renmaed to " << p.second << std::endl;
+//             std::cout << "Task " << p.first << " is renmaed to " << p.second << std::endl;
             args.push_back("--rename");
             args.push_back(p.first + ":" + p.second);
         }
