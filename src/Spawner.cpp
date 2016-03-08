@@ -146,6 +146,12 @@ Spawner::ProcessHandle::ProcessHandle(Deployment *deploment, bool redirectOutput
 
 bool Spawner::ProcessHandle::alive() const
 {
+    //if it was already determined before that the process is already dead,
+    //we can stop here. Otherwise waitpid would fail!
+    if(!isRunning){
+        return isRunning;
+    }
+
     int status = 0;
     pid_t ret = waitpid(pid, &status, WNOHANG);
     
