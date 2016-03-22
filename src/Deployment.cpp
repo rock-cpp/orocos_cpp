@@ -14,6 +14,35 @@ Deployment::Deployment(const std::string& name) : deploymentName(name)
         throw std::runtime_error("Error, executable for deployment " + name + " could not be found in PATH");
 }
 
+Deployment::Deployment(const std::string &cmp1, const std::string &as)
+{
+    //cmp1 is expected in the format "module::TaskSpec"
+    std::string::size_type pos = cmp1.find_first_of(":");
+    
+    if(pos == std::string::npos || cmp1.at(pos +1) != ':')
+    {
+        throw std::runtime_error("given component name " + cmp1 + " is not in the format 'module::TaskSpec'");
+    }
+    
+    std::string moduleName = cmp1.substr(0, pos);
+    std::string taskModelName = cmp1.substr(pos + 2, cmp1.size()) ;
+    std::string defaultDeploymentName = "orogen_default_" + moduleName + "__" + taskModelName;
+    
+    deploymentName = defaultDeploymentName;
+    loadPkgConfigFile(deploymentName);
+    if(!checkExecutable(deploymentName))
+        throw std::runtime_error("Error, executable for deployment " + deploymentName + " could not be found in PATH");
+
+    std::string taskName = as;
+    std::vector<std::string> args;
+    
+    if(!taskName.empty())
+    {
+        renameTask(defaultDeploymentName, taskName);
+        renameTask(defaultDeploymentName  + "_Logger", taskName + "_Logger");
+    }
+}
+
 bool Deployment::checkExecutable(const std::string& name)
 {
     if(boost::filesystem::exists(name))

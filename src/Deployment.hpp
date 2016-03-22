@@ -29,6 +29,8 @@ private:
 public:
     Deployment(const std::string &name);
     
+    Deployment(const std::string &model, const std::string &as);
+    
     /**
      * Returns the name of the deployment
      * */
