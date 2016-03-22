@@ -120,6 +120,12 @@ public:
      * */
     std::vector<const Deployment *> getRunningDeployments();
     
+    
+    /**
+     * Returns, if the given instance of a deployment is running.
+     * */
+    bool isRunning(const Deployment *instance);
+    
 private:
     
     std::vector<ProcessHandle *> handles;

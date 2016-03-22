@@ -410,4 +410,17 @@ std::vector< const Deployment* > Spawner::getRunningDeployments()
     return ret;
 }
 
+bool Spawner::isRunning(const Deployment* instance)
+{
+    for(ProcessHandle *handle: handles)
+    {
+        if(&(handle->getDeployment()) == instance)
+        {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
 
