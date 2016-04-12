@@ -22,6 +22,7 @@ rock_library(orocos_cpp
         Deployment.hpp
         PkgConfigHelper.hpp
         PluginHelper.hpp
+        TransformationProvider.hpp
     DEPS_PKGCONFIG
         orocos_cpp_base
         rtt_typelib-${OROCOS_TARGET}
