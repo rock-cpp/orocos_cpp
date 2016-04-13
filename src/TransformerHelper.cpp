@@ -1,4 +1,5 @@
 #include "TransformerHelper.hpp"
+#include "TransformationProvider.hpp"
 #include <rtt/OperationCaller.hpp>
 #include <base/samples/RigidBodyState.hpp>
 #include <smurf/Smurf.hpp>
@@ -8,22 +9,6 @@
 #include <rtt/transports/corba/TaskContextProxy.hpp>
 
 using namespace orocos_cpp;
-
-class TransformationProvider : public transformer::TransformationElement
-{
-public:
-    TransformationProvider(const std::string& sourceFrame, const std::string& targetFrame, const std::string &providerName, const std::string &portName) : TransformationElement(sourceFrame, targetFrame), providerName(providerName), portName(portName)
-    {
-    }
-    
-    virtual bool getTransformation(const base::Time& atTime, bool doInterpolation, transformer::TransformationType& tr)
-    {
-        return false;
-    };
-    
-    std::string providerName;
-    std::string portName;
-};
 
 TransformerHelper::TransformerHelper(const smurf::Robot& robotConfiguration): conPolicy(RTT::ConnPolicy::buffer(DEFAULT_CONNECTION_BUFFER_SIZE)), robotConfiguration(robotConfiguration)
 {
