@@ -290,6 +290,12 @@ bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
                 const Typelib::Type &indirect = cont.getIndirection();
                 if(cont.kind() == "/std/string")
                 {
+                    if(conf.getType() != ConfigValue::SIMPLE)
+                    {
+                        std::cout << "Error, YAML representation << " << conf.getName() << " of type " << value.getType().getName() << " is not an array " << std::endl;
+                        std::cout << "Error, got container in property, but config value is not a String " << std::endl;
+                        return false;
+                    }
                     const SimpleConfigValue &sconf = dynamic_cast<const SimpleConfigValue &>(conf);
 
                     size_t chars = sconf.getValue().size();
