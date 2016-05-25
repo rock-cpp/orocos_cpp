@@ -63,6 +63,33 @@ void shutdownHandler(int signum, siginfo_t *info, void *data)
     
 }
 
+const std::string getProcessNameByPid(const pid_t pid)
+{
+    std::string cmdString = "ps -p " + std::to_string(pid) + " -o comm=";
+    std::string result = "";
+    FILE *cmdOutput = popen(cmdString.c_str(), "r");
+    char buffer[100];
+    
+    if(cmdOutput)
+    {
+        while(!feof(cmdOutput))
+        {
+            if(fgets(buffer, 100, cmdOutput))
+            {
+                result += buffer;
+            }
+        }
+        result.erase(std::remove(result.begin(), result.end(), '\n'), result.end());
+    }
+    else 
+    {
+        std::cout << "Couldn't get name for process: " + std::to_string(pid) << std::endl;
+    }
+    
+    pclose(cmdOutput);
+    return result;
+}
+
 Spawner::Spawner()
 {
     //log dir always exists if requested from bundle
@@ -108,7 +135,10 @@ Spawner::ProcessHandle::ProcessHandle(Deployment *deploment, bool redirectOutput
     
     //we are the parent
     if(pid != 0)
+    {
+        processName = getProcessNameByPid(getpid());
         return;
+    }
 
     //child, redirect output
     if(redirectOutputv)
@@ -119,6 +149,7 @@ Spawner::ProcessHandle::ProcessHandle(Deployment *deploment, bool redirectOutput
             throw std::runtime_error("Error, log directory '" + logDir + "' does not exist, but it should !");
         }
         redirectOutput(logDir + "/" + cmd + "-" + boost::lexical_cast<std::string>(getpid()) + ".txt");
+        processName = getProcessNameByPid(getpid());
     }
     
     //do the exec
@@ -180,16 +211,20 @@ bool Spawner::ProcessHandle::alive() const
         
         if(sigNum == SIGSEGV)
         {
-            std::cout << "Process " << pid << " segfaulted " << std::endl;            
+            
+            std::cout << "Process " << processName << " segfaulted " << std::endl;            
         }
         else
         {
-            std::cout << "Process " << pid << " was terminated by SIG " << sigNum << std::endl;                        
+            std::cout << "Process " << processName << " was terminated by SIG " << sigNum << std::endl;                        
         }
+        
     }
     
     return isRunning;
 }
+
+
 
 const Deployment& Spawner::ProcessHandle::getDeployment() const
 {

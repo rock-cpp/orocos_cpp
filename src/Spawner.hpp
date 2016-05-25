@@ -21,6 +21,7 @@ class Spawner : public boost::noncopyable
     
     NameService *nameService;
     
+    
     /**
      * Default constructor
      * */
@@ -32,6 +33,7 @@ public:
         mutable bool isRunning;
         pid_t pid;
         void redirectOutput(const std::string &filename);
+        std::string processName;
         
         Deployment *deployment;
     public:
