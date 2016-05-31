@@ -11,7 +11,7 @@ Deployment::Deployment(const std::string& name) : deploymentName(name)
 {
     loadPkgConfigFile(name);
     if(!checkExecutable(name))
-        throw std::runtime_error("Error, executable for deployment " + name + " could not be found in PATH");
+        throw std::runtime_error("Deployment::Error, executable for deployment " + name + " could not be found in PATH");
 }
 
 Deployment::Deployment(const std::string &cmp1, const std::string &as)
@@ -29,9 +29,14 @@ Deployment::Deployment(const std::string &cmp1, const std::string &as)
     std::string defaultDeploymentName = "orogen_default_" + moduleName + "__" + taskModelName;
     
     deploymentName = defaultDeploymentName;
-    loadPkgConfigFile(deploymentName);
+    try {
+        loadPkgConfigFile(deploymentName);
+    } catch (const std::runtime_error &e)
+    {
+        throw std::runtime_error("Deployment::Error, could not find pkgConfig file for deployment " + deploymentName);
+    }
     if(!checkExecutable(deploymentName))
-        throw std::runtime_error("Error, executable for deployment " + deploymentName + " could not be found in PATH");
+        throw std::runtime_error("Deployment::Error, executable for deployment " + deploymentName + " could not be found in PATH");
 
     std::string taskName = as;
     std::vector<std::string> args;
@@ -51,7 +56,7 @@ bool Deployment::checkExecutable(const std::string& name)
     const char *binPath = getenv("PATH");
     if(!binPath)
     {
-        throw std::runtime_error("Internal Error, PATH is not set found.");
+        throw std::runtime_error("Deployment::Internal Error, PATH is not set found.");
     }
     
     std::string binPathS = binPath;
@@ -81,7 +86,7 @@ bool Deployment::loadPkgConfigFile(const std::string& name)
     std::vector<std::string> pkgConfigValues;
 
     if(!PkgConfigHelper::parsePkgConfig("/orogen-" + name + ".pc", pkgConfigFields, pkgConfigValues))
-        throw std::runtime_error("Error, could not finde pkg-config file for deployment " + name );
+        throw std::runtime_error("Deployment::Error, could not finde pkg-config file for deployment " + name );
 
     
     boost::char_separator<char> sep(" ");
@@ -145,12 +150,12 @@ void Deployment::renameTask(const std::string& orignalName, const std::string& n
     auto it = renameMap.find(orignalName);
     if(it == renameMap.end())
     {
-        throw std::runtime_error("Error, deployment " + deploymentName + " has no task " + orignalName);
+        throw std::runtime_error("Deployment::Error, deployment " + deploymentName + " has no task " + orignalName);
     }
     
     if(!it->second.empty())
     {
-        std::cout << "Warning double renaming of task " << orignalName << ". This smells like a bug." << std::endl;
+        std::cout << "Deployment::Warning double renaming of task " << orignalName << ". This smells like a bug." << std::endl;
     }
     
     //set new name
@@ -194,7 +199,7 @@ const std::string Deployment::getLoggerName() const
 {
     auto it = renameMap.find(loggerName);
     if(it == renameMap.end())
-        throw std::runtime_error("Internal Error, logger name could not be found for deployment " + deploymentName + ". Forgott the add_default_logger ?");
+        throw std::runtime_error("Deployment::Internal Error, logger name could not be found for deployment " + deploymentName + ". Forgott the add_default_logger ?");
     
     if(it->second.empty())
         return it->first;
