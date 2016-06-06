@@ -136,7 +136,7 @@ Spawner::ProcessHandle::ProcessHandle(Deployment *deploment, bool redirectOutput
     //we are the parent
     if(pid != 0)
     {
-        processName = getProcessNameByPid(getpid());
+        processName = deploment->getName();
         return;
     }
 
@@ -149,7 +149,7 @@ Spawner::ProcessHandle::ProcessHandle(Deployment *deploment, bool redirectOutput
             throw std::runtime_error("Error, log directory '" + logDir + "' does not exist, but it should !");
         }
         redirectOutput(logDir + "/" + cmd + "-" + boost::lexical_cast<std::string>(getpid()) + ".txt");
-        processName = getProcessNameByPid(getpid());
+        processName = deploment->getName();
     }
     
     //do the exec
