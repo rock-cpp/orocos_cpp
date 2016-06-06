@@ -30,7 +30,6 @@ rock_library(orocos_cpp
         orocos-rtt-mqueue-${OROCOS_TARGET}
         orocos-rtt-corba-${OROCOS_TARGET}
         typelib
-        yaml-cpp
         transformer
         smurf
         logger-proxies
