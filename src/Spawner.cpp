@@ -63,33 +63,6 @@ void shutdownHandler(int signum, siginfo_t *info, void *data)
     
 }
 
-const std::string getProcessNameByPid(const pid_t pid)
-{
-    std::string cmdString = "ps -p " + std::to_string(pid) + " -o comm=";
-    std::string result = "";
-    FILE *cmdOutput = popen(cmdString.c_str(), "r");
-    char buffer[100];
-    
-    if(cmdOutput)
-    {
-        while(!feof(cmdOutput))
-        {
-            if(fgets(buffer, 100, cmdOutput))
-            {
-                result += buffer;
-            }
-        }
-        result.erase(std::remove(result.begin(), result.end(), '\n'), result.end());
-    }
-    else 
-    {
-        std::cout << "Couldn't get name for process: " + std::to_string(pid) << std::endl;
-    }
-    
-    pclose(cmdOutput);
-    return result;
-}
-
 Spawner::Spawner()
 {
     //log dir always exists if requested from bundle
