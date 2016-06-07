@@ -19,7 +19,7 @@ bool TransformerHelper::configureTransformer(RTT::TaskContext* task)
 {
     const std::string opName("getNeededTransformations");
     
-    //test if the task acutally uses the transformer
+    //test if the task actually uses the transformer
     if(!task->provides()->hasMember(opName))
         //does not, we take this as successfully configured
         return true;

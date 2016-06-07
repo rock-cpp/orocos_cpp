@@ -375,21 +375,32 @@ bool ConfigurationHelper::applyConfToProperty(RTT::TaskContext* context, const s
 
     //get Typelib value
     const RTT::types::TypeInfo* typeInfo = property->getTypeInfo();
-    orogen_transports::TypelibMarshallerBase *typelibTransport = dynamic_cast<orogen_transports::TypelibMarshallerBase*>(typeInfo->getProtocol(orogen_transports::TYPELIB_MARSHALLER_ID));
 
     //get data source
     RTT::base::DataSourceBase::shared_ptr ds = property->getDataSource();
-    
+
+    return applyConfigValueOnDSB(ds, typeInfo, value);
+
+}
+
+
+bool ConfigurationHelper::applyConfigValueOnDSB(RTT::base::DataSourceBase::shared_ptr dsb,
+        const RTT::types::TypeInfo* typeInfo, const libConfig::ConfigValue& value){
+
+    orogen_transports::TypelibMarshallerBase *typelibTransport =
+            dynamic_cast<orogen_transports::TypelibMarshallerBase*>(
+                    typeInfo->getProtocol(orogen_transports::TYPELIB_MARSHALLER_ID));
+
     //TODO make faster by adding getType to transport
     const Typelib::Type *type = typelibTransport->getRegistry().get(typelibTransport->getMarshallingType());
 
     orogen_transports::TypelibMarshallerBase::Handle *handle = typelibTransport->createSample();
 
     uint8_t *buffer = typelibTransport->getTypelibSample(handle);
-            
+
     Typelib::Value dest(buffer, *type);
-            
-    if(typelibTransport->readDataSource(*ds, handle))
+
+    if(typelibTransport->readDataSource(*dsb, handle))
     {
         //we need to do this, in case that it is an opaque
         typelibTransport->refreshTypelibSample(handle);
@@ -404,7 +415,7 @@ bool ConfigurationHelper::applyConfToProperty(RTT::TaskContext* context, const s
     typelibTransport->refreshOrocosSample(handle);
 
     //write value back
-    typelibTransport->writeDataSource(*ds, handle);
+    typelibTransport->writeDataSource(*dsb, handle);
     
     //destroy handle to avoid memory leak
     typelibTransport->deleteHandle(handle);
