@@ -34,6 +34,7 @@ rock_library(orocos_cpp
         smurf
         logger-proxies
         lib_config
+        backward
     DEPS_PLAIN 
         Boost_SYSTEM Boost_FILESYSTEM Boost_REGEX Boost_THREAD
     )

@@ -16,11 +16,14 @@
 #include "CorbaNameService.hpp"
 #include <lib_config/Bundle.hpp>
 #include <signal.h>
+#include <backward/backward.hpp>
 
 using namespace orocos_cpp;
 using namespace libConfig;
 
 struct sigaction originalSignalHandler[SIGTERM];
+
+backward::SignalHandling sh;
 
 void shutdownHandler(int signum, siginfo_t *info, void *data);
 
