@@ -1,5 +1,4 @@
 #include "CorbaNameService.hpp"
-#include <rtt/transports/corba/ApplicationServer.hpp>
 #include <rtt/transports/corba/TaskContextProxy.hpp>
 #include <rtt/transports/corba/TaskContextC.h>
 #include <stdexcept>
@@ -11,13 +10,38 @@ CorbaNameService::CorbaNameService(std::string name_service_ip, std::string name
 {
 }
 
+bool CorbaNameService::initOrb()
+{
+    if ( !CORBA::is_nil(orb) )
+        return false;
+
+    try {
+        int argc = 0;
+        char **argv = nullptr;
+        
+        // First initialize the ORB, that will remove some arguments...
+        orb = CORBA::ORB_init (argc, const_cast<char**>(argv),
+                                "omniORB4");
+    }
+    catch (CORBA::Exception &e) {
+        std::cout << "Orb Init : CORBA exception raised!" << std::endl;
+        std::cout << CORBA_EXCEPTION_INFO(e) << std::endl;
+        return false;
+    }
+    return true;
+}
+
+bool CorbaNameService::isConnected()
+{
+    return !CORBA::is_nil(orb);
+}
+
+
 bool CorbaNameService::connect()
 {
     if(CORBA::is_nil(orb))
     {
-        int argc = 0;
-        char **argv = nullptr;
-        if(!InitOrb(argc, argv))
+        if(!initOrb())
         {
             throw std::runtime_error("CorbaNameService::Error, failed to initialize CORBA Orb");
         }
@@ -35,13 +59,17 @@ bool CorbaNameService::connect()
             if(!port.empty())
                 temp = temp + ":" + port;
             temp = temp +"/NameService";
-            rootObj = RTT::corba::ApplicationServer::orb->string_to_object(temp.c_str());
+            rootObj = orb->string_to_object(temp.c_str());
         }
-    } catch (...) {}
+    } catch (...) {
+        return false;
+    }
 
     try {
         rootContext = CosNaming::NamingContext::_narrow(rootObj);
-    } catch (...) {}
+    } catch (...) {
+        return false;
+    }
 
     if (CORBA::is_nil(rootContext)) {
         std::string err("TaskContextProxy could not acquire NameService.");
@@ -112,9 +140,7 @@ bool CorbaNameService::isRegistered(const std::string& taskName)
 {
     if(CORBA::is_nil(orb))
     {
-    	//reinitialization because corba::orb_var init is called on every dynamic library load (error!)
-    	connect();
-//        throw std::runtime_error("CorbaNameService::Error, called getTaskContext() without connection " );
+       throw std::runtime_error("CorbaNameService::Error, called getTaskContext() without connection " );
     }
 
     CosNaming::Name serverName;
@@ -141,8 +167,6 @@ bool CorbaNameService::isRegistered(const std::string& taskName)
         return false;
     }
     
-
-    
     return true;
 }
 
@@ -160,7 +184,7 @@ RTT::TaskContext* CorbaNameService::getTaskContext(const std::string& taskName)
 
     // Get object reference
     CORBA::Object_var task_object = rootContext->resolve(serverName);
-    CORBA::String_var s = RTT::corba::ApplicationServer::orb->object_to_string(task_object);
+    CORBA::String_var s = orb->object_to_string(task_object);
 
     RTT::TaskContext *ret = nullptr;
         

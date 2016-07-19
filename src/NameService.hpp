@@ -21,6 +21,7 @@ public:
      * @return true on success, false on error
      * */
     virtual bool connect() = 0;
+    virtual bool isConnected() = 0;
     
     virtual std::vector<std::string> getRegisteredTasks() = 0;
     
