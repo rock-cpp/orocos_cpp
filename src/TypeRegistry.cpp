@@ -8,7 +8,10 @@ namespace orocos_cpp
 
 TypeRegistry::TypeRegistry()
 {
-
+    typeToTypekit.insert(std::make_pair("int", "rtt-types"));
+    typeToTypekit.insert(std::make_pair("bool", "rtt-types"));
+    typeToTypekit.insert(std::make_pair("string", "rtt-types"));
+    typeToTypekit.insert(std::make_pair("double", "rtt-types"));
 }
 
 bool TypeRegistry::loadTypelist()
