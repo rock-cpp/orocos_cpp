@@ -36,16 +36,18 @@ bool TransformerHelper::configureTransformer(RTT::TaskContext* task)
     for(const auto tr : robotConfiguration.getStaticTransforms())
     {
         base::samples::RigidBodyState transform;
-        transform.sourceFrame = tr->getSourceFrame().getName();
-        transform.targetFrame = tr->getTargetFrame().getName();
+        // NOTE: In the smurf loader classes source and target frame is interpreted the other way around. The transformation however is the same.
+        transform.sourceFrame = tr->getTargetFrame().getName();
+        transform.targetFrame = tr->getSourceFrame().getName();
         transform.setTransform(tr->getTransformation());
-        tree.addTransformation(new transformer::StaticTransformationElement(tr->getSourceFrame().getName(), tr->getTargetFrame().getName(), transform));
+        tree.addTransformation(new transformer::StaticTransformationElement(tr->getTargetFrame().getName(), tr->getSourceFrame().getName(), transform));
         staticTransforms.push_back(transform);
     }
     
     for(const auto tr : robotConfiguration.getDynamicTransforms())
     {
-        tree.addTransformation(new TransformationProvider(tr->getSourceFrame().getName(), tr->getTargetFrame().getName(), tr->getProviderName(), tr->getProviderPortName()));
+        // NOTE: In the smurf loader classes source and target frame is interpreted the other way around. The transformation however is the same.
+        tree.addTransformation(new TransformationProvider(tr->getTargetFrame().getName(), tr->getSourceFrame().getName(), tr->getProviderName(), tr->getProviderPortName()));
     }
 
     RTT::base::PortInterface *dynamicTransformsPort = task->getPort("dynamic_transformations");
