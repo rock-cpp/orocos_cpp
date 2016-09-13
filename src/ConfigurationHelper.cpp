@@ -456,6 +456,11 @@ bool ConfigurationHelper::mergeConfig(const std::vector< std::string >& names, C
         if(entry == subConfigs.end())
         {
             std::cout << "Error, merge failed config " << *it << " not found " << std::endl;
+            std::cout << "Known configs:" << std::endl;
+            for(std::map<std::string, Configuration>::const_iterator it = subConfigs.begin(); it != subConfigs.end(); it++)
+            {
+                std::cout << "    \"" << it->first << "\"" << std::endl;
+            }
             return false;
         }
 
@@ -494,6 +499,11 @@ bool ConfigurationHelper::applyConfig(const std::string& configFilePath, RTT::Ta
     Configuration config("Merged");
     if(!mergeConfig(names, config))
     {
+        std::cout << "Error, merging of configurations for context " + context->getName() + " failed " << std::endl;
+        std::cout << "Configurations : " << std::endl;
+        for(const std::string &confName : names)
+            std::cout << "    " << confName << std::endl;
+        
         throw std::runtime_error("Error, merging of configuarations for context " + context->getName() + " failed ");
         return false;
     }
