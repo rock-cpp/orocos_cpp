@@ -11,7 +11,7 @@ Deployment::Deployment(const std::string& name) : deploymentName(name), withValg
 {
     loadPkgConfigFile(name);
     if(!checkExecutable(name))
-        throw std::runtime_error("Deployment::Error, executable for deployment " + name + " could not be found in PATH");
+        throw std::runtime_error("Deployment::Error, executable for deployment '" + name + "' could not be found in PATH");
 }
 
 Deployment::Deployment(const std::string &cmp1, const std::string &as) : withValgrind(false)

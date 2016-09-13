@@ -124,8 +124,8 @@ Spawner::ProcessHandle::ProcessHandle(Deployment *deploment, bool redirectOutput
         {
             throw std::runtime_error("Error, log directory '" + logDir + "' does not exist, but it should !");
         }
-        redirectOutput(logDir + "/" + processName + "-" + boost::lexical_cast<std::string>(getpid()) + ".txt");
         processName = deploment->getName();
+        redirectOutput(logDir + "/" + processName + "-" + boost::lexical_cast<std::string>(getpid()) + ".txt");
     }
     
     //do the exec
