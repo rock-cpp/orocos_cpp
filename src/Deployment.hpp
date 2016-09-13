@@ -26,6 +26,8 @@ private:
     std::string deploymentName;
     std::string loggerName;
 
+    bool withValgrind;
+    
 public:
     Deployment(const std::string &name);
     
@@ -69,6 +71,10 @@ public:
      * */
     bool hasLogger() const;
     
+    /**
+     * If called, the deployment will be started within valgrind
+     * */
+    void runWithValgrind();    
 };
 
 } //end of namespace

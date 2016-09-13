@@ -7,7 +7,7 @@
 
 using namespace orocos_cpp;
 
-Deployment::Deployment(const std::string& name) : deploymentName(name)
+Deployment::Deployment(const std::string& name) : deploymentName(name), withValgrind(false)
 {
     loadPkgConfigFile(name);
     if(!checkExecutable(name))
@@ -179,9 +179,18 @@ void Deployment::renameTask(const std::string& orignalName, const std::string& n
 
 bool Deployment::getExecString(std::string& cmd, std::vector< std::string >& args)
 {
+    args.clear();
+
     cmd = deploymentName;
     
-    args.clear();
+    if(withValgrind)
+    {
+        args.push_back("--trace-children=yes");
+        args.push_back("--log-file=" + deploymentName + "-valgrind.txt");
+        args.push_back(deploymentName);
+        cmd = "valgrind";
+    }
+
     for(std::pair<std::string, std::string> p: renameMap)
     {
         if(!p.second.empty())
@@ -210,4 +219,9 @@ const std::string Deployment::getLoggerName() const
 bool Deployment::hasLogger() const
 {
     return !loggerName.empty();
+}
+
+void Deployment::runWithValgrind()
+{
+    withValgrind = true;
 }
