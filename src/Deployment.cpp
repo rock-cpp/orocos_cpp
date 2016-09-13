@@ -14,7 +14,7 @@ Deployment::Deployment(const std::string& name) : deploymentName(name), withValg
         throw std::runtime_error("Deployment::Error, executable for deployment " + name + " could not be found in PATH");
 }
 
-Deployment::Deployment(const std::string &cmp1, const std::string &as)
+Deployment::Deployment(const std::string &cmp1, const std::string &as) : withValgrind(false)
 {
     //cmp1 is expected in the format "module::TaskSpec"
     std::string::size_type pos = cmp1.find_first_of(":");
