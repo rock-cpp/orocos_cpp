@@ -21,7 +21,7 @@
 using namespace orocos_cpp;
 using namespace libConfig;
 
-struct sigaction originalSignalHandler[SIGTERM];
+struct sigaction originalSignalHandler[SIGTERM + 1];
 
 backward::SignalHandling sh;
 
