@@ -1,5 +1,4 @@
-#ifndef PLUGINHELPER_H
-#define PLUGINHELPER_H
+#pragma once
 
 #include <vector>
 #include <map>
@@ -11,6 +10,8 @@ namespace orocos_cpp
 class PluginHelper
 {
 private:
+    static std::map<std::string, std::vector<std::string> > componentToTypeKitsMap;
+    
 public:
     static void loadAllPluginsInDir(const std::string &path);
 
@@ -38,4 +39,4 @@ public:
     static std::vector<std::string> getNeededTypekits(const std::string &componentName);
 };
 }//end of namespace
-#endif // PLUGINHELPER_H
+

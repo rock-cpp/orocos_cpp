@@ -13,13 +13,13 @@
 #define str(s) #s
 
 using namespace orocos_cpp;
+/**
+    * Cache for the needed typekits.
+    */
+std::map<std::string, std::vector<std::string> > PluginHelper::componentToTypeKitsMap;
 
 std::vector< std::string > PluginHelper::getNeededTypekits(const std::string& componentName)
 {
-    /**
-     * Cache for the needed typekits.
-     */
-    static std::map<std::string, std::vector<std::string> > componentToTypeKitsMap;
 
     auto it = componentToTypeKitsMap.find(componentName);
     if(it != componentToTypeKitsMap.end())
@@ -42,7 +42,7 @@ std::vector< std::string > PluginHelper::getNeededTypekits(const std::string& co
         ret.push_back(tk);
     }
     
-    componentToTypeKitsMap[componentName] = ret;
+    componentToTypeKitsMap.insert(std::make_pair(componentName, ret));
     
     return ret;
 }
