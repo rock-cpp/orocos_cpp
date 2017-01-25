@@ -93,8 +93,8 @@ bool TransformerHelper::configureTransformer(RTT::TaskContext* task)
             
             if(!proxy)
             {
-                std::cout << "Error, could not connect to transformation provider '" << prov->providerName << "'" << std::endl;
-                throw std::runtime_error("Error, could not connect to transformation provider '" + prov->providerName + "'");
+                std::cout << "Error, could not connect to transformation provider '" << prov->providerName << "' needed by the task '" << task->getName() << "'" << std::endl;
+                throw std::runtime_error("Error, could not connect to transformation provider '" + prov->providerName + "' needed by the task '" + task->getName() + "'");
                 return false;
             }
             
