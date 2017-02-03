@@ -2,16 +2,55 @@
 #include <boost/filesystem.hpp>
 #include <iostream>
 #include <fstream>
+#include <rtt/types/TypeInfoRepository.hpp>
+#include <boost/bind.hpp>
+#include "PluginHelper.hpp"
 
 namespace orocos_cpp 
 {
 
+TypeRegistry *TypeRegistry::instance;
+    
 TypeRegistry::TypeRegistry()
 {
     typeToTypekit.insert(std::make_pair("int", "rtt-types"));
     typeToTypekit.insert(std::make_pair("bool", "rtt-types"));
     typeToTypekit.insert(std::make_pair("string", "rtt-types"));
     typeToTypekit.insert(std::make_pair("double", "rtt-types"));
+    
+    loadTypelist();
+    
+    registerAtRTT();
+}
+
+TypeRegistry* TypeRegistry::getInstance()
+{
+    if(!instance)
+        instance = new TypeRegistry();
+    
+    return instance;
+}
+
+void TypeRegistry::registerAtRTT()
+{
+    RTT::types::TypeInfoRepository *ti = RTT::types::TypeInfoRepository::Instance().get();
+    ti->setAutoLoader(boost::bind(&TypeRegistry::loadTypkekit, this, _1));
+}
+
+bool TypeRegistry::loadTypkekit(const std::string& typeName)
+{
+    std::cout << "Type " << typeName << " requested " << std::endl;
+    std::string tkName;
+    if(getTypekitDefiningType(typeName, tkName))
+    {
+        std::cout << "TK " << tkName << " is defining the type " << typeName << std::endl;
+        if(PluginHelper::loadTypekitAndTransports(tkName))
+        {
+            std::cout << "TK loaded" << std::endl;
+            return true;
+        }
+    }
+    return false;
 }
 
 bool TypeRegistry::loadTypelist()
