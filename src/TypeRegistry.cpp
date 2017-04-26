@@ -18,6 +18,7 @@ TypeRegistry::TypeRegistry()
 
 bool TypeRegistry::loadTypelist()
 {
+    bool loadedAll = true;
     const char *pkgCfgPaths = getenv("PKG_CONFIG_PATH");
     
     if(!pkgCfgPaths)
@@ -30,9 +31,16 @@ bool TypeRegistry::loadTypelist()
 
     for(const std::string& path : paths)
     {
+        if(!boost::filesystem::exists(boost::filesystem::path(path)))
+        {
+            std::cerr << "skipping nonexisting pkg-config path: " << path << std::endl;
+            continue;
+        }
+        
         for(auto it = boost::filesystem::directory_iterator(path); it != boost::filesystem::directory_iterator(); it++)
         {
             const boost::filesystem::path file = it->path();
+            
             if(file.filename().string().find("typekit") != std::string::npos)
             {                
                 // be aware of order of parsed fields
@@ -69,13 +77,13 @@ bool TypeRegistry::loadTypelist()
                     else
                     {
                         std::cerr << "error: couldn't solve pkg-config strings from file " << file.string() << std::endl;
-                        return false;
+                        loadedAll &= false;
                     }
                 }
                 else
                 {
                     std::cerr << "error: couldn't parse pkg-config fields from file " << file.string() << std::endl;
-                    return false;
+                    loadedAll &= false;
                 }
                 
             }
@@ -84,7 +92,7 @@ bool TypeRegistry::loadTypelist()
         
     }
     
-    return true;
+    return loadedAll;
 }
 
 bool TypeRegistry::getTypekitDefiningType(const std::string& typeName, std::string& typekitName)
