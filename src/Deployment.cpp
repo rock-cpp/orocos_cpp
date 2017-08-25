@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iostream>
 #include "PkgConfigHelper.hpp"
+#include <lib_config/Bundle.hpp>
 
 using namespace orocos_cpp;
 
@@ -186,7 +187,8 @@ bool Deployment::getExecString(std::string& cmd, std::vector< std::string >& arg
     if(withValgrind)
     {
         args.push_back("--trace-children=yes");
-        args.push_back("--log-file=" + deploymentName + "-valgrind.txt");
+        args.push_back("--leak-check=full");
+        args.push_back("--log-file=" + libConfig::Bundle::getInstance().getLogDirectory() + "/" + deploymentName + "-valgrind.txt");
         args.push_back(deploymentName);
         cmd = "valgrind";
     }
