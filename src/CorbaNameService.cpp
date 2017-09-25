@@ -122,7 +122,7 @@ std::vector< std::string > CorbaNameService::getRegisteredTasks()
                 CORBA::Object_var task_object = rootContext->resolve(serverName);
                 RTT::corba::CTaskContext_var mtask = RTT::corba::CTaskContext::_narrow (task_object.in ());
                 
-                std::cout << "Connection test to " << name << std::endl;
+                //std::cout << "Connection test to " << name << std::endl;
                 
                 // force connect to object.
                 CORBA::String_var nm = mtask->getName(); 
