@@ -17,11 +17,11 @@ private:
     
     std::vector<std::string> typekits;
     std::vector<std::string> tasks;
-    std::vector<std::string> originalTasks;
 
-    std::vector<std::string> renamedTasks;
-    
+    //this map contains a map from currentName to Origininal Name
     std::map<std::string, std::string> renameMap;
+    
+    void regenerateNameVectors();
     
     std::string deploymentName;
     std::string loggerName;
@@ -43,10 +43,6 @@ public:
      * */
     const std::vector<std::string> &getTaskNames() const;
     
-    /**
-     * Returns the task names before the renaming operation
-     * */
-    const std::vector<std::string> &getOriginalTaskNames() const;
     const std::vector<std::string> &getNeededTypekits() const;
     
     /**

@@ -49,6 +49,16 @@ Deployment::Deployment(const std::string &cmp1, const std::string &as) : withVal
     }
 }
 
+void Deployment::regenerateNameVectors()
+{
+    //regenerate the task list
+    tasks.clear();
+    for(std::pair<std::string, std::string> p: renameMap)
+    {
+        tasks.push_back(p.first);
+    }
+}
+
 bool Deployment::checkExecutable(const std::string& name)
 {
     if(boost::filesystem::exists(name))
@@ -99,8 +109,7 @@ bool Deployment::loadPkgConfigFile(const std::string& name)
     boost::tokenizer<boost::char_separator<char> > tTasks(pkgConfigValues[1], sep2);
     for(const std::string &task: tTasks)
     {
-        renameMap[task] = std::string();
-        originalTasks.push_back(task);
+        renameMap[task] = task;
         tasks.push_back(task);
         
         std::string loggerString("_Logger");
@@ -130,12 +139,6 @@ const std::string& Deployment::getName() const
     return deploymentName;
 }
 
-const std::vector< std::string >& Deployment::getOriginalTaskNames() const
-{
-    return originalTasks;
-}
-
-
 const std::vector< std::string >& Deployment::getTaskNames() const
 {
     return tasks;
@@ -151,30 +154,16 @@ void Deployment::renameTask(const std::string& orignalName, const std::string& n
     auto it = renameMap.find(orignalName);
     if(it == renameMap.end())
     {
-        throw std::runtime_error("Deployment::Error, deployment " + deploymentName + " has no task " + orignalName);
-    }
-    
-    if(!it->second.empty())
-    {
-        std::cout << "Deployment::Warning double renaming of task " << orignalName << ". This smells like a bug." << std::endl;
+        throw std::runtime_error("Deployment::renameTask : Error, deployment " + deploymentName + " has no task " + orignalName);
     }
     
     //set new name
-    it->second = newName;
+    std::string origName = it->second;
+    renameMap.erase(it);
+    renameMap[newName] = origName;
 
     //regenerate the task list
-    tasks.clear();
-    for(std::pair<std::string, std::string> p: renameMap)
-    {
-        if(p.second.empty())
-        {
-            tasks.push_back(p.first);
-        }
-        else
-        {
-            tasks.push_back(p.second);
-        }
-    }
+    regenerateNameVectors();
 }
 
 
@@ -195,11 +184,11 @@ bool Deployment::getExecString(std::string& cmd, std::vector< std::string >& arg
 
     for(std::pair<std::string, std::string> p: renameMap)
     {
-        if(!p.second.empty())
+        if(p.second != p.first)
         {
-//             std::cout << "Task " << p.first << " is renmaed to " << p.second << std::endl;
+//             std::cout << "Task " << p.second << " is renmaed to " << p.first << std::endl;
             args.push_back("--rename");
-            args.push_back(p.first + ":" + p.second);
+            args.push_back(p.second + ":" + p.first);
         }
     }
     
@@ -208,14 +197,18 @@ bool Deployment::getExecString(std::string& cmd, std::vector< std::string >& arg
 
 const std::string Deployment::getLoggerName() const
 {
-    auto it = renameMap.find(loggerName);
-    if(it == renameMap.end())
-        throw std::runtime_error("Deployment::Internal Error, logger name could not be found for deployment " + deploymentName + ". Forgott the add_default_logger ?");
-    
-    if(it->second.empty())
-        return it->first;
-    
-    return it->second;
+    for(std::pair<std::string, std::string> p: renameMap)
+    {
+        if(p.second == loggerName)
+            return p.first;
+    }    
+
+    std::cout << "Rename map is " << std::endl;
+    for(std::pair<std::string, std::string> p: renameMap)
+    {
+        std::cout << "Cur Name " << p.first << " orig name " << p.second << std::endl;
+    }
+    throw std::runtime_error("Deployment::Internal Error, logger name '" + loggerName + "' could not be found for deployment '" + deploymentName + "'. Forgott the add_default_logger ?");
 }
 
 bool Deployment::hasLogger() const
