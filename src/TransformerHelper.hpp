@@ -10,7 +10,7 @@ namespace orocos_cpp
 class TransformerHelper
 {
 private:
-    static const size_t DEFAULT_CONNECTION_BUFFER_SIZE = 500;
+    static const size_t DEFAULT_CONNECTION_BUFFER_SIZE = 2500;
     RTT::ConnPolicy conPolicy;
     smurf::Robot robotConfiguration;
 public:
