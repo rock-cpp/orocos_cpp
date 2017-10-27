@@ -177,6 +177,7 @@ bool Deployment::getExecString(std::string& cmd, std::vector< std::string >& arg
     {
         args.push_back("--trace-children=yes");
         args.push_back("--leak-check=full");
+        args.push_back("--track-origins=yes");
         args.push_back("--log-file=" + libConfig::Bundle::getInstance().getLogDirectory() + "/" + deploymentName + "-valgrind.txt");
         args.push_back(deploymentName);
         cmd = "valgrind";
