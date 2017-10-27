@@ -6,6 +6,7 @@
   <license>dummy-license</license>
   <url>dummy-url</url>
   <logo>dummy-logo-url</logo>
+  <tag>needs_opt</tag>
   <depend package="base/cmake" />
   <depend package="rtt" />
   <depend package="rtt_typelib" />
