@@ -232,7 +232,10 @@ bool LoggingHelper::logAllPorts(RTT::TaskContext* givenContext, const std::strin
         }
         loggerPort->disconnect();
         
-        if(!outPort->connectTo(loggerPort, RTT::ConnPolicy::buffer(DEFAULT_LOG_BUFFER_SIZE)))
+        RTT::ConnPolicy policy = RTT::ConnPolicy::buffer(DEFAULT_LOG_BUFFER_SIZE);
+        policy.init = true;
+        
+        if(!outPort->connectTo(loggerPort, policy))
         {
             throw std::runtime_error("Error, could not connect port to logger");
         }
