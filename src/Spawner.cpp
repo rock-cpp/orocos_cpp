@@ -17,6 +17,7 @@
 #include <lib_config/Bundle.hpp>
 #include <signal.h>
 #include <backward/backward.hpp>
+#include <rtt/transports/corba/TaskContextProxy.hpp>
 
 using namespace orocos_cpp;
 using namespace libConfig;
@@ -102,6 +103,13 @@ Spawner::ProcessHandle::ProcessHandle(Deployment *deploment, bool redirectOutput
     if(!deployment->getExecString(cmd, args))
         throw std::runtime_error("Error, could not get parameters to start deployment " + deployment->getName() );
     
+    /* Block SIGINT. */
+    sigset_t mask, omask;
+    sigemptyset(&mask);
+    sigaddset(&mask, SIGINT);
+    if(sigprocmask(SIG_BLOCK, &mask, &omask))
+        throw std::runtime_error("Spawner : ProcessHandle could not block SIGINT");
+    
     pid = fork();
     
     if(pid < 0)
@@ -112,10 +120,25 @@ Spawner::ProcessHandle::ProcessHandle(Deployment *deploment, bool redirectOutput
     //we are the parent
     if(pid != 0)
     {
+        if (setpgid(pid, pid) < 0 && errno != EACCES)
+        {
+            throw std::runtime_error("Spawner : ProcessHandle: Parent : Error changing process group of child");
+        }
+        
+        if(sigprocmask(SIG_SETMASK, &omask, NULL))
+        {
+            throw std::runtime_error("Spawner : ProcessHandle could not unblock SIGINT");
+        }
+            
         processName = deploment->getName();
         return;
     }
 
+    if(setpgid(0, 0))
+    {
+        throw std::runtime_error("Spawner : ProcessHandle: Child : Error could not change process group");
+    }
+    
     //child, redirect output
     if(redirectOutputv)
     {
@@ -315,6 +338,25 @@ void Spawner::waitUntilAllReady(const base::Time& timeout)
 
 void Spawner::killAll()
 {
+    //first we try to stop and cleanup the processes
+    //ask all processes to terminate
+    for(ProcessHandle *handle : handles)
+    {
+        for(const std::string &tName: handle->getDeployment().getTaskNames())
+        {
+            try {
+                std::cout << "Trying to stop task " << tName << std::endl;
+                RTT::corba::TaskContextProxy *proxy = RTT::corba::TaskContextProxy::Create(tName, false);
+                if(proxy->isRunning())
+                    proxy->stop();
+            }
+            catch (...)
+            {
+                //don't care, we want to shut down anyways
+            }
+        }
+    }    
+    
     //ask all processes to terminate
     for(ProcessHandle *handle : handles)
     {
