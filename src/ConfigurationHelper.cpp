@@ -475,9 +475,17 @@ bool ConfigurationHelper::mergeConfig(const std::vector< std::string >& names, C
 }
 
 bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const Configuration& config)
-{
+{     
+    Configuration baseConf = config;
+    
+    if(overrides.find(context->getName()) != overrides.end())
+    {
+        Configuration &overrideConf = overrides.at(context->getName());
+        if(!baseConf.merge(overrideConf))
+            throw std::runtime_error("error: merging override config for task " + context->getName() + " failed");
+    }
     std::map<std::string, std::shared_ptr<ConfigValue> >::const_iterator propIt;
-    for(propIt = config.getValues().begin(); propIt != config.getValues().end(); propIt++)
+    for(propIt = baseConf.getValues().begin(); propIt != baseConf.getValues().end(); propIt++)
     {
         if(!applyConfToProperty(context, propIt->first, *(propIt->second)))
         {
@@ -591,3 +599,17 @@ bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const std::stri
     
     return applyConfig(context, configs);
 }
+
+bool ConfigurationHelper::registerOverride(const std::string& taskName, Configuration& config)
+{
+    if(overrides.find(taskName) == overrides.end())
+    {
+        overrides.insert(std::make_pair(taskName, config));
+        std::cout << "adding config override for task " << taskName << std::endl;
+        config.print();
+        return true;
+    }
+    
+    return false;
+}
+

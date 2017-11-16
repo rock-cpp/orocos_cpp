@@ -30,6 +30,8 @@ public:
     bool applyConfig(RTT::TaskContext *context, const std::string &conf1, const std::string &conf2);
     bool applyConfig(RTT::TaskContext *context, const std::string &conf1, const std::string &conf2, const std::string &conf3);
     bool applyConfig(RTT::TaskContext *context, const std::string &conf1, const std::string &conf2, const std::string &conf3, const std::string &conf4);
+    bool registerOverride(const std::string& taskName, libConfig::Configuration &config);
+    
     /**
      * @brief Function applying configuration value on a DataSourceBase object.
      * @param dsb The shared pointer object pointing to the DataSourceBase object. This will be modified!
@@ -42,6 +44,7 @@ public:
 
 private:
     std::map<std::string, libConfig::Configuration> subConfigs;
+    std::map<std::string, libConfig::Configuration> overrides;
     bool mergeConfig(const std::vector<std::string> &names, libConfig::Configuration &result);
     bool applyConfToProperty(RTT::TaskContext* context, const std::string &propertyName, const libConfig::ConfigValue &value);
 };
