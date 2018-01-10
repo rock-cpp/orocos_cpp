@@ -5,6 +5,7 @@ rock_library(orocos_cpp
         TransformerHelper.cpp
         TypeRegistry.cpp
         LoggingHelper.cpp
+        LoggerProxy.cpp
         Spawner.cpp
         NameService.cpp
         CorbaNameService.cpp
@@ -32,7 +33,6 @@ rock_library(orocos_cpp
         typelib
         transformer
         smurf
-        logger-proxies
         lib_config
         backward
     DEPS_PLAIN 

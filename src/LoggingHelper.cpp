@@ -4,7 +4,7 @@
 #include <rtt/OperationCaller.hpp>
 #include <rtt/types/TypekitRepository.hpp>
 #include <rtt/plugin/PluginLoader.hpp>
-#include <logger/proxies/Logger.hpp>
+#include "LoggerProxy.hpp"
 #include "CorbaNameService.hpp"
 #include <lib_config/Bundle.hpp>
 #include "Spawner.hpp"
@@ -12,6 +12,7 @@
 
 using namespace orocos_cpp;
 using namespace libConfig;
+
 
 LoggingHelper::LoggingHelper() : DEFAULT_LOG_BUFFER_SIZE(100)
 {
@@ -164,10 +165,10 @@ bool LoggingHelper::logAllPorts(RTT::TaskContext* givenContext, const std::strin
         context = RTT::corba::TaskContextProxy::Create(taskName, false);
     }
     
-    logger::proxies::Logger *logger;
+    LoggerProxy *logger;
     
     try{
-        logger = new logger::proxies::Logger(loggerName, false);
+        logger = new LoggerProxy(loggerName, false);
     } catch (...)
     {
         throw std::runtime_error("Error, could not contact the logger " + loggerName);
@@ -209,7 +210,7 @@ bool LoggingHelper::logAllPorts(RTT::TaskContext* givenContext, const std::strin
         
         
         std::cout << "Create Logging Port for " << name << std::endl;
-        if(!logger->createLoggingPort(name, outPort->getTypeInfo()->getTypeName(), ::std::vector< ::logger::StreamMetadata >()))
+        if(!logger->createLoggingPort(name, outPort->getTypeInfo()->getTypeName()))
         {
             std::cout << "logAllPorts: Error, failed to create port " << name << std::endl;
             return false;
