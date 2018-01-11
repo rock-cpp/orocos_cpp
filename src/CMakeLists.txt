@@ -32,6 +32,7 @@ rock_library(orocos_cpp
         orocos-rtt-corba-${OROCOS_TARGET}
         typelib
         transformer
+        transformer-typekit-gnulinux
         smurf
         lib_config
         backward
