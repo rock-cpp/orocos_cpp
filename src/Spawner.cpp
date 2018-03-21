@@ -69,8 +69,7 @@ void shutdownHandler(int signum, siginfo_t *info, void *data)
 
 Spawner::Spawner()
 {
-    //log dir always exists if requested from bundle
-    logDir = Bundle::getInstance().getLogDirectory();
+    logDir = "";
 
     nameService = new CorbaNameService();
     nameService->connect();
@@ -92,6 +91,16 @@ Spawner& Spawner::getInstace()
     }
     
     return *instance;
+}
+
+void Spawner::setLogDir(std::string logDir)
+{
+    this->logDir = logDir;
+}
+
+void Spawner::setLogDirFromBundle()
+{
+    this->logDir = Bundle::getInstance().getLogDirectory();
 }
 
 
