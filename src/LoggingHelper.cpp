@@ -9,6 +9,7 @@
 #include <lib_config/Bundle.hpp>
 #include "Spawner.hpp"
 #include "PluginHelper.hpp"
+#include <boost/filesystem.hpp>
 
 using namespace orocos_cpp;
 using namespace libConfig;
@@ -246,8 +247,14 @@ bool LoggingHelper::logAllPorts(RTT::TaskContext* givenContext, const std::strin
         return true;
 
     Bundle &bundle(Bundle::getInstance());
-    logger->file.set(bundle.getLogDirectory() + "/" + loggerName + ".0.log"); 
-    
+    int log_file_id = 0;
+    std::string log_path(bundle.getLogDirectory() + "/" + loggerName + "." + std::to_string(log_file_id) + ".log");
+    while(boost::filesystem::exists(log_path))
+    {
+        log_path = std::string(bundle.getLogDirectory() + "/" + loggerName + "." +  std::to_string(++log_file_id) + ".log");
+    }
+    logger->file.set(log_path);
+
     if(!logger->configure())
     {
         std::cout << "Failed to configure logger" << std::endl;
