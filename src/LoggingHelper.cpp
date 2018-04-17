@@ -143,6 +143,13 @@ bool LoggingHelper::logTasks(const std::vector< std::string >& excludeList)
 
 bool LoggingHelper::logAllPorts(RTT::TaskContext* givenContext, const std::string& loggerName, const std::vector< std::string > excludeList, bool loadTypekits)
 {
+    Bundle &bundle(Bundle::getInstance());
+    return logAllPorts(givenContext, loggerName, bundle.getLogDirectory(), excludeList, loadTypekits);
+}
+
+bool LoggingHelper::logAllPorts(RTT::TaskContext* givenContext, const std::string& loggerName, const std::string& log_directory,
+                                const std::vector< std::string > excludeList, bool loadTypekits)
+{
     RTT::TaskContext* context = givenContext;
     std::string taskName = context->getName();
     
@@ -230,7 +237,7 @@ bool LoggingHelper::logAllPorts(RTT::TaskContext* givenContext, const std::strin
         RTT::base::PortInterface *loggerPort = logger->getPort(taskName + "." + outPort->getName());
         if(!loggerPort)
         {
-            throw std::runtime_error("Error, port created on logger could not be aquired"); 
+            throw std::runtime_error("Error, port created on logger could not be aquired");
         }
         loggerPort->disconnect();
         
@@ -246,12 +253,11 @@ bool LoggingHelper::logAllPorts(RTT::TaskContext* givenContext, const std::strin
     if(logger->isRunning())
         return true;
 
-    Bundle &bundle(Bundle::getInstance());
     int log_file_id = 0;
-    std::string log_path(bundle.getLogDirectory() + "/" + loggerName + "." + std::to_string(log_file_id) + ".log");
+    std::string log_path(log_directory + "/" + loggerName + "." + std::to_string(log_file_id) + ".log");
     while(boost::filesystem::exists(log_path))
     {
-        log_path = std::string(bundle.getLogDirectory() + "/" + loggerName + "." +  std::to_string(++log_file_id) + ".log");
+        log_path = std::string(log_directory + "/" + loggerName + "." +  std::to_string(++log_file_id) + ".log");
     }
     logger->file.set(log_path);
 
