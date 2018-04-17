@@ -53,6 +53,16 @@ public:
      * the spawner.
      * */
     static Spawner &getInstace();
+
+    /**
+     * Set directory for logfiles to the given path
+     */
+    void setLogDir(std::string logDir);
+
+    /**
+     * Set directory for logfiles from the currently dselected bundle
+     */
+    void setLogDirFromBundle();
     
     /**
      * This method spawns a default deployment matching the given componente description.
