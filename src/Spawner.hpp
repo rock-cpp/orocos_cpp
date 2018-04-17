@@ -127,6 +127,12 @@ public:
      * Returns, if the given instance of a deployment is running.
      * */
     bool isRunning(const Deployment *instance);
+
+    /**
+     * Sets the default log directory.
+     * If no log directory is set it will be determined using bundles.
+     */
+    void setLogDirectory(const std::string& log_folder);
     
 private:
     

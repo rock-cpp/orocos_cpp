@@ -69,9 +69,6 @@ void shutdownHandler(int signum, siginfo_t *info, void *data)
 
 Spawner::Spawner()
 {
-    //log dir always exists if requested from bundle
-    logDir = Bundle::getInstance().getLogDirectory();
-
     nameService = new CorbaNameService();
     nameService->connect();
 
@@ -264,6 +261,12 @@ Spawner::ProcessHandle &Spawner::spawnTask(const std::string& cmp1, const std::s
 
 Spawner::ProcessHandle& Spawner::spawnDeployment(Deployment* deployment, bool redirectOutput)
 {
+    if(redirectOutput && logDir.empty())
+    {
+        //log dir always exists if requested from bundle
+        logDir = Bundle::getInstance().getLogDirectory();
+    }
+
     ProcessHandle *handle = new ProcessHandle(deployment, redirectOutput, logDir);
     
     handles.push_back(handle);
@@ -454,4 +457,8 @@ bool Spawner::isRunning(const Deployment* instance)
     return false;
 }
 
+void Spawner::setLogDirectory(const std::string& log_folder)
+{
+    logDir = log_folder;
+}
 
