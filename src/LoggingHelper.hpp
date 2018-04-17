@@ -11,7 +11,13 @@ class LoggingHelper
     const int DEFAULT_LOG_BUFFER_SIZE;
 public:
     LoggingHelper();
-    bool logAllPorts(RTT::TaskContext *context,  const std::string &loggerName, const std::vector<std::string> excludeList = std::vector<std::string>(), bool loadTypekits = true);
+    bool logAllPorts(RTT::TaskContext *context, const std::string &loggerName, const std::string& log_directory,
+                     const std::vector<std::string> excludeList = std::vector<std::string>(), bool loadTypekits = true);
+    /**
+     * This uses the local bundle instance to determine the log directory.
+     */
+    bool logAllPorts(RTT::TaskContext *context, const std::string &loggerName,
+                     const std::vector<std::string> excludeList = std::vector<std::string>(), bool loadTypekits = true);
     bool logTasks(const std::map<std::string, bool> &loggingEnabledTaskMap, bool logAll);
     bool logTasks(const std::vector<std::string> &excludeList);
     bool logTasks();
