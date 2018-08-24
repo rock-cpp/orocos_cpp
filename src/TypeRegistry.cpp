@@ -4,6 +4,10 @@
 #include <boost/algorithm/string.hpp>
 #include <iostream>
 #include <fstream>
+#include <typelib/registry.hh>
+#include <typelib/pluginmanager.hh>
+#include <typelib/typemodel.hh>
+#include <typelib/importer.hh>
 
 namespace orocos_cpp 
 {
@@ -95,6 +99,39 @@ bool TypeRegistry::loadTypelist()
     return loadedAll;
 }
 
+bool TypeRegistry::loadRegistry(const std::string &path, Typelib::Registry* registry)
+{
+    try{
+        Typelib::PluginManager::load("tlb", path, *registry);
+    } catch (const Typelib::ImportError& e){
+        return false;
+    }
+    return true;
+}
+
+bool TypeRegistry::loadTypeRegistries()
+{
+    const std::string path = "../../install/share/orogen/";
+    for(auto it = boost::filesystem::directory_iterator(path); it != boost::filesystem::directory_iterator(); it++)
+    {
+        const std::string filename = it->path().filename().string();
+        const std::size_t ext_pos = filename.find_last_of(".");
+        if (!filename.substr(ext_pos + 1).compare("tlb"))
+        {
+            Typelib::Registry* registry = new Typelib::Registry();
+            if (!loadRegistry(path + filename, registry))
+            {
+                std::cerr << "could not load tlb path: " << path << std::endl;
+                continue;
+            }
+            taskNameToRegistries.insert(std::make_pair(filename.substr(0, ext_pos), registry));
+        }
+    }
+    if (taskNameToRegistries.empty())
+        return false;
+    return true;
+}
+
 bool TypeRegistry::getTypekitDefiningType(const std::string& typeName, std::string& typekitName)
 {
     auto it = typeToTypekit.find(typeName);
@@ -102,6 +139,31 @@ bool TypeRegistry::getTypekitDefiningType(const std::string& typeName, std::stri
         return false;
     
     typekitName = it->second;
+    
+    return true;
+}
+
+bool TypeRegistry::getStateID(const std::string &task_model_name, std::string &state_name, unsigned& id) const
+{
+    const std::size_t pos = task_model_name.find_first_of(":");
+    auto task_it = taskNameToRegistries.find(task_model_name.substr(0, pos));
+    if (task_it == taskNameToRegistries.end())
+        return false;
+
+    const std::string type_name = "/" + task_model_name.substr(0, pos) + "/" +
+        task_model_name.substr(pos + 2) + "_STATES";
+        
+    if (!task_it->second->has(type_name))
+        return false;
+    
+    const Typelib::Enum* states = (Typelib::Enum*) task_it->second->get(type_name);
+    std::map<std::string, int> state_map = states->values();
+    
+    auto state_it = state_map.find(task_model_name.substr(pos + 2) + "_" + state_name);
+    if (state_it == state_map.end())
+        return false;
+    
+    id = state_it->second;
     
     return true;
 }
