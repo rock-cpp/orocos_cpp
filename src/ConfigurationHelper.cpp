@@ -554,7 +554,33 @@ bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const std::vect
     if(modelName.empty())
         throw std::runtime_error("ConfigurationHelper::applyConfig error, context did not give a valid model name (none at all)");
     
-    bool ret = applyConfig(bundle.getConfigurationDirectory() + modelName + ".yml", context, names);
+    std::vector<std::string> configPaths = bundle.getConfigurationPaths(modelName);
+
+    libConfig::YAMLConfigParser parser;
+    for(const std::string &configPath : configPaths)
+    {
+        try{
+            std::map<std::string, libConfig::Configuration> tmpConfigs;
+            parser.loadConfigFile(configPath, tmpConfigs);
+            for(auto &kv : tmpConfigs){
+                if(subConfigs.count(kv.first) == 0)
+                    subConfigs.insert(std::make_pair(kv.first, kv.second));
+            }
+        }catch(std::runtime_error &e){
+            throw std::runtime_error("Failed to load configuration for task model " + modelName);
+        }
+    }
+
+    libConfig::Configuration retConfig("merged");
+    for(const std::string &conf: names){
+        try{
+            retConfig.merge(subConfigs.at(conf));
+        }catch(std::out_of_range &e){
+            throw std::runtime_error("Failed to load configuration: " + conf + " for taskModel: " + modelName);
+        }
+    }
+
+    bool ret = applyConfig(context, retConfig);
     
     if(syncNeeded)
         delete context;
