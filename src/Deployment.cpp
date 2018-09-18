@@ -192,6 +192,9 @@ bool Deployment::getExecString(std::string& cmd, std::vector< std::string >& arg
             args.push_back(p.second + ":" + p.first);
         }
     }
+
+    for(const std::string& arg : cmdLineArgs)
+        args.push_back(arg);
     
     return true;
 }
@@ -220,4 +223,9 @@ bool Deployment::hasLogger() const
 void Deployment::runWithValgrind()
 {
     withValgrind = true;
+}
+
+void Deployment::setCmdLineArgs(const std::vector<std::string> &args)
+{
+    cmdLineArgs = args;
 }
