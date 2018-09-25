@@ -1,0 +1,935 @@
+<?xml version='1.0'?>
+<typelib>
+  <enum name='/auv_control/AccelerationController_STATES'>
+    <value symbol='AccelerationController_CONTROLLING' value='7'/>
+    <value symbol='AccelerationController_CONTROLLING_UNSAFE' value='8'/>
+    <value symbol='AccelerationController_EXCEPTION' value='3'/>
+    <value symbol='AccelerationController_FATAL_ERROR' value='2'/>
+    <value symbol='AccelerationController_INIT' value='0'/>
+    <value symbol='AccelerationController_INPUT_COLLIDING' value='9'/>
+    <value symbol='AccelerationController_INPUT_MISSING' value='10'/>
+    <value symbol='AccelerationController_INPUT_UNEXPECTED' value='11'/>
+    <value symbol='AccelerationController_INVALID_NAME_IN_LIMITS' value='15'/>
+    <value symbol='AccelerationController_PRE_OPERATIONAL' value='1'/>
+    <value symbol='AccelerationController_RUNNING' value='5'/>
+    <value symbol='AccelerationController_RUNTIME_ERROR' value='6'/>
+    <value symbol='AccelerationController_STOPPED' value='4'/>
+    <value symbol='AccelerationController_TIMEOUT' value='12'/>
+    <value symbol='AccelerationController_WAIT_FOR_CONNECTED_INPUT_PORT' value='13'/>
+    <value symbol='AccelerationController_WAIT_FOR_INPUT' value='14'/>
+    <value symbol='AccelerationController_WRONG_SIZE_OF_CONTROLMODES' value='16'/>
+    <value symbol='AccelerationController_WRONG_SIZE_OF_LIMITS' value='17'/>
+    <value symbol='AccelerationController_WRONG_SIZE_OF_NAMES' value='18'/>
+  <metadata key='cxxname'><![CDATA[::auv_control::AccelerationController_STATES]]></metadata>
+<metadata key='orogen_defining_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_include'><![CDATA[auv_control:auv_control/TaskStates.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/.orogen/typekit/types/auv_control/TaskStates.hpp:208]]></metadata>
+
+  </enum>
+  <enum name='/auv_control/AlignedToBody_STATES'>
+    <value symbol='AlignedToBody_CONTROLLING' value='7'/>
+    <value symbol='AlignedToBody_CONTROLLING_UNSAFE' value='8'/>
+    <value symbol='AlignedToBody_EXCEPTION' value='3'/>
+    <value symbol='AlignedToBody_FATAL_ERROR' value='2'/>
+    <value symbol='AlignedToBody_INIT' value='0'/>
+    <value symbol='AlignedToBody_INPUT_COLLIDING' value='9'/>
+    <value symbol='AlignedToBody_INPUT_MISSING' value='10'/>
+    <value symbol='AlignedToBody_INPUT_UNEXPECTED' value='11'/>
+    <value symbol='AlignedToBody_ORIENTATION_SAMPLE_INVALID' value='15'/>
+    <value symbol='AlignedToBody_ORIENTATION_TIMEOUT' value='16'/>
+    <value symbol='AlignedToBody_PRE_OPERATIONAL' value='1'/>
+    <value symbol='AlignedToBody_RUNNING' value='5'/>
+    <value symbol='AlignedToBody_RUNTIME_ERROR' value='6'/>
+    <value symbol='AlignedToBody_STOPPED' value='4'/>
+    <value symbol='AlignedToBody_TIMEOUT' value='12'/>
+    <value symbol='AlignedToBody_WAIT_FOR_CONNECTED_INPUT_PORT' value='13'/>
+    <value symbol='AlignedToBody_WAIT_FOR_INPUT' value='14'/>
+    <value symbol='AlignedToBody_WAIT_FOR_ORIENTATION_SAMPLE' value='17'/>
+  <metadata key='cxxname'><![CDATA[::auv_control::AlignedToBody_STATES]]></metadata>
+<metadata key='orogen_defining_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_include'><![CDATA[auv_control:auv_control/TaskStates.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/.orogen/typekit/types/auv_control/TaskStates.hpp:167]]></metadata>
+
+  </enum>
+  <enum name='/auv_control/BasePIDController_STATES'>
+    <value symbol='BasePIDController_CONTROLLING' value='7'/>
+    <value symbol='BasePIDController_CONTROLLING_UNSAFE' value='8'/>
+    <value symbol='BasePIDController_EXCEPTION' value='3'/>
+    <value symbol='BasePIDController_FATAL_ERROR' value='2'/>
+    <value symbol='BasePIDController_INIT' value='0'/>
+    <value symbol='BasePIDController_INPUT_COLLIDING' value='9'/>
+    <value symbol='BasePIDController_INPUT_MISSING' value='10'/>
+    <value symbol='BasePIDController_INPUT_UNEXPECTED' value='11'/>
+    <value symbol='BasePIDController_POSE_SAMPLE_INVALID' value='15'/>
+    <value symbol='BasePIDController_POSE_TIMEOUT' value='16'/>
+    <value symbol='BasePIDController_PRE_OPERATIONAL' value='1'/>
+    <value symbol='BasePIDController_RUNNING' value='5'/>
+    <value symbol='BasePIDController_RUNTIME_ERROR' value='6'/>
+    <value symbol='BasePIDController_STOPPED' value='4'/>
+    <value symbol='BasePIDController_TIMEOUT' value='12'/>
+    <value symbol='BasePIDController_UNSURE_POSE_SAMPLE' value='17'/>
+    <value symbol='BasePIDController_WAIT_FOR_CONNECTED_INPUT_PORT' value='13'/>
+    <value symbol='BasePIDController_WAIT_FOR_INPUT' value='14'/>
+  <metadata key='cxxname'><![CDATA[::auv_control::BasePIDController_STATES]]></metadata>
+<metadata key='orogen_defining_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_include'><![CDATA[auv_control:auv_control/TaskStates.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/.orogen/typekit/types/auv_control/TaskStates.hpp:44]]></metadata>
+
+  </enum>
+  <enum name='/auv_control/Base_STATES'>
+    <value symbol='Base_CONTROLLING' value='7'/>
+    <value symbol='Base_CONTROLLING_UNSAFE' value='8'/>
+    <value symbol='Base_EXCEPTION' value='3'/>
+    <value symbol='Base_FATAL_ERROR' value='2'/>
+    <value symbol='Base_INIT' value='0'/>
+    <value symbol='Base_INPUT_COLLIDING' value='9'/>
+    <value symbol='Base_INPUT_MISSING' value='10'/>
+    <value symbol='Base_INPUT_UNEXPECTED' value='11'/>
+    <value symbol='Base_PRE_OPERATIONAL' value='1'/>
+    <value symbol='Base_RUNNING' value='5'/>
+    <value symbol='Base_RUNTIME_ERROR' value='6'/>
+    <value symbol='Base_STOPPED' value='4'/>
+    <value symbol='Base_TIMEOUT' value='12'/>
+    <value symbol='Base_WAIT_FOR_CONNECTED_INPUT_PORT' value='13'/>
+    <value symbol='Base_WAIT_FOR_INPUT' value='14'/>
+  <metadata key='cxxname'><![CDATA[::auv_control::Base_STATES]]></metadata>
+<metadata key='orogen_defining_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_include'><![CDATA[auv_control:auv_control/TaskStates.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/.orogen/typekit/types/auv_control/TaskStates.hpp:9]]></metadata>
+
+  </enum>
+  <enum name='/auv_control/CommandInjection_STATES'>
+    <value symbol='CommandInjection_CONTROLLING' value='7'/>
+    <value symbol='CommandInjection_CONTROLLING_UNSAFE' value='8'/>
+    <value symbol='CommandInjection_EXCEPTION' value='3'/>
+    <value symbol='CommandInjection_FATAL_ERROR' value='2'/>
+    <value symbol='CommandInjection_INIT' value='0'/>
+    <value symbol='CommandInjection_INPUT_COLLIDING' value='9'/>
+    <value symbol='CommandInjection_INPUT_MISSING' value='10'/>
+    <value symbol='CommandInjection_INPUT_UNEXPECTED' value='11'/>
+    <value symbol='CommandInjection_PRE_OPERATIONAL' value='1'/>
+    <value symbol='CommandInjection_RUNNING' value='5'/>
+    <value symbol='CommandInjection_RUNTIME_ERROR' value='6'/>
+    <value symbol='CommandInjection_STOPPED' value='4'/>
+    <value symbol='CommandInjection_TIMEOUT' value='12'/>
+    <value symbol='CommandInjection_WAIT_FOR_CONNECTED_INPUT_PORT' value='13'/>
+    <value symbol='CommandInjection_WAIT_FOR_INPUT' value='14'/>
+  <metadata key='cxxname'><![CDATA[::auv_control::CommandInjection_STATES]]></metadata>
+<metadata key='orogen_defining_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_include'><![CDATA[auv_control:auv_control/TaskStates.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/.orogen/typekit/types/auv_control/TaskStates.hpp:474]]></metadata>
+
+  </enum>
+  <enum name='/auv_control/ConstantCommandGroundFollower_STATES'>
+    <value symbol='ConstantCommandGroundFollower_EXCEPTION' value='3'/>
+    <value symbol='ConstantCommandGroundFollower_FATAL_ERROR' value='2'/>
+    <value symbol='ConstantCommandGroundFollower_INIT' value='0'/>
+    <value symbol='ConstantCommandGroundFollower_INVALID_DEPTH_READING' value='7'/>
+    <value symbol='ConstantCommandGroundFollower_INVALID_NEGATIVE_ALTIMETER_READING' value='8'/>
+    <value symbol='ConstantCommandGroundFollower_INVALID_TARGET_DEPTH_CONFIG' value='9'/>
+    <value symbol='ConstantCommandGroundFollower_NO_ALTIMETER_READING' value='10'/>
+    <value symbol='ConstantCommandGroundFollower_NO_DEPTH_READING' value='11'/>
+    <value symbol='ConstantCommandGroundFollower_PRE_OPERATIONAL' value='1'/>
+    <value symbol='ConstantCommandGroundFollower_RUNNING' value='5'/>
+    <value symbol='ConstantCommandGroundFollower_RUNTIME_ERROR' value='6'/>
+    <value symbol='ConstantCommandGroundFollower_STOPPED' value='4'/>
+  <metadata key='cxxname'><![CDATA[::auv_control::ConstantCommandGroundFollower_STATES]]></metadata>
+<metadata key='orogen_defining_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_include'><![CDATA[auv_control:auv_control/TaskStates.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/.orogen/typekit/types/auv_control/TaskStates.hpp:270]]></metadata>
+
+  </enum>
+  <enum name='/auv_control/ConstantCommand_STATES'>
+    <value symbol='ConstantCommand_EXCEPTION' value='3'/>
+    <value symbol='ConstantCommand_FATAL_ERROR' value='2'/>
+    <value symbol='ConstantCommand_INIT' value='0'/>
+    <value symbol='ConstantCommand_PRE_OPERATIONAL' value='1'/>
+    <value symbol='ConstantCommand_RUNNING' value='5'/>
+    <value symbol='ConstantCommand_RUNTIME_ERROR' value='6'/>
+    <value symbol='ConstantCommand_STOPPED' value='4'/>
+  <metadata key='cxxname'><![CDATA[::auv_control::ConstantCommand_STATES]]></metadata>
+<metadata key='orogen_defining_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_include'><![CDATA[auv_control:auv_control/TaskStates.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/.orogen/typekit/types/auv_control/TaskStates.hpp:251]]></metadata>
+
+  </enum>
+  <enum name='/auv_control/MotionCommand2DConverter_STATES'>
+    <value symbol='MotionCommand2DConverter_EXCEPTION' value='3'/>
+    <value symbol='MotionCommand2DConverter_FATAL_ERROR' value='2'/>
+    <value symbol='MotionCommand2DConverter_INIT' value='0'/>
+    <value symbol='MotionCommand2DConverter_PRE_OPERATIONAL' value='1'/>
+    <value symbol='MotionCommand2DConverter_RUNNING' value='5'/>
+    <value symbol='MotionCommand2DConverter_RUNTIME_ERROR' value='6'/>
+    <value symbol='MotionCommand2DConverter_STOPPED' value='4'/>
+  <metadata key='cxxname'><![CDATA[::auv_control::MotionCommand2DConverter_STATES]]></metadata>
+<metadata key='orogen_defining_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_include'><![CDATA[auv_control:auv_control/TaskStates.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/.orogen/typekit/types/auv_control/TaskStates.hpp:326]]></metadata>
+
+  </enum>
+  <enum name='/auv_control/OptimalHeadingController_STATES'>
+    <value symbol='OptimalHeadingController_CONTROLLING' value='7'/>
+    <value symbol='OptimalHeadingController_CONTROLLING_UNSAFE' value='8'/>
+    <value symbol='OptimalHeadingController_EXCEPTION' value='3'/>
+    <value symbol='OptimalHeadingController_FATAL_ERROR' value='2'/>
+    <value symbol='OptimalHeadingController_INIT' value='0'/>
+    <value symbol='OptimalHeadingController_INPUT_COLLIDING' value='9'/>
+    <value symbol='OptimalHeadingController_INPUT_MISSING' value='10'/>
+    <value symbol='OptimalHeadingController_INPUT_UNEXPECTED' value='11'/>
+    <value symbol='OptimalHeadingController_PRE_OPERATIONAL' value='1'/>
+    <value symbol='OptimalHeadingController_RUNNING' value='5'/>
+    <value symbol='OptimalHeadingController_RUNTIME_ERROR' value='6'/>
+    <value symbol='OptimalHeadingController_STOPPED' value='4'/>
+    <value symbol='OptimalHeadingController_TIMEOUT' value='12'/>
+    <value symbol='OptimalHeadingController_WAIT_FOR_CONNECTED_INPUT_PORT' value='13'/>
+    <value symbol='OptimalHeadingController_WAIT_FOR_INPUT' value='14'/>
+    <value symbol='OptimalHeadingController_WAIT_FOR_ORIENTATION_SAMPLE' value='15'/>
+  <metadata key='cxxname'><![CDATA[::auv_control::OptimalHeadingController_STATES]]></metadata>
+<metadata key='orogen_defining_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_include'><![CDATA[auv_control:auv_control/TaskStates.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/.orogen/typekit/types/auv_control/TaskStates.hpp:345]]></metadata>
+
+  </enum>
+  <enum name='/auv_control/PIDController_STATES'>
+    <value symbol='PIDController_CONTROLLING' value='7'/>
+    <value symbol='PIDController_CONTROLLING_UNSAFE' value='8'/>
+    <value symbol='PIDController_EXCEPTION' value='3'/>
+    <value symbol='PIDController_FATAL_ERROR' value='2'/>
+    <value symbol='PIDController_INIT' value='0'/>
+    <value symbol='PIDController_INPUT_COLLIDING' value='9'/>
+    <value symbol='PIDController_INPUT_MISSING' value='10'/>
+    <value symbol='PIDController_INPUT_UNEXPECTED' value='11'/>
+    <value symbol='PIDController_POSE_SAMPLE_INVALID' value='15'/>
+    <value symbol='PIDController_POSE_TIMEOUT' value='16'/>
+    <value symbol='PIDController_PRE_OPERATIONAL' value='1'/>
+    <value symbol='PIDController_RUNNING' value='5'/>
+    <value symbol='PIDController_RUNTIME_ERROR' value='6'/>
+    <value symbol='PIDController_STOPPED' value='4'/>
+    <value symbol='PIDController_TIMEOUT' value='12'/>
+    <value symbol='PIDController_UNSURE_POSE_SAMPLE' value='17'/>
+    <value symbol='PIDController_WAIT_FOR_CONNECTED_INPUT_PORT' value='13'/>
+    <value symbol='PIDController_WAIT_FOR_INPUT' value='14'/>
+  <metadata key='cxxname'><![CDATA[::auv_control::PIDController_STATES]]></metadata>
+<metadata key='orogen_defining_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_include'><![CDATA[auv_control:auv_control/TaskStates.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/.orogen/typekit/types/auv_control/TaskStates.hpp:85]]></metadata>
+
+  </enum>
+  <enum name='/auv_control/ThrusterForce2BodyEffort_STATES'>
+    <value symbol='ThrusterForce2BodyEffort_EXCEPTION' value='3'/>
+    <value symbol='ThrusterForce2BodyEffort_FATAL_ERROR' value='2'/>
+    <value symbol='ThrusterForce2BodyEffort_INIT' value='0'/>
+    <value symbol='ThrusterForce2BodyEffort_PRE_OPERATIONAL' value='1'/>
+    <value symbol='ThrusterForce2BodyEffort_RUNNING' value='5'/>
+    <value symbol='ThrusterForce2BodyEffort_RUNTIME_ERROR' value='6'/>
+    <value symbol='ThrusterForce2BodyEffort_STOPPED' value='4'/>
+    <value symbol='ThrusterForce2BodyEffort_UNEXPECTED_THRUSTER_INPUT' value='7'/>
+    <value symbol='ThrusterForce2BodyEffort_UNSET_THRUSTER_INPUT' value='8'/>
+  <metadata key='cxxname'><![CDATA[::auv_control::ThrusterForce2BodyEffort_STATES]]></metadata>
+<metadata key='orogen_defining_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_include'><![CDATA[auv_control:auv_control/TaskStates.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/.orogen/typekit/types/auv_control/TaskStates.hpp:451]]></metadata>
+
+  </enum>
+  <enum name='/auv_control/ThrustersBase_STATES'>
+    <value symbol='ThrustersBase_EXCEPTION' value='3'/>
+    <value symbol='ThrustersBase_FATAL_ERROR' value='2'/>
+    <value symbol='ThrustersBase_INIT' value='0'/>
+    <value symbol='ThrustersBase_PRE_OPERATIONAL' value='1'/>
+    <value symbol='ThrustersBase_RUNNING' value='5'/>
+    <value symbol='ThrustersBase_RUNTIME_ERROR' value='6'/>
+    <value symbol='ThrustersBase_STOPPED' value='4'/>
+    <value symbol='ThrustersBase_UNEXPECTED_THRUSTER_INPUT' value='7'/>
+    <value symbol='ThrustersBase_UNSET_THRUSTER_INPUT' value='8'/>
+  <metadata key='cxxname'><![CDATA[::auv_control::ThrustersBase_STATES]]></metadata>
+<metadata key='orogen_defining_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_include'><![CDATA[auv_control:auv_control/TaskStates.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/.orogen/typekit/types/auv_control/TaskStates.hpp:382]]></metadata>
+
+  </enum>
+  <enum name='/auv_control/ThrustersFeedback_STATES'>
+    <value symbol='ThrustersFeedback_EXCEPTION' value='3'/>
+    <value symbol='ThrustersFeedback_FATAL_ERROR' value='2'/>
+    <value symbol='ThrustersFeedback_INIT' value='0'/>
+    <value symbol='ThrustersFeedback_PRE_OPERATIONAL' value='1'/>
+    <value symbol='ThrustersFeedback_RUNNING' value='5'/>
+    <value symbol='ThrustersFeedback_RUNTIME_ERROR' value='6'/>
+    <value symbol='ThrustersFeedback_STOPPED' value='4'/>
+    <value symbol='ThrustersFeedback_UNEXPECTED_THRUSTER_INPUT' value='7'/>
+    <value symbol='ThrustersFeedback_UNSET_THRUSTER_INPUT' value='8'/>
+  <metadata key='cxxname'><![CDATA[::auv_control::ThrustersFeedback_STATES]]></metadata>
+<metadata key='orogen_defining_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_include'><![CDATA[auv_control:auv_control/TaskStates.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/.orogen/typekit/types/auv_control/TaskStates.hpp:428]]></metadata>
+
+  </enum>
+  <enum name='/auv_control/ThrustersInput_STATES'>
+    <value symbol='ThrustersInput_EXCEPTION' value='3'/>
+    <value symbol='ThrustersInput_FATAL_ERROR' value='2'/>
+    <value symbol='ThrustersInput_INIT' value='0'/>
+    <value symbol='ThrustersInput_PRE_OPERATIONAL' value='1'/>
+    <value symbol='ThrustersInput_RUNNING' value='5'/>
+    <value symbol='ThrustersInput_RUNTIME_ERROR' value='6'/>
+    <value symbol='ThrustersInput_STOPPED' value='4'/>
+    <value symbol='ThrustersInput_UNEXPECTED_THRUSTER_INPUT' value='7'/>
+    <value symbol='ThrustersInput_UNSET_THRUSTER_INPUT' value='8'/>
+  <metadata key='cxxname'><![CDATA[::auv_control::ThrustersInput_STATES]]></metadata>
+<metadata key='orogen_defining_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_include'><![CDATA[auv_control:auv_control/TaskStates.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/.orogen/typekit/types/auv_control/TaskStates.hpp:405]]></metadata>
+
+  </enum>
+  <enum name='/auv_control/WaypointNavigator_STATES'>
+    <value symbol='WaypointNavigator_EXCEPTION' value='3'/>
+    <value symbol='WaypointNavigator_FATAL_ERROR' value='2'/>
+    <value symbol='WaypointNavigator_FOLLOWING_WAYPOINTS' value='7'/>
+    <value symbol='WaypointNavigator_INIT' value='0'/>
+    <value symbol='WaypointNavigator_KEEP_WAYPOINT' value='8'/>
+    <value symbol='WaypointNavigator_POSE_SAMPLE_MISSING' value='9'/>
+    <value symbol='WaypointNavigator_PRE_OPERATIONAL' value='1'/>
+    <value symbol='WaypointNavigator_RUNNING' value='5'/>
+    <value symbol='WaypointNavigator_RUNTIME_ERROR' value='6'/>
+    <value symbol='WaypointNavigator_STOPPED' value='4'/>
+    <value symbol='WaypointNavigator_WAIT_FOR_WAYPOINTS' value='10'/>
+  <metadata key='cxxname'><![CDATA[::auv_control::WaypointNavigator_STATES]]></metadata>
+<metadata key='orogen_defining_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_include'><![CDATA[auv_control:auv_control/TaskStates.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/.orogen/typekit/types/auv_control/TaskStates.hpp:299]]></metadata>
+
+  </enum>
+  <enum name='/auv_control/WorldToAligned_STATES'>
+    <value symbol='WorldToAligned_CONTROLLING' value='7'/>
+    <value symbol='WorldToAligned_CONTROLLING_UNSAFE' value='8'/>
+    <value symbol='WorldToAligned_EXCEPTION' value='3'/>
+    <value symbol='WorldToAligned_FATAL_ERROR' value='2'/>
+    <value symbol='WorldToAligned_INIT' value='0'/>
+    <value symbol='WorldToAligned_INPUT_COLLIDING' value='9'/>
+    <value symbol='WorldToAligned_INPUT_MISSING' value='10'/>
+    <value symbol='WorldToAligned_INPUT_UNEXPECTED' value='11'/>
+    <value symbol='WorldToAligned_POSE_SAMPLE_INVALID' value='15'/>
+    <value symbol='WorldToAligned_POSE_TIMEOUT' value='16'/>
+    <value symbol='WorldToAligned_PRE_OPERATIONAL' value='1'/>
+    <value symbol='WorldToAligned_RUNNING' value='5'/>
+    <value symbol='WorldToAligned_RUNTIME_ERROR' value='6'/>
+    <value symbol='WorldToAligned_STOPPED' value='4'/>
+    <value symbol='WorldToAligned_TIMEOUT' value='12'/>
+    <value symbol='WorldToAligned_WAIT_FOR_CONNECTED_INPUT_PORT' value='13'/>
+    <value symbol='WorldToAligned_WAIT_FOR_INPUT' value='14'/>
+    <value symbol='WorldToAligned_WAIT_FOR_POSE_SAMPLE' value='17'/>
+  <metadata key='cxxname'><![CDATA[::auv_control::WorldToAligned_STATES]]></metadata>
+<metadata key='orogen_defining_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_include'><![CDATA[auv_control:auv_control/TaskStates.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/.orogen/typekit/types/auv_control/TaskStates.hpp:126]]></metadata>
+
+  </enum>
+  <enum name='/base/JointState/MODE'>
+    <value symbol='ACCELERATION' value='4'/>
+    <value symbol='EFFORT' value='2'/>
+    <value symbol='POSITION' value='0'/>
+    <value symbol='RAW' value='3'/>
+    <value symbol='SPEED' value='1'/>
+    <value symbol='UNSET' value='5'/>
+  <metadata key='cxxname'><![CDATA[::base::JointState::MODE]]></metadata>
+<metadata key='orogen_defining_typekits'><![CDATA[base]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[base]]></metadata>
+<metadata key='orogen_include'><![CDATA[base:base/JointState.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/base/JointState.hpp:21]]></metadata>
+
+  </enum>
+  <opaque includes='' marshal_as='/wrappers/Vector3d' name='/base/Vector3d' needs_copy='1' size='0'>
+  <metadata key='cxxname'><![CDATA[::base::Vector3d]]></metadata>
+<metadata key='opaque_is_typedef'><![CDATA[1]]></metadata>
+<metadata key='orogen_include'><![CDATA[base:base/geometry/Spline.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/base/Eigen.hpp:20]]></metadata>
+
+  </opaque>
+  <numeric category='uint' name='/bool' size='1'>
+  <metadata key='orogen_include'><![CDATA[:boost/cstdint.hpp]]></metadata>
+
+  </numeric>
+  <numeric category='float' name='/double' size='8'>
+  <metadata key='orogen_defining_typekits'><![CDATA[std]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[std]]></metadata>
+<metadata key='orogen_include'/>
+  </numeric>
+  <numeric category='sint' name='/int32_t' size='4'>
+  <metadata key='cxxname'><![CDATA[::int32_t]]></metadata>
+<metadata key='orogen_include'><![CDATA[boost/cstdint.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/usr/include/x86_64-linux-gnu/sys/types.h:196]]></metadata>
+
+  </numeric>
+  <numeric category='sint' name='/int64_t' size='8'>
+  <metadata key='cxxname'><![CDATA[::int64_t]]></metadata>
+<metadata key='orogen_defining_typekits'><![CDATA[std]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[std]]></metadata>
+<metadata key='orogen_include'><![CDATA[boost/cstdint.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/usr/include/stdint.h:40]]></metadata>
+<metadata key='source_file_line'><![CDATA[/usr/include/x86_64-linux-gnu/sys/types.h:197]]></metadata>
+
+  </numeric>
+  <alias name='/int long long' source='/int64_t'/>
+  <alias name='/int signed long' source='/int64_t'/>
+  <alias name='/int signed long long' source='/int64_t'/>
+  <alias name='/int64' source='/int64_t'/>
+  <alias name='/long' source='/int64_t'/>
+  <alias name='/long int' source='/int64_t'/>
+  <alias name='/long int long' source='/int64_t'/>
+  <alias name='/long long' source='/int64_t'/>
+  <alias name='/long long int' source='/int64_t'/>
+  <alias name='/long long int signed' source='/int64_t'/>
+  <alias name='/long long signed' source='/int64_t'/>
+  <alias name='/long long signed int' source='/int64_t'/>
+  <alias name='/long signed' source='/int64_t'/>
+  <alias name='/long signed int' source='/int64_t'/>
+  <alias name='/long signed long' source='/int64_t'/>
+  <alias name='/long signed long int' source='/int64_t'/>
+  <alias name='/signed int long' source='/int64_t'/>
+  <alias name='/signed int long long' source='/int64_t'/>
+  <alias name='/signed long' source='/int64_t'/>
+  <alias name='/signed long int' source='/int64_t'/>
+  <alias name='/signed long int long' source='/int64_t'/>
+  <alias name='/signed long long' source='/int64_t'/>
+  <alias name='/signed long long int' source='/int64_t'/>
+  <compound name='/auv_control/ExpectedInputs' size='6'>
+    <field name='linear' offset='0' type='/bool[3]'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/6dControl.hpp:14]]></metadata>
+
+    </field>
+    <field name='angular' offset='3' type='/bool[3]'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/6dControl.hpp:15]]></metadata>
+
+    </field>
+  <metadata key='cxxname'><![CDATA[::auv_control::ExpectedInputs]]></metadata>
+<metadata key='orogen_defining_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_include'><![CDATA[auv_control:auv_control/6dControl.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/6dControl.hpp:13]]></metadata>
+
+  </compound>
+  <alias name='/base/Orientation2D' source='/double'/>
+  <compound name='/base/Time' size='8'>
+    <field name='microseconds' offset='0' type='/int64_t'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/base/Time.hpp:16]]></metadata>
+
+    </field>
+  <metadata key='cxxname'><![CDATA[::base::Time]]></metadata>
+<metadata key='orogen_defining_typekits'><![CDATA[base]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[base]]></metadata>
+<metadata key='orogen_include'><![CDATA[base:base/Time.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/base/Time.hpp:10]]></metadata>
+
+  </compound>
+  <compound name='/auv_control/PIDState' size='80'>
+    <field name='time' offset='0' type='/base/Time'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:179]]></metadata>
+
+    </field>
+    <field name='initialized' offset='8' type='/bool'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:181]]></metadata>
+
+    </field>
+    <field name='P' offset='16' type='/double'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:182]]></metadata>
+
+    </field>
+    <field name='I' offset='24' type='/double'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:182]]></metadata>
+
+    </field>
+    <field name='D' offset='32' type='/double'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:182]]></metadata>
+
+    </field>
+    <field name='input' offset='40' type='/double'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:183]]></metadata>
+
+    </field>
+    <field name='reference' offset='48' type='/double'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:184]]></metadata>
+
+    </field>
+    <field name='rawOutput' offset='56' type='/double'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:185]]></metadata>
+
+    </field>
+    <field name='saturatedOutput' offset='64' type='/double'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:186]]></metadata>
+
+    </field>
+    <field name='active' offset='72' type='/bool'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/6dControl.hpp:20]]></metadata>
+
+    </field>
+  <metadata key='base_classes'><![CDATA[/motor_controller/PIDState]]></metadata>
+<metadata key='cxxname'><![CDATA[::auv_control::PIDState]]></metadata>
+<metadata key='orogen_defining_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_include'><![CDATA[auv_control:auv_control/6dControl.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/6dControl.hpp:18]]></metadata>
+
+  </compound>
+  <compound name='/auv_control/LinearAngular6DPIDState' size='488'>
+    <field name='linear' offset='0' type='/auv_control/PIDState[3]'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/6dControl.hpp:29]]></metadata>
+
+    </field>
+    <field name='angular' offset='240' type='/auv_control/PIDState[3]'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/6dControl.hpp:30]]></metadata>
+
+    </field>
+    <field name='time' offset='480' type='/base/Time'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/6dControl.hpp:31]]></metadata>
+
+    </field>
+  <metadata key='cxxname'><![CDATA[::auv_control::LinearAngular6DPIDState]]></metadata>
+<metadata key='orogen_defining_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_include'><![CDATA[auv_control:auv_control/6dControl.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/6dControl.hpp:28]]></metadata>
+
+  </compound>
+  <compound name='/base/commands/LinearAngular6DCommand' size='56'>
+    <field name='time' offset='0' type='/base/Time'>
+    <metadata key='doc'><![CDATA[The command timestamp ]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/base/commands/LinearAngular6DCommand.hpp:16]]></metadata>
+
+    </field>
+    <field name='linear' offset='8' type='/base/Vector3d'>
+    <metadata key='doc'><![CDATA[The linear part of the command, as (x,y,z) ]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/base/commands/LinearAngular6DCommand.hpp:18]]></metadata>
+
+    </field>
+    <field name='angular' offset='32' type='/base/Vector3d'>
+    <metadata key='doc'><![CDATA[The angular part of the command, as (r,p,y) ]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/base/commands/LinearAngular6DCommand.hpp:20]]></metadata>
+
+    </field>
+  <metadata key='cxxname'><![CDATA[::base::commands::LinearAngular6DCommand]]></metadata>
+<metadata key='doc'><![CDATA[Common command structure for all controller types, in all control frames ]]></metadata>
+<metadata key='orogen_include'><![CDATA[base:base/commands/LinearAngular6DCommand.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/base/commands/LinearAngular6DCommand.hpp:13]]></metadata>
+
+  </compound>
+  <alias name='/base/LinearAngular6DCommand' source='/base/commands/LinearAngular6DCommand'/>
+  <compound name='/base/LinearAngular6DWaypoint' size='96'>
+    <field name='cmd' offset='0' type='/base/commands/LinearAngular6DCommand'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/6dControl.hpp:42]]></metadata>
+
+    </field>
+    <field name='opt_orientation' offset='56' type='/double'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/6dControl.hpp:43]]></metadata>
+
+    </field>
+    <field name='opt_orientation_distance' offset='64' type='/double'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/6dControl.hpp:44]]></metadata>
+
+    </field>
+    <field name='linear_tolerance' offset='72' type='/double'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/6dControl.hpp:45]]></metadata>
+
+    </field>
+    <field name='angular_tolerance' offset='80' type='/double'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/6dControl.hpp:46]]></metadata>
+
+    </field>
+    <field name='hold_time' offset='88' type='/double'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/6dControl.hpp:47]]></metadata>
+
+    </field>
+  <metadata key='cxxname'><![CDATA[::base::LinearAngular6DWaypoint]]></metadata>
+<metadata key='orogen_defining_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_include'><![CDATA[auv_control:auv_control/6dControl.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/6dControl.hpp:41]]></metadata>
+
+  </compound>
+  <compound name='/base/LinearAngular6DWaypointInfo' size='160'>
+    <field name='current_delta' offset='0' type='/base/commands/LinearAngular6DCommand'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/6dControl.hpp:58]]></metadata>
+
+    </field>
+    <field name='current_waypoint' offset='56' type='/base/LinearAngular6DWaypoint'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/6dControl.hpp:59]]></metadata>
+
+    </field>
+    <field name='queue_size' offset='152' type='/int32_t'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/6dControl.hpp:60]]></metadata>
+
+    </field>
+  <metadata key='cxxname'><![CDATA[::base::LinearAngular6DWaypointInfo]]></metadata>
+<metadata key='orogen_defining_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_include'><![CDATA[auv_control:auv_control/6dControl.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/6dControl.hpp:57]]></metadata>
+
+  </compound>
+  <compound name='/motor_controller/PIDSettings' size='72'>
+    <field name='Ts' offset='0' type='/double'>
+    <metadata key='doc'><![CDATA[! Sampling time in seconds]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:39]]></metadata>
+
+    </field>
+    <field name='K' offset='8' type='/double'>
+    <metadata key='doc'><![CDATA[! Proportional gain]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:42]]></metadata>
+
+    </field>
+    <field name='Ti' offset='16' type='/double'>
+    <metadata key='doc'><![CDATA[! Integral time constant, 0 to disable it]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:45]]></metadata>
+
+    </field>
+    <field name='Td' offset='24' type='/double'>
+    <metadata key='doc'><![CDATA[! Derivative time constant, 0 to disable it]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:48]]></metadata>
+
+    </field>
+    <field name='N' offset='32' type='/double'>
+    <metadata key='doc'><![CDATA[! Derivative term
+ Derivative term filtered by a first order system with time constant Td/N
+ - Typical values of N are between 8 and 20
+ - No derivative action on frequencies above N/Td]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:55]]></metadata>
+
+    </field>
+    <field name='B' offset='40' type='/double'>
+    <metadata key='doc'><![CDATA[! Setpoint weighing term
+ Setpoint weighing term, generally between 0 and 1
+ - B = 0 reference is introduced only through integral term
+ - B = 1 disables setpoint weighting]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:62]]></metadata>
+
+    </field>
+    <field name='Tt' offset='48' type='/double'>
+    <metadata key='doc'><![CDATA[! Anti-integrator-windup
+ Anti-integrator-windup time constant
+ - < 0 disable
+ - = 0 and Td = 0  disable
+ - = 0 and Td > 0  Tt = sqrt(Ti * Td)
+ ]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:70]]></metadata>
+
+    </field>
+    <field name='YMin' offset='56' type='/double'>
+    <metadata key='doc'><![CDATA[! Minimum output value]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:74]]></metadata>
+
+    </field>
+    <field name='YMax' offset='64' type='/double'>
+    <metadata key='doc'><![CDATA[! Maximum output value]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:76]]></metadata>
+
+    </field>
+  <metadata key='cxxname'><![CDATA[::motor_controller::PIDSettings]]></metadata>
+<metadata key='doc'><![CDATA[! Structure to hold the PID parameters for 'IDEAL' type PID.
+
+ To convert from PARALLEL form to IDEAL form
+ 		Ti = 1.0/Ki/Kp and Td = Kd/Kp]]></metadata>
+<metadata key='orogen_defining_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_include'><![CDATA[auv_control:auv_control/6dControl.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:36]]></metadata>
+
+  </compound>
+  <compound name='/motor_controller/PIDState' size='72'>
+    <field name='time' offset='0' type='/base/Time'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:179]]></metadata>
+
+    </field>
+    <field name='initialized' offset='8' type='/bool'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:181]]></metadata>
+
+    </field>
+    <field name='P' offset='16' type='/double'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:182]]></metadata>
+
+    </field>
+    <field name='I' offset='24' type='/double'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:182]]></metadata>
+
+    </field>
+    <field name='D' offset='32' type='/double'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:182]]></metadata>
+
+    </field>
+    <field name='input' offset='40' type='/double'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:183]]></metadata>
+
+    </field>
+    <field name='reference' offset='48' type='/double'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:184]]></metadata>
+
+    </field>
+    <field name='rawOutput' offset='56' type='/double'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:185]]></metadata>
+
+    </field>
+    <field name='saturatedOutput' offset='64' type='/double'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:186]]></metadata>
+
+    </field>
+  <metadata key='cxxname'><![CDATA[::motor_controller::PIDState]]></metadata>
+<metadata key='doc'><![CDATA[Representation of the internal state of a PID controller
+
+This is meant to be used for debugging / logging purposes mainly]]></metadata>
+<metadata key='orogen_defining_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_include'><![CDATA[auv_control:auv_control/6dControl.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:177]]></metadata>
+
+  </compound>
+  <compound name='/motor_controller/ParallelPIDSettings' size='72'>
+    <field name='Ts' offset='0' type='/double'>
+    <metadata key='doc'><![CDATA[! Sampling time in seconds]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:108]]></metadata>
+
+    </field>
+    <field name='Kp' offset='8' type='/double'>
+    <metadata key='doc'><![CDATA[! Proportional gain]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:111]]></metadata>
+
+    </field>
+    <field name='Ki' offset='16' type='/double'>
+    <metadata key='doc'><![CDATA[! Integral gain]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:114]]></metadata>
+
+    </field>
+    <field name='Kd' offset='24' type='/double'>
+    <metadata key='doc'><![CDATA[! Derivative gain]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:117]]></metadata>
+
+    </field>
+    <field name='N' offset='32' type='/double'>
+    <metadata key='doc'><![CDATA[! Derivative term
+ Derivative term filtered by a first order system with time constant Td/N
+ - Typical values of N are between 8 and 20
+ - No derivative action on frequencies above N/Td]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:124]]></metadata>
+
+    </field>
+    <field name='B' offset='40' type='/double'>
+    <metadata key='doc'><![CDATA[! Setpoint weighing term
+ Setpoint weighing term, generally between 0 and 1
+ - B = 0 reference is introduced only through integral term
+ - B = 1 disables setpoint weighting]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:131]]></metadata>
+
+    </field>
+    <field name='Tt' offset='48' type='/double'>
+    <metadata key='doc'><![CDATA[! Anti-integrator-windup
+ Anti-integrator-windup time constant
+ - < 0 disable
+ - = 0 and Td = 0  disable
+ - = 0 and Td > 0  Tt = sqrt(Ti * Td)
+ ]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:139]]></metadata>
+
+    </field>
+    <field name='YMin' offset='56' type='/double'>
+    <metadata key='doc'><![CDATA[! Minimum output value]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:143]]></metadata>
+
+    </field>
+    <field name='YMax' offset='64' type='/double'>
+    <metadata key='doc'><![CDATA[! Maximum output value]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:145]]></metadata>
+
+    </field>
+  <metadata key='cxxname'><![CDATA[::motor_controller::ParallelPIDSettings]]></metadata>
+<metadata key='doc'><![CDATA[! Structure to hold the PID parameters for 'PARALLEL' type PID.]]></metadata>
+<metadata key='orogen_defining_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_include'><![CDATA[auv_control:auv_control/6dControl.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/motor_controller/PID.hpp:105]]></metadata>
+
+  </compound>
+  <compound name='/base/LinearAngular6DPIDSettings' size='432'>
+    <field name='linear' offset='0' type='/motor_controller/PIDSettings[3]'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/6dControl.hpp:65]]></metadata>
+
+    </field>
+    <field name='angular' offset='216' type='/motor_controller/PIDSettings[3]'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/6dControl.hpp:66]]></metadata>
+
+    </field>
+  <metadata key='cxxname'><![CDATA[::base::LinearAngular6DPIDSettings]]></metadata>
+<metadata key='orogen_defining_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_include'><![CDATA[auv_control:auv_control/6dControl.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/6dControl.hpp:64]]></metadata>
+
+  </compound>
+  <compound name='/base/LinearAngular6DParallelPIDSettings' size='432'>
+    <field name='linear' offset='0' type='/motor_controller/ParallelPIDSettings[3]'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/6dControl.hpp:82]]></metadata>
+
+    </field>
+    <field name='angular' offset='216' type='/motor_controller/ParallelPIDSettings[3]'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/6dControl.hpp:83]]></metadata>
+
+    </field>
+  <metadata key='cxxname'><![CDATA[::base::LinearAngular6DParallelPIDSettings]]></metadata>
+<metadata key='orogen_defining_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_include'><![CDATA[auv_control:auv_control/6dControl.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/6dControl.hpp:81]]></metadata>
+
+  </compound>
+  <container kind='/std/vector' name='/std/vector&lt;/base/JointState/MODE&gt;' of='/base/JointState/MODE' size='24'>
+  <metadata key='orogen_defining_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_include'><![CDATA[:vector]]></metadata>
+<metadata key='orogen_include'><![CDATA[base:base/JointState.hpp]]></metadata>
+
+  </container>
+  <container kind='/std/vector' name='/std/vector&lt;/base/LinearAngular6DWaypoint&gt;' of='/base/LinearAngular6DWaypoint' size='24'>
+  <metadata key='orogen_defining_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_include'><![CDATA[:vector]]></metadata>
+<metadata key='orogen_include'><![CDATA[auv_control:auv_control/6dControl.hpp]]></metadata>
+
+  </container>
+  <alias name='/wrappers/Matrix&lt;/double,2,1&gt;/Scalar' source='/double'/>
+  <alias name='/wrappers/Matrix&lt;/double,2,2&gt;/Scalar' source='/double'/>
+  <compound name='/wrappers/Matrix&lt;/double,3,1&gt;' size='24'>
+    <field name='data' offset='0' type='/double[3]'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/base/orogen/types/base/wrappers/Eigen.hpp:15]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/orocos/base/wrappers/Eigen.hpp:15]]></metadata>
+
+    </field>
+  <metadata key='cxxname'><![CDATA[::base::Vector3d]]></metadata>
+<metadata key='cxxname'><![CDATA[::wrappers::Matrix<double, 3, 1>]]></metadata>
+<metadata key='opaque_is_typedef'><![CDATA[1]]></metadata>
+<metadata key='orogen_defining_typekits'><![CDATA[base]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[base]]></metadata>
+<metadata key='orogen_include'><![CDATA[base:base/wrappers/Eigen.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/base/orogen/types/base/wrappers/Eigen.hpp:12]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/orocos/base/wrappers/Eigen.hpp:12]]></metadata>
+
+  </compound>
+  <alias name='/wrappers/Vector3d' source='/wrappers/Matrix&lt;/double,3,1&gt;'/>
+  <compound name='/base/commands/LinearAngular6DCommand_m' size='56'>
+    <field name='time' offset='0' type='/base/Time'>
+    <metadata key='doc'><![CDATA[The command timestamp ]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/base/orogen/types/.orogen/typekit/types/base/m_types/base_commands_LinearAngular6DCommand.hpp:15]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/orocos/base/m_types/base_commands_LinearAngular6DCommand.hpp:15]]></metadata>
+
+    </field>
+    <field name='linear' offset='8' type='/wrappers/Matrix&lt;/double,3,1&gt;'>
+    <metadata key='doc'><![CDATA[The linear part of the command, as (x,y,z) ]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/base/orogen/types/.orogen/typekit/types/base/m_types/base_commands_LinearAngular6DCommand.hpp:16]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/orocos/base/m_types/base_commands_LinearAngular6DCommand.hpp:16]]></metadata>
+
+    </field>
+    <field name='angular' offset='32' type='/wrappers/Matrix&lt;/double,3,1&gt;'>
+    <metadata key='doc'><![CDATA[The angular part of the command, as (r,p,y) ]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/base/orogen/types/.orogen/typekit/types/base/m_types/base_commands_LinearAngular6DCommand.hpp:17]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/orocos/base/m_types/base_commands_LinearAngular6DCommand.hpp:17]]></metadata>
+
+    </field>
+  <metadata key='cxxname'><![CDATA[::base::commands::LinearAngular6DCommand]]></metadata>
+<metadata key='cxxname'><![CDATA[::base::commands::LinearAngular6DCommand_m]]></metadata>
+<metadata key='doc'><![CDATA[Common command structure for all controller types, in all control frames ]]></metadata>
+<metadata key='orogen:intermediate_for'><![CDATA[/base/commands/LinearAngular6DCommand]]></metadata>
+<metadata key='orogen:m_type'><![CDATA[1]]></metadata>
+<metadata key='orogen_defining_typekits'><![CDATA[base]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[base]]></metadata>
+<metadata key='orogen_include'><![CDATA[base:base/m_types/base_commands_LinearAngular6DCommand.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/base/orogen/types/.orogen/typekit/types/base/m_types/base_commands_LinearAngular6DCommand.hpp:13]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/install/include/orocos/base/m_types/base_commands_LinearAngular6DCommand.hpp:13]]></metadata>
+
+  </compound>
+  <compound name='/base/LinearAngular6DWaypoint_m' size='96'>
+    <field name='cmd' offset='0' type='/base/commands/LinearAngular6DCommand_m'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/.orogen/typekit/types/auv_control/m_types/base_LinearAngular6DWaypoint.hpp:13]]></metadata>
+
+    </field>
+    <field name='opt_orientation' offset='56' type='/double'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/.orogen/typekit/types/auv_control/m_types/base_LinearAngular6DWaypoint.hpp:14]]></metadata>
+
+    </field>
+    <field name='opt_orientation_distance' offset='64' type='/double'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/.orogen/typekit/types/auv_control/m_types/base_LinearAngular6DWaypoint.hpp:15]]></metadata>
+
+    </field>
+    <field name='linear_tolerance' offset='72' type='/double'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/.orogen/typekit/types/auv_control/m_types/base_LinearAngular6DWaypoint.hpp:16]]></metadata>
+
+    </field>
+    <field name='angular_tolerance' offset='80' type='/double'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/.orogen/typekit/types/auv_control/m_types/base_LinearAngular6DWaypoint.hpp:17]]></metadata>
+
+    </field>
+    <field name='hold_time' offset='88' type='/double'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/.orogen/typekit/types/auv_control/m_types/base_LinearAngular6DWaypoint.hpp:18]]></metadata>
+
+    </field>
+  <metadata key='cxxname'><![CDATA[::base::LinearAngular6DWaypoint]]></metadata>
+<metadata key='cxxname'><![CDATA[::base::LinearAngular6DWaypoint_m]]></metadata>
+<metadata key='orogen:intermediate_for'><![CDATA[/base/LinearAngular6DWaypoint]]></metadata>
+<metadata key='orogen:m_type'><![CDATA[1]]></metadata>
+<metadata key='orogen_defining_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_include'><![CDATA[auv_control:auv_control/m_types/base_LinearAngular6DWaypoint.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/.orogen/typekit/types/auv_control/m_types/base_LinearAngular6DWaypoint.hpp:11]]></metadata>
+
+  </compound>
+  <compound name='/base/LinearAngular6DWaypointInfo_m' size='160'>
+    <field name='current_delta' offset='0' type='/base/commands/LinearAngular6DCommand_m'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/.orogen/typekit/types/auv_control/m_types/base_LinearAngular6DWaypointInfo.hpp:15]]></metadata>
+
+    </field>
+    <field name='current_waypoint' offset='56' type='/base/LinearAngular6DWaypoint_m'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/.orogen/typekit/types/auv_control/m_types/base_LinearAngular6DWaypointInfo.hpp:16]]></metadata>
+
+    </field>
+    <field name='queue_size' offset='152' type='/int32_t'>
+    <metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/.orogen/typekit/types/auv_control/m_types/base_LinearAngular6DWaypointInfo.hpp:17]]></metadata>
+
+    </field>
+  <metadata key='cxxname'><![CDATA[::base::LinearAngular6DWaypointInfo]]></metadata>
+<metadata key='orogen:intermediate_for'><![CDATA[/base/LinearAngular6DWaypointInfo]]></metadata>
+<metadata key='orogen:m_type'><![CDATA[1]]></metadata>
+<metadata key='orogen_defining_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_include'><![CDATA[auv_control:auv_control/m_types/base_LinearAngular6DWaypointInfo.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/home/dfki.uni-bremen.de/jwehrmann/entern/control/orogen/auv_control/.orogen/typekit/types/auv_control/m_types/base_LinearAngular6DWaypointInfo.hpp:13]]></metadata>
+
+  </compound>
+  <container kind='/std/vector' name='/std/vector&lt;/base/LinearAngular6DWaypoint_m&gt;' of='/base/LinearAngular6DWaypoint_m' size='24'>
+  <metadata key='cxxname'><![CDATA[::std::vector<base::LinearAngular6DWaypoint_m, std::allocator<base::LinearAngular6DWaypoint_m> >]]></metadata>
+<metadata key='orogen:intermediate_for'><![CDATA[/std/vector</base/LinearAngular6DWaypoint>]]></metadata>
+<metadata key='orogen:m_type'><![CDATA[1]]></metadata>
+<metadata key='orogen_defining_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_exporting_typekits'><![CDATA[auv_control]]></metadata>
+<metadata key='orogen_include'><![CDATA[:vector]]></metadata>
+<metadata key='orogen_include'><![CDATA[auv_control:auv_control/m_types/base_LinearAngular6DWaypoint.hpp]]></metadata>
+<metadata key='source_file_line'><![CDATA[/usr/include/c++/5/bits/stl_vector.h:214]]></metadata>
+
+  </container>
+  <alias name='/std/orogen_typekits_mtype_std_vector_LT__base_LinearAngular6DWaypoint_GT_' source='/std/vector&lt;/base/LinearAngular6DWaypoint_m&gt;'/>
+  <alias name='/wrappers/Matrix&lt;/double,3,1&gt;/Scalar' source='/double'/>
+  <alias name='/wrappers/Matrix&lt;/double,3,3&gt;/Scalar' source='/double'/>
+  <alias name='/wrappers/Matrix&lt;/double,4,1&gt;/Scalar' source='/double'/>
+  <alias name='/wrappers/Matrix&lt;/double,4,4&gt;/Scalar' source='/double'/>
+  <alias name='/wrappers/Matrix&lt;/double,6,1&gt;/Scalar' source='/double'/>
+  <alias name='/wrappers/Matrix&lt;/double,6,6&gt;/Scalar' source='/double'/>
+  <alias name='/wrappers/MatrixX&lt;/double&gt;/Scalar' source='/double'/>
+  <alias name='/wrappers/VectorX&lt;/double&gt;/Scalar' source='/double'/>
+</typelib>

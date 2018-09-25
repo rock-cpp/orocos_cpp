@@ -10,10 +10,37 @@
 
 using namespace orocos_cpp;
 
-BOOST_AUTO_TEST_CASE( unknown_names )
+
+class TypeRegistryTest: public TypeRegistry
 {
-    orocos_cpp::TypeRegistry type_registries;
-    type_registries.loadTypeRegistries();
+public:
+    TypeRegistryTest():TypeRegistry(){}
+
+    void loadStatesFromCustomPath(const std::string &path)
+    {
+        loadStateToIDMapping(path);
+    }
+
+    void loadTypesFromCustomPath(const std::string &path, const std::string &typekitName)
+    {
+        loadTypeToTypekitMapping(path, typekitName);
+    }
+};
+
+struct Fixture
+{
+    Fixture()
+    {
+        type_registries.loadStatesFromCustomPath("testfile.tlb");
+        type_registries.loadTypesFromCustomPath("testfile.typelist", "auv_control");
+    }
+
+    TypeRegistryTest type_registries;
+};
+
+
+BOOST_FIXTURE_TEST_CASE(test_typeregistry_taskStates_unknownNames, Fixture)
+{
     unsigned int id;
     std::string state_name = "CONTROLLING";
     std::string wrong_state_name = "UNKNOWNSTATENAME";
@@ -22,10 +49,8 @@ BOOST_AUTO_TEST_CASE( unknown_names )
     BOOST_CHECK(!type_registries.getStateID("auv_control::AccelerationController", wrong_state_name, id));
 }
 
-BOOST_AUTO_TEST_CASE( testfile )
+BOOST_FIXTURE_TEST_CASE(test_typeregistry_taskStates, Fixture)
 {
-    orocos_cpp::TypeRegistry type_registries;
-    type_registries.loadTypeRegistries();
     unsigned int controlling_id;
     unsigned int exception_id;
     std::string controlling_state = "CONTROLLING";
@@ -34,4 +59,11 @@ BOOST_AUTO_TEST_CASE( testfile )
     BOOST_CHECK(type_registries.getStateID("auv_control::AccelerationController", exception_state, exception_id));
     BOOST_REQUIRE_EQUAL(controlling_id, 7);
     BOOST_REQUIRE_EQUAL(exception_id, 3);
+}
+
+BOOST_FIXTURE_TEST_CASE(test_typeregistry_typeToTypekit, Fixture)
+{
+    std::string typekitName;
+    BOOST_CHECK(type_registries.getTypekitDefiningType("/auv_control/PIDState", typekitName));
+    BOOST_CHECK_EQUAL(typekitName, "auv_control");
 }

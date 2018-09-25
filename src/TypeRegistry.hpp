@@ -14,14 +14,13 @@ namespace orocos_cpp
 class TypeRegistry
 {
     std::map<std::string, std::string> typeToTypekit;
-    std::map<std::string, Typelib::Registry*> taskNameToRegistries;
+    std::map<std::string, unsigned> taskStateToID;
+
 public:
     TypeRegistry();
     
-    bool loadTypelist();
-    
     /**
-     * Laods all type registries in order to receive the nessesary informations.
+     * Loads all type registries in order to receive the nessesary information.
      */
     bool loadTypeRegistries();
     
@@ -35,7 +34,7 @@ public:
      *
      * @returns false if the state or the task is unknown
      */
-    bool getStateID(const std::string &task_model_name, std::string &state_name, unsigned& id) const;
+    bool getStateID(const std::string &task_model_name, const std::string &state_name, unsigned& id) const;
 
 protected:
     /**
@@ -43,6 +42,19 @@ protected:
      * @param path the path to the tlb file
      */
     bool loadRegistry(const std::string &path, Typelib::Registry* registry);
+
+    /**
+     * Saves the stateToIDMapping from a given tlb file.
+     * @param path the path to the tlb file
+     */
+    bool loadStateToIDMapping(const std::string &path);
+
+    /**
+     * Saves the typeToTypekitMapping from a given typelist file.
+     * @param path the path to the typelist file
+     * @param typekitName the name of the corresponding typekit
+     */
+    bool loadTypeToTypekitMapping(const std::string &path, const std::string &typekitName);
 };
 
 }
