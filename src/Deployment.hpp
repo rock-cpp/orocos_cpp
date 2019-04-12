@@ -27,6 +27,7 @@ private:
     std::string loggerName;
 
     bool withValgrind;
+    std::vector<std::string> cmdLineArgs;
     
 public:
     Deployment(const std::string &name);
@@ -71,6 +72,11 @@ public:
      * If called, the deployment will be started within valgrind
      * */
     void runWithValgrind();    
+
+    /**
+     * Set additional command line arguments. Default is empty
+     * */
+    void setCmdLineArgs(const std::vector<std::string> &args);
 };
 
 } //end of namespace
