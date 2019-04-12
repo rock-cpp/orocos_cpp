@@ -43,9 +43,7 @@ public:
             const RTT::types::TypeInfo* typeInfo, const libConfig::ConfigValue& value);
 
 private:
-    std::map<std::string, libConfig::Configuration> subConfigs;
     std::map<std::string, libConfig::Configuration> overrides;
-    bool mergeConfig(const std::vector<std::string> &names, libConfig::Configuration &result);
     bool applyConfToProperty(RTT::TaskContext* context, const std::string &propertyName, const libConfig::ConfigValue &value);
 };
 

@@ -424,56 +424,6 @@ bool ConfigurationHelper::applyConfigValueOnDSB(RTT::base::DataSourceBase::share
 }
 
 
-
-bool ConfigurationHelper::mergeConfig(const std::vector< std::string >& names, Configuration& result)
-{
-    if(names.empty())
-        throw std::runtime_error("Error given config array was empty");
-    
-    std::map<std::string, Configuration>::const_iterator entry = subConfigs.find(names.front());
-
-    if(entry == subConfigs.end())
-    {
-        std::cout << "Error, config " << names.front() << " not found " << std::endl;
-        std::cout << "Known configs:" << std::endl;
-        for(std::map<std::string, Configuration>::const_iterator it = subConfigs.begin(); it != subConfigs.end(); it++)
-        {
-            std::cout << "    \"" << it->first << "\"" << std::endl;
-        }
-        return false;
-    }
-    
-    //first we merge the configurations
-    result = entry->second;
-    
-    std::vector< std::string >::const_iterator it = names.begin();
-    it++;
-    
-    for(; it != names.end(); it++)
-    {
-        entry = subConfigs.find(*it);
-
-        if(entry == subConfigs.end())
-        {
-            std::cout << "Error, merge failed config " << *it << " not found " << std::endl;
-            std::cout << "Known configs:" << std::endl;
-            for(std::map<std::string, Configuration>::const_iterator it = subConfigs.begin(); it != subConfigs.end(); it++)
-            {
-                std::cout << "    \"" << it->first << "\"" << std::endl;
-            }
-            return false;
-        }
-
-        if(!result.merge(entry->second))
-            return false;
-    }    
-    
-//     std::cout << "Resulting config is :" << std::endl;
-//     displayConfiguration(result);
-    
-    return true;
-}
-
 bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const Configuration& config)
 {     
     Configuration baseConf = config;
@@ -501,24 +451,11 @@ bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const Configura
 
 bool ConfigurationHelper::applyConfig(const std::string& configFilePath, RTT::TaskContext* context, const std::vector< std::string >& names)
 {
-    YAMLConfigParser parser;
-    parser.loadConfigFile(configFilePath, subConfigs);
+    libConfig::MultiSectionConfiguration mcfg;
+    mcfg.load(configFilePath);
+    libConfig::Configuration config = mcfg.getConfig(names);
     
-    Configuration config("Merged");
-    if(!mergeConfig(names, config))
-    {
-        std::cout << "Error, merging of configurations for context " + context->getName() + " failed " << std::endl;
-        std::cout << "Configurations : " << std::endl;
-        for(const std::string &confName : names)
-            std::cout << "    " << confName << std::endl;
-        
-        throw std::runtime_error("Error, merging of configuarations for context " + context->getName() + " failed ");
-        return false;
-    }
-    
-    //finally apply:
     return applyConfig(context, config);
-
 }
 
 bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const std::vector< std::string >& names)
@@ -554,7 +491,9 @@ bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const std::vect
     if(modelName.empty())
         throw std::runtime_error("ConfigurationHelper::applyConfig error, context did not give a valid model name (none at all)");
     
-    bool ret = applyConfig(bundle.getConfigurationDirectory() + modelName + ".yml", context, names);
+    libConfig::Configuration retConfig = bundle.taskConfigurations.getConfig(
+                modelName, names);
+    bool ret = applyConfig(context, retConfig);
     
     if(syncNeeded)
         delete context;
