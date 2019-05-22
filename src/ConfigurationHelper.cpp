@@ -357,6 +357,7 @@ bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
 bool ConfigurationHelper::applyConfToProperty(RTT::TaskContext* context, const std::string& propertyName, const libConfig::ConfigValue& value)
 {
     RTT::base::PropertyBase *property = context->getProperty(propertyName);
+    
     if(!property)
     {
         std::cout << "Error, there is no property with the name '" << propertyName << "' in the TaskContext " << context->getName() << std::endl;
@@ -440,7 +441,7 @@ bool ConfigurationHelper::applyConfig(RTT::TaskContext* context, const Configura
         if(!applyConfToProperty(context, propIt->first, *(propIt->second)))
         {
             std::cout << "ERROR configuration of " << propIt->first << " failed" << std::endl;
-            throw std::runtime_error("ERROR configuration of "  + propIt->first + " failed for context " + context->getName());
+            throw std::runtime_error("ERROR: Apply configuration of variable '"  + propIt->first + "' failed for context " + context->getName());
             return false;
         }
     }
