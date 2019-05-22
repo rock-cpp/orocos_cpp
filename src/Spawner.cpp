@@ -350,7 +350,7 @@ void Spawner::killAll()
             try {
                 std::cout << "Trying to stop task " << tName << std::endl;
                 RTT::corba::TaskContextProxy *proxy = RTT::corba::TaskContextProxy::Create(tName, false);
-                if(proxy->isRunning())
+                if(proxy && proxy->isRunning())
                     proxy->stop();
             }
             catch (...)
