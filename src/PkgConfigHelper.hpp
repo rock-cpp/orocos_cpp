@@ -11,6 +11,8 @@ namespace orocos_cpp
 class PkgConfigHelper
 {
 public:
+    static std::vector<std::string> getSearchPathsFromEnvVar();
+
     /** deprecated
      * Helper function that parses a pkg-Config file. 
      * Will open the file of the given name, and search 
@@ -27,7 +29,7 @@ public:
      * @param properties : All properties specified in \p pkgConfigFileName as <varname, value>-tuples will be stored here
      * @return false if any error occured
      */
-    static bool parsePkgConfig(const std::string& pkgConfigFileName, std::map<std::string,std::string>& variables, std::map<std::string, std::string> &properties);
+    static bool parsePkgConfig(const std::string& filePathOrName, std::map<std::string,std::string>& variables, std::map<std::string, std::string> &properties, bool isFilePath = true);
 
     /**
     * Helper function, to replace a given string by a given string in an input string.

@@ -6,6 +6,7 @@
 #include <regex>
 #include <boost/algorithm/string.hpp>
 #include <iostream>
+#include <base-logging/Logging.hpp>
 
 using namespace orocos_cpp;
 
@@ -18,6 +19,38 @@ bool PkgConfigHelper::solveString(std::string &input, const std::string &replace
     
     input.replace(start_pos, replace.length(), by);
     return true;
+}
+
+//Returns a vector of search paths defined in PKG_CONFIG_PATH environment variable
+std::vector<std::string> PkgConfigHelper::getSearchPathsFromEnvVar()
+{
+    std::vector<std::string> paths;
+
+    const char *pkgConfigPath = getenv("PKG_CONFIG_PATH");
+    if(!pkgConfigPath)
+    {
+        throw std::runtime_error("Internal Error, no pkgConfig path found.");
+    }
+
+    std::string pkgConfigPathS = pkgConfigPath;
+    boost::split(paths, pkgConfigPathS, boost::is_any_of(":"));
+    return paths;
+}
+
+//Search for a file in paths by filename. Returns empty string if file could not be found.
+std::string find_file(const std::string filename, const std::vector<std::string>& paths)
+{
+    std::string filepath = "";
+    for(const std::string &path: paths)
+    {
+        std::string candidate = path + "/" + filename;
+        if(boost::filesystem::exists(candidate))
+        {
+            filepath = candidate;
+            break;
+        }
+    }
+    return filepath;
 }
 
 
@@ -33,8 +66,6 @@ bool substitude(const std::string& line, const std::map<std::string, std::string
 {
     std::regex e{R"(.*\$\{(\w*)\}.*)"};
     std::smatch sm;
-    std::cout <<"====" <<std::endl;
-    std::cout << line <<std::endl;
     std::string new_line = line;
     bool ok = true;
     while(std::regex_match(new_line, sm, e)){
@@ -45,13 +76,11 @@ bool substitude(const std::string& line, const std::map<std::string, std::string
             size_t pos = new_line.find(varstr);
             new_line.replace(pos, varstr.size(), val);
         }catch(std::out_of_range ex){
-            std::clog << "Could not substitude varibale " << varname << std::endl;
+            LOG_WARN_S << "Could not substitude varibale " << varname;
             ok=false;
         }
     }
     substituded = new_line;
-    std::cout << substituded <<std::endl;
-    std::cout <<"...." <<std::endl;
     return ok;
 }
 
@@ -119,18 +148,23 @@ bool parseProperty(const std::string& line, std::string& prop_name, std::string&
     return false;
 }
 
-bool PkgConfigHelper::parsePkgConfig(const std::string& pkgConfigFileName, std::map<std::string,std::string>& variables, std::map<std::string,std::string>& properties)
+bool PkgConfigHelper::parsePkgConfig(const std::string& filePathOrName, std::map<std::string,std::string>& variables, std::map<std::string,std::string>& properties, bool isFilePath)
 {
-    //Resolve full filepath for filename given via pkgConfigFileName
-    std::vector<std::string> paths = get_search_paths_from_env_var();
-    std::string filepath = find_file(pkgConfigFileName, paths);
-
-    if(filepath.empty())
-    {
-        throw std::runtime_error("Error, could not find pkg-config file " + pkgConfigFileName + " in the PKG_CONFIG_PATH");
+    std::string filepath;
+    if(!isFilePath){
+        //Resolve full filepath for filename given via pkgConfigFileName
+        std::vector<std::string> paths = getSearchPathsFromEnvVar();
+        filepath = find_file(filePathOrName, paths);
+    }else{
+        filepath = filePathOrName;
     }
 
     std::ifstream fileStream(filepath);
+    if(!fileStream.is_open())
+    {
+        throw std::runtime_error("Error, could not open pkg-config file " + filePathOrName + " in the PKG_CONFIG_PATH");
+    }
+
     bool all_ok=true;
     while(!fileStream.eof())
     {
@@ -156,7 +190,7 @@ bool PkgConfigHelper::parsePkgConfig(const std::string& pkgConfigFileName, std::
 
         //Deletes all whitespaces
         if(!curLine2.empty()){
-            std::clog << "Warning: Could not parse line " << curLine << " from PkgConfig-file " << filepath << std::endl;
+            LOG_WARN_S << "Could not parse line " << curLine << " from PkgConfig-file " << filepath;
             all_ok = false;
         }
     }
@@ -165,14 +199,14 @@ bool PkgConfigHelper::parsePkgConfig(const std::string& pkgConfigFileName, std::
     for(std::pair<const std::string, std::string>& var : variables){
         bool st = substitude(var.second, variables, var.second);
         if(!st){
-            std::clog << "Could not substitude value '" << var.second << "' of variable " << var.first << " from PkgConfig-file " << filepath << std::endl;
+            LOG_ERROR_S << "Could not substitude value '" << var.second << "' of variable " << var.first << " from PkgConfig-file " << filepath;
             all_ok = false;
         }
     }
     for(std::pair<const std::string, std::string>& prop : properties){
         bool st = substitude(prop.second, variables, prop.second);
         if(!st){
-            std::clog << "Could not substitude value " << prop.second << "' of property "<< prop.first << " from PkgConfig-file " << filepath << std::endl;
+            LOG_ERROR_S << "Could not substitude value " << prop.second << "' of property "<< prop.first << " from PkgConfig-file " << filepath;
             all_ok = false;
         }
     }
