@@ -1,0 +1,24 @@
+# Generated from orogen/lib/orogen/templates/proxies/proxies.pc
+
+prefix=/media/wirkus/Data/development/rock-runtime/install
+exec_prefix=${prefix}
+libdir=${prefix}/lib/orocos
+includedir=${prefix}/include/orocos
+
+
+
+project_name=execution
+deffile=${prefix}/share/orogen/execution.orogen
+task_models=execution::CNDHandler,execution::ProcessServer
+typekits=execution base orocos std
+
+Name: executionTasks
+Version: 0.1
+Description: tasks defined for the execution project
+Requires: orocos_cpp_base  execution-typekit-gnulinux execution-transport-corba-gnulinux execution-transport-mqueue-gnulinux execution-transport-typelib-gnulinux std-typekit-gnulinux std-transport-corba-gnulinux std-transport-mqueue-gnulinux std-transport-typelib-gnulinux base-typekit-gnulinux base-transport-corba-gnulinux base-transport-mqueue-gnulinux base-transport-typelib-gnulinux orocos_cpp_base
+
+
+Libs:  /media/wirkus/Data/development/rock-runtime/install/lib/orocos/gnulinux/types/librtt-typekit-gnulinux.so /media/wirkus/Data/development/rock-runtime/install/lib/orocos/gnulinux/types/librtt-transport-corba-gnulinux.so /media/wirkus/Data/development/rock-runtime/install/lib/orocos/gnulinux/types/librtt-transport-mqueue-gnulinux.so  -L${libdir} -lexecution-proxies
+
+Cflags: -I${includedir} -DOROCOS_TARGET=gnulinux -I/media/wirkus/Data/development/rock-runtime/install/include -I/media/wirkus/Data/development/rock-runtime/install/include/orocos -I/media/wirkus/Data/development/rock-runtime/install/include/orocos/base/types -I/usr/include/eigen3 -I/media/wirkus/Data/development/rock-runtime/install/include/orocos/std/types -I/media/wirkus/Data/development/rock-runtime/install/include/orocos/logger/types -I${includedir}/execution/types -I/media/wirkus/Data/development/rock-runtime/install/include -DOROCOS_TARGET=gnulinux -I/media/wirkus/Data/development/rock-runtime/install/include/orocos -I/media/wirkus/Data/development/rock-runtime/install/include/orocos/std/types -I/media/wirkus/Data/development/rock-runtime/install/include -DOROCOS_TARGET=gnulinux -I/usr/include/eigen3 -I/media/wirkus/Data/development/rock-runtime/install/include/orocos -I/media/wirkus/Data/development/rock-runtime/install/include/orocos/std/types -I/media/wirkus/Data/development/rock-runtime/install/include/orocos/base/types
+

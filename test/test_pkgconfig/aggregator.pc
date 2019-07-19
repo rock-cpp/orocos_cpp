@@ -1,0 +1,12 @@
+prefix=/media/wirkus/Data/development/rock-runtime/install
+exec_prefix=/media/wirkus/Data/development/rock-runtime/install
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: aggregator
+Description: 
+Version: 0.1
+Requires:  base-types base-lib
+Libs: -L${libdir} -laggregator
+Cflags: -I${includedir}
+

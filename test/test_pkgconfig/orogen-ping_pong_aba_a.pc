@@ -1,0 +1,16 @@
+prefix=/media/wirkus/Data/development/rock-runtime/install
+exec_prefix=${prefix}
+libdir=${prefix}/lib/orocos
+includedir=${prefix}/include/orocos
+binfile=${prefix}/bin/ping_pong_aba_a
+
+project_name=rrt_evaluation_deployments
+deffile=${prefix}/share/orogen/rrt_evaluation_deployments.orogen
+typekits= base rock_runtime_evaluation std
+deployed_tasks=consumer,producer
+deployed_tasks_with_models=consumer,rock_runtime_evaluation::MessageConsumer,producer,rock_runtime_evaluation::MessageProducer
+
+Name: ping_pong_aba_a
+Version: 0.0
+Description: the static deployment defined for the ping_pong_aba_a deployment
+

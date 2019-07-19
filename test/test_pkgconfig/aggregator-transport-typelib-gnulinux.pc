@@ -1,0 +1,18 @@
+# Generated from orogen/lib/orogen/templates/typekit/typelib/transport-typelib.pc 
+
+prefix=/media/wirkus/Data/development/rock-runtime/install
+exec_prefix=${prefix}
+libdir=${prefix}/lib/orocos/types
+includedir=${prefix}/include/orocos
+
+project_name=aggregator
+deffile=${prefix}/share/orogen/aggregator.orogen
+type_registry=/media/wirkus/Data/development/rock-runtime/install/share/orogen/aggregator.tlb
+
+Name: aggregatorTypelibTransport
+Version: 0.0
+Requires: rtt_typelib-gnulinux 
+Description: aggregator types support for the Orocos type system
+Libs: -L${libdir} -laggregator-transport-typelib-gnulinux
+Cflags: -I${includedir}
+
