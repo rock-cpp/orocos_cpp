@@ -217,7 +217,7 @@ bool PkgConfigHelper::parsePkgConfig(const std::string& pkgConfigFileName, const
 {
     std::map<std::string,std::string> variables;
     std::map<std::string,std::string> properties;
-    parsePkgConfig(pkgConfigFileName, variables, properties);
+    parsePkgConfig(pkgConfigFileName, variables, properties, false);
 
     bool all_ok = true;
     result.resize(searchedFields.size());
