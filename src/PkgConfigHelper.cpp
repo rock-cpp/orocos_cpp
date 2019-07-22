@@ -244,5 +244,18 @@ bool PkgConfigHelper::parsePkgConfig(const std::string& pkgConfigFileName, const
     return all_ok;
 }
 
+std::vector<std::string> PkgConfigHelper::vectorizeTokenSeparatedString(const std::string& data, std::string token)
+{
+    boost::char_separator<char> sep(token.c_str());
+    boost::tokenizer<boost::char_separator<char> > typekits(data, sep);
+
+    std::vector< std::string > ret;
+    for(const std::string &tk: typekits)
+    {
+        ret.push_back(tk);
+    }
+    return ret;
+}
+
 
 

@@ -35,6 +35,14 @@ public:
     * Helper function, to replace a given string by a given string in an input string.
     * */
     static bool solveString(std::string &input, const std::string &replace, const std::string &by);
+
+    /**
+     * @brief Vectorize a string into separated elements at the occurance of a specific token
+     * @param data : The string to process. e.g. [/hello/world:/tolle/sache]
+     * @param token : Character at which the string should be splitted. e.g. ':'
+     * @return Vector of individual elements. With the input given about would result in ["/hello/world", "/tolle/sache"]
+     */
+    static std::vector<std::string> vectorizeTokenSeparatedString(const std::string& data, std::string token);
 };
 }//end of namespace
 #endif // PKGCONFIGHELPER_H

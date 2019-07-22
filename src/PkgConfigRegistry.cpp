@@ -92,6 +92,12 @@ bool orocos_cpp::PkgConfigRegistry::getOrogen(const std::string &name, orocos_cp
     return true;
 }
 
+bool orocos_cpp::PkgConfigRegistry::getOrocosRTT(orocos_cpp::PkgConfig &pkg)
+{
+    pkg = orocosRTTPkg;
+    return orocosRTTPkg.isLoaded();
+}
+
 std::vector<std::string> orocos_cpp::PkgConfigRegistry::getRegisteredDeploymentNames()
 {
     std::vector<std::string> ret;
@@ -205,12 +211,29 @@ bool orocos_cpp::PkgConfigRegistry::isDeploymentPkg(const std::string &filename,
     return false;
 }
 
+bool orocos_cpp::PkgConfigRegistry::isOrocosRTTPkg(const std::string &filename, std::string &arch)
+{
+    std::regex r(R"(orocos-rtt-([\w\d]+).pc)");
+    std::smatch match;
+    if(std::regex_match(filename, match, r)){
+        LOG_DEBUG_S << filename << " is Orocos RTT:";
+        arch = match[1];
+        LOG_DEBUG_S << "  arch: "<<arch;
+        return true;
+    }
+    return false;
+}
+
 bool orocos_cpp::PkgConfigRegistry::addFile(const std::string &filepath)
 {
     std::string typekitName, orogenProjectName, deploymentName, arch, transportName;
     PkgConfig pkg;
     boost::filesystem::path p(filepath);
     std::string filename = p.filename().string();
+
+    //In Rock different special kinds of libraries can be identified by patterns in their file
+    //names. Following the type of a library is identifyied by the name of the corresponding
+    //PkgConfig file.
 
     //Is Deployment?
     if(isDeploymentPkg(filename, deploymentName)){
@@ -311,6 +334,19 @@ bool orocos_cpp::PkgConfigRegistry::addFile(const std::string &filepath)
             return false;
         }
         it->second.typekit = pkg;
+        return st;
+    }
+
+    //IS OrocosRTT
+    //RTT follows a different convention. Kind of library is determined by folder they are installed in.
+    else if(isOrocosRTTPkg(filename, arch)){
+        if(orocosRTTPkg.isLoaded()){
+            LOG_WARN_S << "Ignoring PkgConfig file " << filepath << ". It describes the package orocos-rtt, but that was already described by the PkgConfig file "<<orocosRTTPkg.sourceFile;
+            return false;
+        }
+
+        bool st = pkg.load(filepath);
+        orocosRTTPkg = pkg;
         return st;
     }
     else{

@@ -81,6 +81,7 @@ public:
     bool getDeployment(const std::string& name, PkgConfig& pkg);
     bool getTypekit(const std::string& name, TypekitPkgConfig &pkg);
     bool getOrogen(const std::string& name, OrogenPkgConfig& pkg);
+    bool getOrocosRTT(PkgConfig& pkg);
     std::vector<std::string> getRegisteredDeploymentNames();
     std::vector<std::string> getRegisteredTypekitNames();
     std::vector<std::string> getRegisteredOrogenNames();
@@ -94,6 +95,7 @@ protected:
     bool isTypekitPkg(const std::string& filename, std::string& typekitName, std::string &arch);
     bool isProxiesPkg(const std::string& filename, std::string& orogenProjectName);
     bool isDeploymentPkg(const std::string& filename, std::string& deploymentName);
+    bool isOrocosRTTPkg(const std::string &filename, std::string &arch);
 
     bool addFile(const std::string& filepath);
     void scan(const std::vector<std::string>& searchPaths);
