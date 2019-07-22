@@ -1,3 +1,4 @@
+#pragma once
 #include <map>
 #include <vector>
 #include <memory>
@@ -72,7 +73,7 @@ public:
 
 class PkgConfigRegistry;
 typedef std::shared_ptr<PkgConfigRegistry> PkgConfigRegistryPtr;
-PkgConfigRegistryPtr __pkgcfgreg;
+extern PkgConfigRegistryPtr __pkgcfgreg;
 
 class PkgConfigRegistry
 {
@@ -100,9 +101,13 @@ protected:
     bool addFile(const std::string& filepath);
     void scan(const std::vector<std::string>& searchPaths);
 
+    //Containers to store PkgConfig files for different categories of libraries used
+    //in Rock
     std::map<std::string, PkgConfig> deployments;
     std::map<std::string, OrogenPkgConfig> orogen;
     std::map<std::string, TypekitPkgConfig> typekits;
+    //orocos-rtt library does not fit the other categories above
+    PkgConfig orocosRTTPkg;
 };
 
 }

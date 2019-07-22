@@ -4,7 +4,7 @@
 #include <boost/filesystem.hpp>
 #include <base-logging/Logging.hpp>
 
-orocos_cpp::PkgConfigRegistryPtr __pkgcfgreg = nullptr;
+orocos_cpp::PkgConfigRegistryPtr orocos_cpp::__pkgcfgreg(nullptr);
 
 template<typename T>
 void extract_keys(const std::map<std::string,T>& m, std::vector<std::string>& res){
