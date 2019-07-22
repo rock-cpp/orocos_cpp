@@ -89,12 +89,14 @@ bool substitude(const std::string& line, const std::map<std::string, std::string
 //! \param line
 //! \return true if \p line is a comment. false otherwise.
 //!
-bool parseComment(const std::string& line)
+void truncateComment(std::string& line)
 {
     //Is comment if first character is '#'
-    if(line.size() < 1)
-        return false;
-    return line.at(0) == '#';
+    size_t pos = line.find('#');
+    if(pos == std::string::npos)
+        return;
+
+    line = line.substr(0, pos);
 }
 
 //!
@@ -116,6 +118,8 @@ bool parseVariable(const std::string& line, std::string& var_name, std::string& 
         assert(sm.size() == 3);
         var_name = sm[1];
         value = sm[2];
+        boost::trim(var_name);
+        boost::trim(value);
         return true;
     }
     return false;
@@ -143,6 +147,8 @@ bool parseProperty(const std::string& line, std::string& prop_name, std::string&
         assert(sm.size() == 3);
         prop_name = sm[1];
         value = sm[2];
+        boost::trim(prop_name);
+        boost::trim(value);
         return true;
     }
     return false;
@@ -170,8 +176,7 @@ bool PkgConfigHelper::parsePkgConfig(const std::string& filePathOrName, std::map
     {
         std::string curLine;
         std::getline(fileStream, curLine);
-        if(parseComment(curLine))
-            continue;
+        truncateComment(curLine);
 
         std::string name, value;
         if(parseVariable(curLine, name, value)){
