@@ -96,12 +96,6 @@ bool Deployment::loadPkgConfigFile(const std::string& deploymentName)
     PkgConfigRegistryPtr pkgreg = PkgConfigRegistry::get();
     PkgConfig pkg;
 
-    std::vector<std::string> pkgConfigFields;
-    pkgConfigFields.push_back("typekits");
-    pkgConfigFields.push_back("deployed_tasks");
-    std::vector<std::string> pkgConfigValues;
-
-    //if(!PkgConfigHelper::parsePkgConfig("/orogen-" + name + ".pc", pkgConfigFields, pkgConfigValues))
     if(!pkgreg->getDeployment(deploymentName, pkg))
         throw std::runtime_error("PkgConfig file for deployment " + deploymentName + " was not loaded." );
 
@@ -112,7 +106,7 @@ bool Deployment::loadPkgConfigFile(const std::string& deploymentName)
     }
     std::vector<std::string> typekits = PkgConfigHelper::vectorizeTokenSeparatedString(typekitsString, " ");
 
-    if(!pkg.getVariable("deployed_tasks", typekitsString)){
+    if(!pkg.getVariable("deployed_tasks", deployedTasksString)){
         throw(std::runtime_error("PkgConfig file for deployment "+deploymentName+" does not describe required typekits."));
     }
     std::vector<std::string> deployedTasks = PkgConfigHelper::vectorizeTokenSeparatedString(deployedTasksString, ",");
