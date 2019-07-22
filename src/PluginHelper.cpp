@@ -6,6 +6,7 @@
 
 #include <rtt/plugin/PluginLoader.hpp>
 #include <base/Time.hpp>
+#include "PkgConfigRegistry.hpp"
 #include "PkgConfigHelper.hpp"
 #include <iostream>
 
@@ -25,23 +26,17 @@ std::vector< std::string > PluginHelper::getNeededTypekits(const std::string& co
     if(it != componentToTypeKitsMap.end())
         return it->second;
     
-    //first we load the typekit
-    std::vector<std::string> pkgConfigFields;
-    pkgConfigFields.push_back("typekits");
-    std::vector<std::string> pkgConfigValues;
-
-    if(!PkgConfigHelper::parsePkgConfig(componentName + std::string("-tasks-") + xstr(OROCOS_TARGET) + std::string(".pc"), pkgConfigFields, pkgConfigValues))
+    PkgConfigRegistryPtr pkgreg = PkgConfigRegistry::get();
+    OrogenPkgConfig pkg;
+    if(!pkgreg->getOrogen(componentName, pkg)){
         throw std::runtime_error("Could not load pkgConfig file for typekit for component " + componentName);
-
-    boost::char_separator<char> sep(" ");
-    boost::tokenizer<boost::char_separator<char> > typekits(pkgConfigValues[0], sep);
-
-    std::vector< std::string > ret;
-    for(const std::string &tk: typekits)
-    {
-        ret.push_back(tk);
     }
-    
+    std::string neededTypekitsString;
+    if(!pkg.tasks.getVariable("typekits", neededTypekitsString)){
+        throw std::runtime_error("Tasks-PkgConfig file for component "+ componentName + " ("+pkg.tasks.sourceFile+") is expected to define the 'typekits' varibale, but it does not.");
+    }
+
+    std::vector<std::string> ret = PkgConfigHelper::vectorizeTokenSeparatedString(neededTypekitsString, " ");
     componentToTypeKitsMap.insert(std::make_pair(componentName, ret));
     
     return ret;
@@ -71,65 +66,64 @@ void PluginHelper::loadAllPluginsInDir(const std::string& path)
     std::cout << "Loaded " << cnt << " typekits in " << (end - start).toSeconds() << " Seconds " << std::endl; 
 }
 
-bool PluginHelper::loadTypekitAndTransports(const std::string& componentName)
+bool PluginHelper::loadTypekitAndTransports(const std::string& typekitName)
 {
     //already loaded, we can just exit
-    if(RTT::types::TypekitRepository::hasTypekit(componentName))
+    if(RTT::types::TypekitRepository::hasTypekit(typekitName))
         return true;
     
-    std::vector<std::string> knownTransports;
-    knownTransports.push_back("corba");
-    knownTransports.push_back("mqueue");
-    knownTransports.push_back("typelib");
+    //Supported transport types
+    static const std::vector<std::string> knownTransports = {"corba", "mqueue", "typelib"};
     
-    //first we load the typekit
-    std::vector<std::string> pkgConfigFields;
-    pkgConfigFields.push_back("prefix");
-    pkgConfigFields.push_back("libdir");
-    std::vector<std::string> pkgConfigValues;
-
+    PkgConfigRegistryPtr pkgreg = PkgConfigRegistry::get();
     RTT::plugin::PluginLoader &loader(*RTT::plugin::PluginLoader::Instance());
-
-    if(componentName == "rtt-types" || componentName == "orocos" )
+    PkgConfig pkg;
+    if(typekitName == "rtt-types" || typekitName == "orocos" )
     {
         //special case, rtt does not follow the convention below
-        if(!PkgConfigHelper::parsePkgConfig("orocos-rtt-" xstr(OROCOS_TARGET) ".pc", pkgConfigFields, pkgConfigValues))
-            throw std::runtime_error("Could not load pkgConfig file for typekit for component " + componentName);
-    
-        if(!loader.loadTypekits(pkgConfigValues[0] + "/lib/orocos/gnulinux/"))
+        if(!pkgreg->getOrocosRTT(pkg)){
+            throw std::runtime_error("PkgConfig for OROCOS RTT package was not loaded");
+        }
+        std::string libdir;
+        pkg.getProperty("libdir", libdir);
+        if(!loader.loadTypekits(libdir + "/orocos/gnulinux/"))
             throw std::runtime_error("Error, failed to load rtt basis typekits");
 
-        if(!loader.loadPlugins(pkgConfigValues[0] + "/lib/orocos/gnulinux/"))
+        if(!loader.loadPlugins(libdir + "/orocos/gnulinux/"))
             throw std::runtime_error("Error, failed to load rtt basis plugins");
         
         return true;
     }
     
-    if(!PkgConfigHelper::parsePkgConfig(componentName + std::string("-typekit-") + xstr(OROCOS_TARGET) + std::string(".pc"), pkgConfigFields, pkgConfigValues))
-        throw std::runtime_error("Could not load pkgConfig file for typekit for component " + componentName);
+    TypekitPkgConfig tpkg;
+    if(!pkgreg->getTypekit(typekitName, tpkg))
+        throw std::runtime_error("No PkgConfig file for typekit of component " + typekitName + " was loaded.");
+    if(!tpkg.typekit.isLoaded()){
+        throw std::runtime_error("No Typekit PkgConfig file for component " + typekitName + " was loaded.");
+    }
 
-    std::string libDir = pkgConfigValues[1];
-    if(!PkgConfigHelper::solveString(libDir, "${prefix}", pkgConfigValues[0]))
-        throw std::runtime_error("Internal Error while parsing pkgConfig file");
-    
-        
-    if(!loader.loadLibrary(libDir + "/lib" + componentName + "-typekit-" xstr(OROCOS_TARGET) ".so"))
-        throw std::runtime_error("Error, could not load typekit for component " + componentName);
+    std::string libDir;
+    tpkg.typekit.getVariable("libdir", libDir);
 
+    //Library of typekit is named after a specific file pattern
+    if(!loader.loadLibrary(libDir + "/lib" + typekitName + "-typekit-" xstr(OROCOS_TARGET) ".so"))
+        throw std::runtime_error("Error, could not load typekit for component " + typekitName);
+
+    //Load transports for typekit
     for(const std::string &transport: knownTransports)
     {
-        if(!PkgConfigHelper::parsePkgConfig(componentName + "-typekit-" xstr(OROCOS_TARGET) ".pc", pkgConfigFields, pkgConfigValues))
-            throw std::runtime_error("Could not load pkgConfig file for transport " + transport + " for component " + componentName);
+        std::map<std::string, PkgConfig>::iterator it = tpkg.transports.find(transport);
+        if(it == tpkg.transports.end())
+            throw std::runtime_error("No PkgConfig file was loaded for transport " + transport + " for component " + typekitName);
 
-        std::string libDir = pkgConfigValues[1];
-        if(!PkgConfigHelper::solveString(libDir, "${prefix}", pkgConfigValues[0]))
-            throw std::runtime_error("Internal Error while parsing pkgConfig file");
-        
-        RTT::plugin::PluginLoader &loader(*RTT::plugin::PluginLoader::Instance());
-            
-        if(!loader.loadLibrary(libDir + "/lib" + componentName + "-transport-" + transport + "-" xstr(OROCOS_TARGET) ".so"))
-            throw std::runtime_error("Error, could not load transport " + transport + " for component " + componentName);
+        pkg = it->second;
+        if(!pkg.getVariable("libdir", libDir)){
+            throw(std::runtime_error("PkgConfig file for transport "+transport+"  of typekit "+typekitName+" does not define a 'libdir'."));
+        }
 
+        //Library of transport for a typekit is named after a specific file pattern
+        if(!loader.loadLibrary(libDir + "/lib" + typekitName + "-transport-" + transport + "-" xstr(OROCOS_TARGET) ".so"))
+            throw std::runtime_error("Error, could not load transport " + transport + " for component " + typekitName);
     }
     
     return true;

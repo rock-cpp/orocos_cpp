@@ -12,7 +12,7 @@ namespace orocos_cpp
 class Deployment : public boost::noncopyable
 {
 private:
-    bool loadPkgConfigFile(const std::string &name);
+    bool loadPkgConfigFile(const std::string &deploymentName);
     bool checkExecutable(const std::string &name);
     
     std::vector<std::string> typekits;

@@ -3,8 +3,10 @@
 #include <boost/filesystem.hpp>
 #include <fstream>
 #include <iostream>
+#include "PkgConfigRegistry.hpp"
 #include "PkgConfigHelper.hpp"
 #include <lib_config/Bundle.hpp>
+#include <base-logging/Logging.hpp>
 
 using namespace orocos_cpp;
 
@@ -89,48 +91,48 @@ bool Deployment::checkExecutable(const std::string& name)
 }
 
 
-bool Deployment::loadPkgConfigFile(const std::string& name)
+bool Deployment::loadPkgConfigFile(const std::string& deploymentName)
 {
+    PkgConfigRegistryPtr pkgreg = PkgConfigRegistry::get();
+    PkgConfig pkg;
+
     std::vector<std::string> pkgConfigFields;
     pkgConfigFields.push_back("typekits");
     pkgConfigFields.push_back("deployed_tasks");
     std::vector<std::string> pkgConfigValues;
 
-    if(!PkgConfigHelper::parsePkgConfig("/orogen-" + name + ".pc", pkgConfigFields, pkgConfigValues))
-        throw std::runtime_error("Deployment::Error, could not finde pkg-config file for deployment " + name );
+    //if(!PkgConfigHelper::parsePkgConfig("/orogen-" + name + ".pc", pkgConfigFields, pkgConfigValues))
+    if(!pkgreg->getDeployment(deploymentName, pkg))
+        throw std::runtime_error("PkgConfig file for deployment " + deploymentName + " was not loaded." );
 
-    
-    boost::char_separator<char> sep(" ");
-    boost::tokenizer<boost::char_separator<char> > tkits(pkgConfigValues[0], sep);
-    for(const std::string &tkit: tkits)
-        typekits.push_back(tkit);
+    //Extract required information from PkgConfig
+    std::string typekitsString, deployedTasksString;
+    if(!pkg.getVariable("typekits", typekitsString)){
+        throw(std::runtime_error("PkgConfig file for deployment "+deploymentName+" does not describe required typekits."));
+    }
+    std::vector<std::string> typekits = PkgConfigHelper::vectorizeTokenSeparatedString(typekitsString, " ");
 
-    boost::char_separator<char> sep2(",");
-    boost::tokenizer<boost::char_separator<char> > tTasks(pkgConfigValues[1], sep2);
-    for(const std::string &task: tTasks)
+    if(!pkg.getVariable("deployed_tasks", typekitsString)){
+        throw(std::runtime_error("PkgConfig file for deployment "+deploymentName+" does not describe required typekits."));
+    }
+    std::vector<std::string> deployedTasks = PkgConfigHelper::vectorizeTokenSeparatedString(deployedTasksString, ",");
+
+    //Populate renameMap with deployed tasks specified in PkgConfig file
+    renameMap.clear();
+    for(const std::string &taskName: deployedTasks)
     {
-        renameMap[task] = task;
-        tasks.push_back(task);
+        renameMap[taskName] = taskName;
+        tasks.push_back(taskName);
         
+        //Identify if task is logger...
+        //FIXME: Looks complicated. Does it look for the longest task name with '_Logger' suffix? WHy not simply assume '#{deploymentName}_Logger'?
         std::string loggerString("_Logger");
-        if(task.length() > loggerString.length() && task.substr(task.length() - loggerString.length(), task.length()) == loggerString)
+        if(taskName.length() > loggerString.length() && taskName.substr(taskName.length() - loggerString.length(), taskName.length()) == loggerString)
         {
-            loggerName = task;
+            loggerName = taskName;
         }
     }
 
-//     std::cout << "Needed Typekits :" << std::endl;
-//     for(const std::string &tkit:  typekits)
-//     {
-//         std::cout << tkit << std::endl;
-//     }
-//     
-//     std::cout << "Deployed Tasks :" << std::endl;
-//     for(const std::string &task: originalTasks)
-//     {
-//         std::cout << task << std::endl;
-//     }
-//     
     return true;
 }
 
@@ -173,6 +175,7 @@ bool Deployment::getExecString(std::string& cmd, std::vector< std::string >& arg
 
     cmd = deploymentName;
     
+    //FIXME: Better handle Valgrind (and GDB and possibly more) at the software module that actually controls the processes. E.g. ProcessServer in cnd/orogen/execution
     if(withValgrind)
     {
         args.push_back("--trace-children=yes");
@@ -201,18 +204,16 @@ bool Deployment::getExecString(std::string& cmd, std::vector< std::string >& arg
 
 const std::string Deployment::getLoggerName() const
 {
+    //Logger was possibly renamed.Thus, resolve new name of loggerName.
     for(std::pair<std::string, std::string> p: renameMap)
     {
         if(p.second == loggerName)
             return p.first;
-    }    
-
-    std::cout << "Rename map is " << std::endl;
-    for(std::pair<std::string, std::string> p: renameMap)
-    {
-        std::cout << "Cur Name " << p.first << " orig name " << p.second << std::endl;
     }
-    throw std::runtime_error("Deployment::Internal Error, logger name '" + loggerName + "' could not be found for deployment '" + deploymentName + "'. Forgott the add_default_logger ?");
+
+    //Deployment has no logger
+    LOG_ERROR_S << "getLoggerName() was called on a Delployment that has no logger.";
+    return "";
 }
 
 bool Deployment::hasLogger() const

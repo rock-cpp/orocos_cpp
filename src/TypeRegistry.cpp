@@ -1,5 +1,4 @@
 #include "TypeRegistry.hpp"
-#include "PkgConfigHelper.hpp"
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 #include <iostream>
@@ -9,6 +8,8 @@
 #include <typelib/pluginmanager.hh>
 #include <typelib/typemodel.hh>
 #include <typelib/importer.hh>
+#include "PkgConfigRegistry.hpp"
+#include <base-logging/Logging.hpp>
 
 namespace orocos_cpp 
 {
@@ -23,71 +24,39 @@ TypeRegistry::TypeRegistry()
 
 bool TypeRegistry::loadTypeRegistries()
 {
-    bool loadedAll = true;
-    const char *pkgCfgPaths = getenv("PKG_CONFIG_PATH");
-    
-    if(!pkgCfgPaths)
-    {
-        return false;
-    }
-    
-    std::vector<std::string> paths;
-    boost::split(paths, pkgCfgPaths, boost::is_any_of(":"));
+    PkgConfigRegistryPtr pkgreg = PkgConfigRegistry::get();
 
-    for(const std::string& path : paths)
-    {
-        if(!boost::filesystem::exists(boost::filesystem::path(path)))
-        {
-            std::cerr << "skipping nonexisting pkg-config path: " << path << std::endl;
+    bool loadedAll = true;
+
+    for(const std::string& typekitName :  pkgreg->getRegisteredTypekitNames()){
+        TypekitPkgConfig tpkg;
+        pkgreg->getTypekit(typekitName, tpkg);
+
+        std::string typeRegistryPath;
+        if(!tpkg.typekit.getVariable("type_registry", typeRegistryPath)){
+            LOG_ERROR_S << "PkgConfig file of typekit " << typekitName << " does not specify the type_registry variable";
+            loadedAll = false;
             continue;
         }
-        
-        for(auto it = boost::filesystem::directory_iterator(path); it != boost::filesystem::directory_iterator(); it++)
+
+        // Load any states from the tlb to taskStateToID;
+        LOG_INFO_S << "Parsing Typlib file " << typeRegistryPath;
+        if (!loadStateToIDMapping(typeRegistryPath))
         {
-            const boost::filesystem::path file = it->path();
-            
-            if(file.filename().string().find("typekit") != std::string::npos)
-            {                
-                // be aware of order of parsed fields
-                std::vector<std::string> result, fields{"prefix", "project_name", "type_registry"};
-                if(PkgConfigHelper::parsePkgConfig(file.filename().string(), fields, result))
-                {
-                    if(PkgConfigHelper::solveString(result.at(2), "${prefix}", result.at(0)))
-                    {
-                        std::string typeKitPath = result.at(2);
-
-                        // Load any states from the tlb to taskStateToID;
-                        if (!loadStateToIDMapping(typeKitPath))
-                        {
-                            throw std::runtime_error("Failed to open file " + file.filename().string());
-                        }
-
-                        boost::replace_last(typeKitPath, "tlb", "typelist");
-                        
-                        // Load types to typeToTypekit.
-                        if(!loadTypeToTypekitMapping(typeKitPath, result.at(1)))
-                        {
-                            throw std::runtime_error("Failed to open file " + file.filename().string());
-                        }
-                    }
-                    else
-                    {
-                        std::cerr << "error: couldn't solve pkg-config strings from file " << file.string() << std::endl;
-                        loadedAll &= false;
-                    }
-                }
-                else
-                {
-                    std::cerr << "error: couldn't parse pkg-config fields from file " << file.string() << std::endl;
-                    loadedAll &= false;
-                }
-                
-            }
-            
+            LOG_ERROR_S << "Could not parse Typelib file " << typeRegistryPath << " which was referred to as 'type_registriy' for typekit " << typekitName << " in " << tpkg.typekit.sourceFile;
+            loadedAll = false;
+            continue;
         }
-        
+
+        // Load types to typeToTypekit.
+        boost::replace_last(typeRegistryPath, "tlb", "typelist");
+        LOG_INFO_S << "Parsing typelist file " <<typeRegistryPath;
+        if(!loadTypeToTypekitMapping(typeRegistryPath, typekitName))
+        {
+            LOG_ERROR_S << "Could not parse Typelist file " << typeRegistryPath;;
+            loadedAll = false;
+        }
     }
-    
     return loadedAll;
 }
 

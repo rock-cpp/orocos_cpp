@@ -1,0 +1,11 @@
+prefix=/media/wirkus/Data/development/rock-runtime/install
+exec_prefix=${prefix}  # defining another variable in terms of the first
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: Orocos-RTT                          # human-readable name
+Description: Open Robot Control Software: Real-Time Tookit # human-readable description
+Version: 2.8.99
+Libs: -L${libdir} -lorocos-rtt-gnulinux  -L/usr/lib/x86_64-linux-gnu -lpthread -lrt  # If some RTT headers include inline calls to other libraries, we need to specify these here too.
+Libs.private:  -L/usr/lib/x86_64-linux-gnu -lboost_filesystem -L/usr/lib/x86_64-linux-gnu -lboost_system -L/usr/lib/x86_64-linux-gnu -lboost_serialization -L/usr/lib/x86_64-linux-gnu -lxerces-c -L/usr/lib/x86_64-linux-gnu -lpthread -lrt -ldl
+Cflags: -I${includedir}  -DOROCOS_TARGET=gnulinux  
