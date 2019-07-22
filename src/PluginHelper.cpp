@@ -85,7 +85,7 @@ bool PluginHelper::loadTypekitAndTransports(const std::string& typekitName)
             throw std::runtime_error("PkgConfig for OROCOS RTT package was not loaded");
         }
         std::string libdir;
-        pkg.getProperty("libdir", libdir);
+        pkg.getVariable("libdir", libdir);
         if(!loader.loadTypekits(libdir + "/orocos/gnulinux/"))
             throw std::runtime_error("Error, failed to load rtt basis typekits");
 
