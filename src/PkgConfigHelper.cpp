@@ -112,7 +112,7 @@ void truncateComment(std::string& line)
 bool parseVariable(const std::string& line, std::string& var_name, std::string& value)
 {
     //Start of line, followed by a word, followed by a '=' sign, NO whitespace
-    std::regex e("^(\\w+)=(.*)");
+    std::regex e(R"(^([\w\d\.-]+)=(.*))");
     std::smatch sm;
     if(std::regex_match(line, sm, e)){
         assert(sm.size() == 3);
@@ -141,7 +141,7 @@ bool parseVariable(const std::string& line, std::string& var_name, std::string& 
 bool parseProperty(const std::string& line, std::string& prop_name, std::string& value)
 {
     //Start of line, followed by a sequence of characters, followed by a ':' sign, followed by a whitespace
-    std::regex e(R"((.+):\s(.*))");
+    std::regex e(R"(^([\w\d\.-]+):(.*))");
     std::smatch sm;
     if(std::regex_match(line, sm, e)){
         assert(sm.size() == 3);

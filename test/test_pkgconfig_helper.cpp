@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE(parsePkgConfig)
         std::pair<std::string,std::string>("project_name", "test"),
         std::pair<std::string,std::string>("deffile", "/my/prefix/share/orogen/test.orogen"),
         std::pair<std::string,std::string>("type_registry", "/my/prefix/share/orogen/test.tlb"),
-        std::pair<std::string,std::string>("typekits", " base test std"),
+        std::pair<std::string,std::string>("typekits", "base test std"),
         std::pair<std::string,std::string>("deployed_tasks", "consumer,producer,relay"),
         std::pair<std::string,std::string>("deployed_tasks_with_models", "consumer,my::Consumer,producer,my::Producer"),
     };
