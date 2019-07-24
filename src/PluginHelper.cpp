@@ -1,6 +1,6 @@
 #include "PluginHelper.hpp"
 #include <rtt/types/TypekitPlugin.hpp>
-    
+
 #include <boost/filesystem.hpp>
 #include <boost/tokenizer.hpp>
 
@@ -25,7 +25,7 @@ std::vector< std::string > PluginHelper::getNeededTypekits(const std::string& co
     auto it = componentToTypeKitsMap.find(componentName);
     if(it != componentToTypeKitsMap.end())
         return it->second;
-    
+
     PkgConfigRegistryPtr pkgreg = PkgConfigRegistry::get();
     OrogenPkgConfig pkg;
     if(!pkgreg->getOrogen(componentName, pkg)){
@@ -61,7 +61,7 @@ void PluginHelper::loadAllPluginsInDir(const std::string& path)
 
     int cnt = 0;
     boost::shared_ptr<RTT::plugin::PluginLoader> loader = RTT::plugin::PluginLoader::Instance();
-    
+
     boost::filesystem::directory_iterator end_it; // default construction yields past-the-end
     for (boost::filesystem::directory_iterator it( pluginDir );
         it != end_it; it++ )
@@ -75,7 +75,7 @@ void PluginHelper::loadAllPluginsInDir(const std::string& path)
     }
     base::Time end = base::Time::now();
 
-    std::cout << "Loaded " << cnt << " typekits in " << (end - start).toSeconds() << " Seconds " << std::endl; 
+    std::cout << "Loaded " << cnt << " typekits in " << (end - start).toSeconds() << " Seconds " << std::endl;
 }
 
 bool PluginHelper::loadTypekitAndTransports(const std::string& typekitName)
@@ -83,10 +83,10 @@ bool PluginHelper::loadTypekitAndTransports(const std::string& typekitName)
     //already loaded, we can just exit
     if(RTT::types::TypekitRepository::hasTypekit(typekitName))
         return true;
-    
+
     //Supported transport types
     static const std::vector<std::string> knownTransports = {"corba", "mqueue", "typelib"};
-    
+
     PkgConfigRegistryPtr pkgreg = PkgConfigRegistry::get();
     RTT::plugin::PluginLoader &loader(*RTT::plugin::PluginLoader::Instance());
     PkgConfig pkg;
@@ -103,10 +103,10 @@ bool PluginHelper::loadTypekitAndTransports(const std::string& typekitName)
 
         if(!loader.loadPlugins(libdir + "/orocos/gnulinux/"))
             throw std::runtime_error("Error, failed to load rtt basis plugins");
-        
+
         return true;
     }
-    
+
     TypekitPkgConfig tpkg;
     if(!pkgreg->getTypekit(typekitName, tpkg))
         throw std::runtime_error("No PkgConfig file for typekit of component " + typekitName + " was loaded.");
@@ -137,23 +137,23 @@ bool PluginHelper::loadTypekitAndTransports(const std::string& typekitName)
         if(!loader.loadLibrary(libDir + "/lib" + typekitName + "-transport-" + transport + "-" xstr(OROCOS_TARGET) ".so"))
             throw std::runtime_error("Error, could not load transport " + transport + " for component " + typekitName);
     }
-    
+
     return true;
 }
 
 //This method loads all typkits required for a task model.
 bool PluginHelper::loadAllTypekitsForModel(const std::string &modelName){
-	std::string componentName = modelName.substr(0, modelName.find_first_of(':'));
+    std::string componentName = modelName.substr(0, modelName.find_first_of(':'));
 
-	std::vector<std::string> neededTks = PluginHelper::getNeededTypekits(componentName);
-	bool retVal = false;
-	for(const std::string &tk: neededTks)
-	{
-	    if(RTT::types::TypekitRepository::hasTypekit(tk))
-	        continue;
+    std::vector<std::string> neededTks = PluginHelper::getNeededTypekits(componentName);
+    bool retVal = false;
+    for(const std::string &tk: neededTks)
+    {
+        if(RTT::types::TypekitRepository::hasTypekit(tk))
+            continue;
 
-	    retVal = true;
-	    PluginHelper::loadTypekitAndTransports(tk);
-	}
-	return retVal;
+        retVal = true;
+        PluginHelper::loadTypekitAndTransports(tk);
+    }
+    return retVal;
 }
