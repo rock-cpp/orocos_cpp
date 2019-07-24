@@ -37,8 +37,20 @@ std::vector< std::string > PluginHelper::getNeededTypekits(const std::string& co
     }
 
     std::vector<std::string> ret = PkgConfigHelper::vectorizeTokenSeparatedString(neededTypekitsString, " ");
+    // Name of orocos-rtt typekit in RTT::types::TypekitRepository is 'rtt-types', but the rock pkg
+    // config files call it as 'orocos'
+    // Result is that RTT::types::TypekitRepository::hasTypekit(tk=orocos) always returns false and
+    // the loading process is triggered
+    // The following loop works around this naming inconsistency
+    //
+    // Note: It is not clear 'why' oroGen generates the tpekit name as 'orocos'. Maybe because of
+    //       orocos.rb specific things? Maybe becausen there was a renaming somewhen in the past?
+    for(std::string& tk : ret){
+        if(tk == "orocos")
+            tk = "rtt-types";
+    }
     componentToTypeKitsMap.insert(std::make_pair(componentName, ret));
-    
+
     return ret;
 }
 
