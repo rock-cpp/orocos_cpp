@@ -1,0 +1,18 @@
+# Generated from orogen/lib/orogen/templates/typekit/typekit.pc
+
+prefix=/media/wirkus/Data/development/rock-runtime/install
+exec_prefix=${prefix}
+libdir=${prefix}/lib/orocos/types
+includedir=${prefix}/include/orocos
+
+project_name=aggregator
+deffile=${prefix}/share/orogen/aggregator.orogen
+type_registry=${prefix}/share/orogen/aggregator.tlb
+
+Name: aggregatorTypekit
+Version: 0.0
+Requires: aggregator
+Description: aggregator types support for the Orocos type system
+Libs: -L${libdir} -laggregator-typekit-gnulinux
+Cflags: -I${includedir} -I${includedir}/aggregator/types -I/media/wirkus/Data/development/rock-runtime/install/include "-DOROCOS_TARGET=gnulinux" "-I/media/wirkus/Data/development/rock-runtime/install/include" "-I/usr/include/eigen3" "-I/media/wirkus/Data/development/rock-runtime/install/include/orocos" "-I/media/wirkus/Data/development/rock-runtime/install/include/orocos/base/types" "-I/media/wirkus/Data/development/rock-runtime/install/include/orocos/std/types"
+

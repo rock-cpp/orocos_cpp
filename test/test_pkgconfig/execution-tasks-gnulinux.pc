@@ -1,0 +1,23 @@
+# Generated from orogen/lib/orogen/templates/tasks/tasks.pc
+
+prefix=/media/wirkus/Data/development/rock-runtime/install
+exec_prefix=${prefix}
+libdir=${prefix}/lib/orocos
+includedir=${prefix}/include/orocos
+
+
+
+project_name=execution
+deffile=${prefix}/share/orogen/execution.orogen
+task_models=execution::CNDHandler,execution::ProcessServer
+typekits=execution base orocos std
+
+Name: executionTasks
+Version: 0.1
+Description: tasks defined for the execution oroGen project
+Requires: 
+
+Libs:  -L${libdir} -lexecution-tasks-gnulinux
+
+Cflags: -I${includedir} -I/media/wirkus/Data/development/rock-runtime/install/include -DOROCOS_TARGET=gnulinux -I/media/wirkus/Data/development/rock-runtime/install/include/orocos -I/media/wirkus/Data/development/rock-runtime/install/include/orocos/std/types -I/usr/include/eigen3 -I/media/wirkus/Data/development/rock-runtime/install/include/orocos/base/types -I/media/wirkus/Data/development/rock-runtime/install/include/orocos/logger/types -I${includedir}/execution/types
+

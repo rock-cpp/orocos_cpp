@@ -19,7 +19,7 @@ public:
      * This function loads the typekits and transports of the given
      * component.
      * */
-    static bool loadTypekitAndTransports(const std::string &componentName);
+    static bool loadTypekitAndTransports(const std::string &typekitName);
 
     /**
      * This method loads all typkits required for a task model.
