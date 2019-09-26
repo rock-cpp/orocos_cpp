@@ -1,7 +1,6 @@
 #include "PkgConfigRegistry.hpp"
 #include "PkgConfigHelper.hpp"
 #include <regex>
-#include <boost/filesystem.hpp>
 #include <base-logging/Logging.hpp>
 
 orocos_cpp::PkgConfigRegistryPtr orocos_cpp::__pkgcfgreg(nullptr);
@@ -42,7 +41,9 @@ bool orocos_cpp::PkgConfig::getProperty(const std::string &fieldName, std::strin
 bool orocos_cpp::PkgConfig::load(const std::string &filepath)
 {
     bool st = PkgConfigHelper::parsePkgConfig(filepath, variables, properties);
-    bool got_name = getProperty("Name", name);
+    if(st){
+        st = getProperty("Name", name);
+    }
     sourceFile = filepath;
     return st;
 }
@@ -237,6 +238,7 @@ bool orocos_cpp::PkgConfigRegistry::addFile(const std::string &filepath)
 
     //Is Deployment?
     if(isDeploymentPkg(filename, deploymentName)){
+        LOG_DEBUG_S << "PkgConfig file " << filename << " refers to a Deployment package." << std::endl;
         bool st = pkg.load(filepath);
         std::map<std::string, PkgConfig>::iterator it = deployments.find(deploymentName);
         if(it != deployments.end()){
@@ -249,6 +251,7 @@ bool orocos_cpp::PkgConfigRegistry::addFile(const std::string &filepath)
 
     //Is Proxy?
     else if(isProxiesPkg(filename, orogenProjectName)){
+        LOG_DEBUG_S << "PkgConfig file " << filename << " refers to a Proxies package." << std::endl;
         bool st = pkg.load(filepath);
         std::map<std::string, OrogenPkgConfig>::iterator it = orogen.find(orogenProjectName);
 
@@ -267,6 +270,7 @@ bool orocos_cpp::PkgConfigRegistry::addFile(const std::string &filepath)
 
     //Is OrogenProject
     else if(isOrogenProjectPkg(filename, orogenProjectName)){
+        LOG_DEBUG_S << "PkgConfig file " << filename << " refers to a Proxies package." << std::endl;
         bool st = pkg.load(filepath);
         std::map<std::string, OrogenPkgConfig>::iterator it = orogen.find(orogenProjectName);
 
@@ -285,6 +289,7 @@ bool orocos_cpp::PkgConfigRegistry::addFile(const std::string &filepath)
 
     //Is OrogenTasks
     else if(isOrogenTasksPkg(filename, orogenProjectName, arch)){
+        LOG_DEBUG_S << "PkgConfig file " << filename << " refers to a Orogen-Tasks package." << std::endl;
         bool st = pkg.load(filepath);
         std::map<std::string, OrogenPkgConfig>::iterator it = orogen.find(orogenProjectName);
 
@@ -303,6 +308,7 @@ bool orocos_cpp::PkgConfigRegistry::addFile(const std::string &filepath)
 
     //Is Transports
     else if(isTransportPkg(filename, typekitName, transportName, arch)){
+        LOG_DEBUG_S << "PkgConfig file " << filename << " refers to a Transports package." << std::endl;
         bool st = pkg.load(filepath);
         std::map<std::string, TypekitPkgConfig>::iterator it = typekits.find(typekitName);
 
@@ -322,6 +328,7 @@ bool orocos_cpp::PkgConfigRegistry::addFile(const std::string &filepath)
 
     //Is Typekit
     else if(isTypekitPkg(filename, typekitName, arch)){
+        LOG_DEBUG_S << "PkgConfig file " << filename << " refers to a Typekit package." << std::endl;
         bool st = pkg.load(filepath);
         std::map<std::string, TypekitPkgConfig>::iterator it = typekits.find(typekitName);
         if(it == typekits.end()){
@@ -340,6 +347,7 @@ bool orocos_cpp::PkgConfigRegistry::addFile(const std::string &filepath)
     //IS OrocosRTT
     //RTT follows a different convention. Kind of library is determined by folder they are installed in.
     else if(isOrocosRTTPkg(filename, arch)){
+        LOG_DEBUG_S << "PkgConfig file " << filename << " refers to a Orocos-RTT package." << std::endl;
         if(orocosRTTPkg.isLoaded()){
             LOG_WARN_S << "Ignoring PkgConfig file " << filepath << ". It describes the package orocos-rtt, but that was already described by the PkgConfig file "<<orocosRTTPkg.sourceFile;
             return false;
@@ -351,14 +359,95 @@ bool orocos_cpp::PkgConfigRegistry::addFile(const std::string &filepath)
     }
     else{
         //Do nothing.. we don't load pkgconfig files for arbitrary libraries, since we'll not need them.
+        LOG_DEBUG_S << "PkgConfig file " << filename << " refers to a Non-Rock package." << std::endl;
         return false;
     }
 }
 
+bool load_pkg(const fs::path& pkg_path, orocos_cpp::PkgConfig& pkg)
+{
+    if(!fs::exists(pkg_path)){
+        LOG_WARN_S << "File " << pkg_path << " not found.";
+    }else{
+        bool st = pkg.load(pkg_path.string());
+        if(st){
+            LOG_INFO_S << "Loading PkgConfig " << pkg_path << "\t[OK]";
+        }else{
+            LOG_ERROR_S << "Loading PkgConfig " << pkg_path << "\t[FAILED]";
+        }
+        return st;
+    }
+    return false;
+}
+
+
+bool orocos_cpp::PkgConfigRegistry::loadOrogenPkg(const fs::path &filepath)
+{
+    //Extract name of orogen package, target and init transports
+    std::string filename = filepath.filename().string();
+    std::string package_name = filename.substr(std::string("orogen-project-").size(), filename.size()-std::string("orogen-project-").size()-std::string(".pc").size());
+    const fs::path pkg_search_path = filepath.parent_path();
+    std::string target = std::getenv("OROCOS_TARGET");
+    std::vector<std::string> known_transports = {"corba","mqueue","typelib"};
+
+    //Load PkgConfig file of OrogenProject
+    PkgConfig pkg_proj;
+    bool st = pkg_proj.load(filepath.string());
+    if(!st){
+        LOG_ERROR_S << "Error loading PkgConfig file of OroGen Project-package "<<package_name<<" from "<<filepath.string();
+        return st;
+    }
+    OrogenPkgConfig opkg;
+    opkg.project = pkg_proj;
+
+    //Load Tasks package, if it is defined
+    PkgConfig pkg;
+    fs::path pkg_path = pkg_search_path / (package_name + "-tasks-"+target+".pc");
+    st = load_pkg(pkg_path, pkg);
+    opkg.tasks = pkg;
+    //Load Proxies package, if it is defined
+    pkg_path = pkg_search_path / (package_name + "-proxies" + ".pc");
+    st = load_pkg(pkg_path, pkg);
+    opkg.proxies = pkg;
+
+    //store orogen package
+    orogen[package_name] = opkg;
+
+    //Load typekit-PkgConfig, if it is defined
+    pkg_path = pkg_search_path / (package_name + "-typekit-"+target+".pc");
+    st = load_pkg(pkg_path, pkg);
+    if(st){
+        TypekitPkgConfig tpkg;
+        tpkg.typekit = pkg;
+
+        //Load transports-PkgConfig, if it is defined
+        for(const std::string& t : known_transports){
+            pkg_path = pkg_search_path / (package_name + "-transport-" + t + "-"  +target + ".pc");
+            st = load_pkg(pkg_path, pkg);
+            if(st){
+                tpkg.transports[t] = pkg;
+            }
+        }
+        typekits[package_name] = tpkg;
+    }
+    return true;
+}
+
+bool orocos_cpp::PkgConfigRegistry::loadDeploymentPkg(const fs::path &filepath)
+{
+    //Extract name of orogen package, target and init transports
+    std::string filename = filepath.filename().string();
+    std::string package_name = filename.substr(std::string("orogen-").size(), filename.size()-std::string("orogen-").size()-std::string(".pc").size());
+
+    //Load deployment
+    PkgConfig pkg;
+    bool st = load_pkg(filepath, pkg);
+    deployments[package_name] = pkg;
+    return st;
+}
+
 void orocos_cpp::PkgConfigRegistry::scan(const std::vector<std::string> &searchPaths)
 {
-    namespace fs = boost::filesystem;
-
     for(const std::string& path : searchPaths){
         if(!fs::is_directory(path)){
             LOG_WARN_S << "Skipping directory " << path << " since it is not a valid directory";
@@ -367,11 +456,39 @@ void orocos_cpp::PkgConfigRegistry::scan(const std::vector<std::string> &searchP
         for (fs::directory_iterator itr(path); itr!=fs::directory_iterator(); ++itr)
         {
             if( fs::is_regular_file(*itr) ){
-                bool st = addFile(itr->path().string());
-                if(st){
-                    LOG_INFO_S << "Loaded PkgConfig file " << itr->path().string() << "\t" << "[OK]";
-                }else{
-                    LOG_INFO_S << "Loaded PkgConfig file " << itr->path().string() << "\t" << "[IGNORED]";
+                fs::path filepath = *itr;
+                std::string filename = filepath.filename().string();
+                //In Rock different special kinds of libraries can be identified by
+                //patterns in their file names. Following we identify if the
+                //PkgConfig file corresponds to a Orogen-Package or
+                //if it refers to a oroge-deployment package and the corresponding
+                //"package-loading-method" is called. All other packages are ignored.
+                //Note that in the packge-loading-method further PkgConfig files are
+                //possibly loaded. I.e.
+                //if a file is ignored here, it sill might get loaded in the
+                //package-loading-method.
+                if(filename.rfind("orogen-project-", 0) != std::string::npos){
+                    LOG_INFO_S << "File " << filepath << "refers to a OroGen package.";
+                    bool st = loadOrogenPkg(*itr);
+                    if(!st){
+                        LOG_ERROR_S << "Error loading PkgConfig file of orogen package " << filepath;
+                    }
+                }
+                else if(filename.rfind("orogen-", 0) != std::string::npos){
+                    LOG_INFO_S << "File " << filepath << "refers to a OroGen Deployment package.";
+                    bool st = loadDeploymentPkg(*itr);
+                    if(!st){
+                        LOG_ERROR_S << "Error loading PkgConfig file of orogen deployment package " << filepath;
+                    }
+                }
+                else if(filename.rfind("orocos-rtt-", 0) != std::string::npos){
+                    LOG_INFO_S << "File " << filepath << "refers to the Orocos-RTT package.";
+                    PkgConfig pkg;
+                    bool st = pkg.load(filepath.string());
+                    if(!st){
+                        LOG_ERROR_S << "Error loading Orocos-RTT PkgConfig file from " << filepath;
+                    }
+                    orocosRTTPkg = pkg;
                 }
             }
         }

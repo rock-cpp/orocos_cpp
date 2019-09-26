@@ -48,13 +48,13 @@ BOOST_AUTO_TEST_CASE(parsePkgConfig)
     BOOST_CHECK(!oro.tasks.isLoaded()); //Not present in folder
 
     BOOST_CHECK(reg.getOrogen("execution", oro));
-    BOOST_CHECK(!oro.project.isLoaded()); //Not present in folder
+    BOOST_CHECK(oro.project.isLoaded());
     BOOST_CHECK(oro.proxies.isLoaded());
     BOOST_CHECK(oro.tasks.isLoaded());
 
     std::vector<std::string> expected_orogen = {"aggregator", "execution"};
     std::vector<std::string> expected_deployments = {"ping_pong_aba_a"};
-    std::vector<std::string> expected_typekits = {"aggregator", "test"};
+    std::vector<std::string> expected_typekits = {"aggregator"};
 
     std::vector<std::string> regoro = reg.getRegisteredOrogenNames();
     BOOST_CHECK(regoro == expected_orogen);

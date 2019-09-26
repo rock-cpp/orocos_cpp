@@ -2,6 +2,9 @@
 #include <map>
 #include <vector>
 #include <memory>
+#include <boost/filesystem.hpp>
+
+namespace fs = boost::filesystem;
 
 namespace orocos_cpp{
 class PkgConfig
@@ -98,7 +101,10 @@ protected:
     bool isDeploymentPkg(const std::string& filename, std::string& deploymentName);
     bool isOrocosRTTPkg(const std::string &filename, std::string &arch);
 
+    //[[deprecated(Due to performance issues with the matching of regular expressions this function is now no longer used. Instead 'scan' calls 'loadOrogenPkg and loadDeploymentPkg)]]
     bool addFile(const std::string& filepath);
+    bool loadOrogenPkg(const fs::path &filepath);
+    bool loadDeploymentPkg(const fs::path &filepath);
     void scan(const std::vector<std::string>& searchPaths);
 
     //Containers to store PkgConfig files for different categories of libraries used
