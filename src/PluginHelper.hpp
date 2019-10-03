@@ -15,6 +15,7 @@ private:
 public:
     static void loadAllPluginsInDir(const std::string &path);
 
+    static bool loadAllTypekitAndTransports();
     /**
      * This function loads the typekits and transports of the given
      * component.

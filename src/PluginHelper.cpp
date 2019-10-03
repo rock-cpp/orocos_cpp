@@ -78,6 +78,17 @@ void PluginHelper::loadAllPluginsInDir(const std::string& path)
     std::cout << "Loaded " << cnt << " typekits in " << (end - start).toSeconds() << " Seconds " << std::endl;
 }
 
+bool PluginHelper::loadAllTypekitAndTransports()
+{
+    PkgConfigRegistryPtr pkgreg = PkgConfigRegistry::get();
+    pkgreg->initialize();
+    bool all_okay=true;
+    for(std::string tk_name : pkgreg->getRegisteredTypekitNames()){
+        all_okay &= PluginHelper::loadTypekitAndTransports(tk_name);
+    }
+    return all_okay;
+}
+
 bool PluginHelper::loadTypekitAndTransports(const std::string& typekitName)
 {
     //already loaded, we can just exit
