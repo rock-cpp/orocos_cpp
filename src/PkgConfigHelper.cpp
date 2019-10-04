@@ -166,9 +166,9 @@ bool PkgConfigHelper::parsePkgConfig(const std::string& filePathOrName, std::map
     }
 
     std::ifstream fileStream(filepath);
-    if(!fileStream.is_open())
-    {
-        throw std::runtime_error("Error, could not open pkg-config file " + filePathOrName + " in the PKG_CONFIG_PATH");
+    if(!fileStream.is_open()){
+        LOG_INFO_S << "Could not open file " << filepath;
+        return false;
     }
 
     bool all_ok=true;

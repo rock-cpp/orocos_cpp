@@ -10,12 +10,10 @@
 #include <stdlib.h>
 
 using namespace orocos_cpp;
-
-BOOST_AUTO_TEST_CASE(parsePkgConfig)
+BOOST_AUTO_TEST_CASE(loadAllPackages)
 {
     int ret = putenv("PKG_CONFIG_PATH=../../test/test_pkgconfig");
-    PkgConfigRegistry reg;
-    reg.initialize();
+    PkgConfigRegistry reg({}, true);
 
     PkgConfig pkg;
     BOOST_CHECK(reg.getDeployment("ping_pong_aba_a", pkg));
@@ -62,5 +60,38 @@ BOOST_AUTO_TEST_CASE(parsePkgConfig)
     BOOST_CHECK(regdep == expected_deployments);
     std::vector<std::string> regtyp = reg.getRegisteredTypekitNames();
     BOOST_CHECK(regtyp == expected_typekits);
+}
+
+BOOST_AUTO_TEST_CASE(loadNamedPackages)
+{
+    int ret = putenv("PKG_CONFIG_PATH=../../test/test_pkgconfig");
+    PkgConfigRegistry reg({"ping_pong_aba_a"}, false);
+
+    PkgConfig pkg;
+    //Only the named package is loaded
+    BOOST_CHECK_EQUAL(reg.getRegisteredDeploymentNames().size(), 1);
+    BOOST_CHECK_EQUAL(reg.getRegisteredOrogenNames().size(), 0);
+    BOOST_CHECK_EQUAL(reg.getRegisteredTypekitNames().size(), 0);
+    std::vector<std::string> packages = reg.getRegisteredDeploymentNames();
+    BOOST_CHECK(std::find(packages.begin(),packages.end(),"ping_pong_aba_a") != packages.end());
+
+    //Not-pre-loaded packages can still be searched and post-loaded
+    TypekitPkgConfig typ;
+    BOOST_CHECK(reg.getTypekit("aggregator", typ));
+    BOOST_CHECK_EQUAL(reg.getRegisteredDeploymentNames().size(), 1);
+    BOOST_CHECK_EQUAL(reg.getRegisteredOrogenNames().size(), 1);
+    BOOST_CHECK_EQUAL(reg.getRegisteredTypekitNames().size(), 1);
+
+    OrogenPkgConfig oro;
+    BOOST_CHECK(reg.getOrogen("execution", oro));
+    BOOST_CHECK_EQUAL(reg.getRegisteredDeploymentNames().size(), 1);
+    BOOST_CHECK_EQUAL(reg.getRegisteredOrogenNames().size(), 2);
+    BOOST_CHECK_EQUAL(reg.getRegisteredTypekitNames().size(), 1);
+
+    BOOST_CHECK_EQUAL(reg.getOrocosRTT(pkg, false), false);
+    BOOST_CHECK_EQUAL(reg.getOrocosRTT(pkg, true), true);
+
+    //Terminates if unknown apcakge is requested
+    BOOST_CHECK(reg.getOrogen("gibt'snicht", oro) == false);
 }
 
