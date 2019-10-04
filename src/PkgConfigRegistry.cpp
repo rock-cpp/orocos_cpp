@@ -65,7 +65,7 @@ bool orocos_cpp::PkgConfigRegistry::loadPackages(const std::vector<std::string>&
 orocos_cpp::PkgConfigRegistryPtr orocos_cpp::PkgConfigRegistry::initialize(const std::vector<std::string>& packageNames, bool loadAllPackages)
 {
     if(__pkgcfgreg){
-        LOG_ERROR_S << "PkgConfigRegistry::initialize was already called earlier!";
+        LOG_WARN_S << "PkgConfigRegistry::initialize was already called earlier!";
     }
     __pkgcfgreg = PkgConfigRegistryPtr(new PkgConfigRegistry(packageNames, loadAllPackages));
 
@@ -79,7 +79,7 @@ bool orocos_cpp::PkgConfigRegistry::getDeployment(const std::string &name, oroco
         if(!searchPackageIfNotLoaded){
             return false;
         }
-        LOG_WARN_S << "Deployment Package " << name << " was requested but is not present in PkgConfigregistry. Trying to find it.";
+        LOG_DEBUG_S << "Deployment Package " << name << " was requested but is not present in PkgConfigregistry. Trying to find it.";
         bool st = findAndLoadPackage(name);
         if(st){
             return getDeployment(name, pkg, false);
@@ -98,7 +98,7 @@ bool orocos_cpp::PkgConfigRegistry::getTypekit(const std::string &name, orocos_c
         if(!searchPackageIfNotLoaded){
             return false;
         }
-        LOG_WARN_S << "Typekit Package " << name << " was requested but is not present in PkgConfigregistry. Trying to find it.";
+        LOG_DEBUG_S << "Typekit Package " << name << " was requested but is not present in PkgConfigregistry. Trying to find it.";
         bool st = findAndLoadPackage(name);
         if(st){
             return getTypekit(name, pkg, false);
@@ -117,7 +117,7 @@ bool orocos_cpp::PkgConfigRegistry::getOrogen(const std::string &name, orocos_cp
         if(!searchPackageIfNotLoaded){
             return false;
         }
-        LOG_WARN_S << "Orogen Package " << name << " was requested but is not present in PkgConfigregistry. Trying to find it.";
+        LOG_DEBUG_S << "Orogen Package " << name << " was requested but is not present in PkgConfigregistry. Trying to find it.";
         bool st = findAndLoadPackage(name);
         if(st){
             return getOrogen(name, pkg, false);
@@ -135,7 +135,7 @@ bool orocos_cpp::PkgConfigRegistry::getOrocosRTT(orocos_cpp::PkgConfig &pkg, boo
         if(!searchPackageIfNotLoaded){
             return false;
         }
-        LOG_WARN_S << "The Orocos-RTT Package was requested but is not present in PkgConfigregistry. Trying to find it.";
+        LOG_DEBUG_S << "The Orocos-RTT Package was requested but is not present in PkgConfigregistry. Trying to find it.";
         bool st = findAndLoadPackage("rtt");
         if(st){
             return getOrocosRTT(pkg, false);
@@ -510,7 +510,7 @@ bool orocos_cpp::PkgConfigRegistry::findAndLoadPackage(const std::string& pname,
     LOG_DEBUG_S << "Searching for package " << pname;
     for(const fs::path& path : searchPaths){
         if(!fs::is_directory(path)){
-            LOG_ERROR_S << "Skipping directory " << path << " since it is not a valid directory";
+            LOG_WARN_S << "Skipping directory " << path << " since it is not a valid directory";
             continue;
         }
 
@@ -519,7 +519,7 @@ bool orocos_cpp::PkgConfigRegistry::findAndLoadPackage(const std::string& pname,
             std::string target = std::getenv("OROCOS_TARGET");
             fpath = path / ("orocos-rtt-"+target+".pc");
             if(fs::exists(fpath)){
-                LOG_INFO_S << "PkgConfig for RTT Package was found in file " << fpath;
+                LOG_DEBUG_S << "PkgConfig for RTT Package was found in file " << fpath;
                 PkgConfig pkg;
                 bool st = pkg.load(fpath.string());
                 if(st){
@@ -550,7 +550,7 @@ bool orocos_cpp::PkgConfigRegistry::findAndLoadPackage(const std::string& pname,
         //Check for oroGen package
         fpath = path / ("orogen-project-"+pname+".pc");
         if(fs::exists(fpath)){
-            LOG_INFO_S << "PkgConfig for Orogen Package with name " << pname << " found in file " << fpath;
+            LOG_DEBUG_S << "PkgConfig for Orogen Package with name " << pname << " found in file " << fpath;
             bool st = loadOrogenPkg(fpath);
             if(st){
                 LOG_INFO_S << "PkgConfig " << fpath << "  for Orogen Package with name " << pname << " was sucessfully loaded";
@@ -563,7 +563,7 @@ bool orocos_cpp::PkgConfigRegistry::findAndLoadPackage(const std::string& pname,
         //Check for Deployment package
         fpath = path / ("orogen-"+pname+".pc");
         if(fs::exists(fpath)){
-            LOG_INFO_S << "PkgConfig for Orogen Deployment Package with name " << pname << " found in file " << fpath;
+            LOG_DEBUG_S << "PkgConfig for Orogen Deployment Package with name " << pname << " found in file " << fpath;
             bool st = loadDeploymentPkg(fpath);
             if(st){
                 LOG_INFO_S << "PkgConfig " << fpath << "  for Orogen Deployment Package with name " << pname << " was sucessfully loaded";
@@ -581,7 +581,7 @@ void orocos_cpp::PkgConfigRegistry::loadAllPackages(const std::vector<std::strin
 {
     LOG_INFO_S << "Loading all packages defined in search path";
     for(const std::string& path : searchPaths){
-        LOG_INFO_S << "Scanning " << path;
+        LOG_DEBUG_S << "Scanning " << path;
         if(!fs::is_directory(path)){
             LOG_WARN_S << "Skipping directory " << path << " since it is not a valid directory";
             continue;

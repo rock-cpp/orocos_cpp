@@ -9,6 +9,7 @@
 #include "PkgConfigRegistry.hpp"
 #include "PkgConfigHelper.hpp"
 #include <iostream>
+#include <base-logging/Logging.hpp>
 
 #define xstr(s) str(s)
 #define str(s) #s
@@ -94,8 +95,11 @@ bool PluginHelper::loadAllTypekitAndTransports()
 bool PluginHelper::loadTypekitAndTransports(const std::string& typekitName)
 {
     //already loaded, we can just exit
-    if(RTT::types::TypekitRepository::hasTypekit(typekitName))
+    if(RTT::types::TypekitRepository::hasTypekit(typekitName)){
+        LOG_DEBUG_S << "Typekit and transport for " << typekitName << " was already laoded earlier";
         return true;
+    }
+    LOG_INFO_S << "Loading Typekit and Transport for " << typekitName;
 
     //Supported transport types
     static const std::vector<std::string> knownTransports = {"corba", "mqueue", "typelib"};
@@ -103,8 +107,9 @@ bool PluginHelper::loadTypekitAndTransports(const std::string& typekitName)
     PkgConfigRegistryPtr pkgreg = PkgConfigRegistry::get();
     RTT::plugin::PluginLoader &loader(*RTT::plugin::PluginLoader::Instance());
     PkgConfig pkg;
-    if(typekitName == "rtt-types" || typekitName == "orocos" )
+    if(typekitName == "rtt-types" || typekitName == "orocos" || typekitName == "rtt")
     {
+        LOG_DEBUG_S << "Loading RTT typekit";
         //special case, rtt does not follow the convention below
         if(!pkgreg->getOrocosRTT(pkg)){
             throw std::runtime_error("PkgConfig for OROCOS RTT package was not loaded");
@@ -131,7 +136,9 @@ bool PluginHelper::loadTypekitAndTransports(const std::string& typekitName)
     tpkg.typekit.getVariable("libdir", libDir);
 
     //Library of typekit is named after a specific file pattern
-    if(!loader.loadLibrary(libDir + "/lib" + typekitName + "-typekit-" xstr(OROCOS_TARGET) ".so"))
+    std::string fname =  libDir + "/lib" + typekitName + "-typekit-" xstr(OROCOS_TARGET) ".so";
+    LOG_DEBUG_S << "Loading typekit from " << fname;
+    if(!loader.loadLibrary(fname))
         throw std::runtime_error("Error, could not load typekit for component " + typekitName);
 
     //Load transports for typekit
@@ -147,7 +154,9 @@ bool PluginHelper::loadTypekitAndTransports(const std::string& typekitName)
         }
 
         //Library of transport for a typekit is named after a specific file pattern
-        if(!loader.loadLibrary(libDir + "/lib" + typekitName + "-transport-" + transport + "-" xstr(OROCOS_TARGET) ".so"))
+        fname = libDir + "/lib" + typekitName + "-transport-" + transport + "-" xstr(OROCOS_TARGET) ".so";
+        LOG_DEBUG_S << "Loading typekit from " << fname;
+        if(!loader.loadLibrary(fname))
             throw std::runtime_error("Error, could not load transport " + transport + " for component " + typekitName);
     }
 

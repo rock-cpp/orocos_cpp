@@ -6,6 +6,7 @@
 
 namespace orocos_cpp {
 
+//Taken from /media/wirkus/Data/development/rock-runtime/tools/orocos.rb/ext/rorocos/corba_name_service_client.cc
 CosNaming::NamingContext_var getNameService(const std::string name_service_ip, const std::string name_service_port)
 {
     if(CORBA::is_nil(RTT::corba::ApplicationServer::orb))
@@ -78,13 +79,13 @@ bool initializeCORBA(int argc, char**argv, std::string host="")
     return true;
 }
 
-bool OrocosCpp::initialize(const OrocosCppConfig& config)
+bool OrocosCpp::initialize(const OrocosCppConfig& config, bool quiet)
 {
     bool st;
 
     //Init CORBA
     if(config.init_corba){
-        std::cout << "Initializing CORBA.. " << std::endl;
+        if(!quiet) std::cout << "Initializing CORBA.. " << std::endl;
         st = initializeCORBA(0, {}, config.corba_host);
         if(!st){
             std::cerr << "Failed to initialze CORBA" << std::endl;
@@ -93,7 +94,7 @@ bool OrocosCpp::initialize(const OrocosCppConfig& config)
     }
 
     //Init PkgConfig Registry
-    std::cout << "Loading Rock-packages.." << std::endl;
+    if(!quiet) std::cout << "\nLoading Rock-packages.." << std::endl;
     package_registry = PkgConfigRegistry::initialize(config.package_initialization_whitelist, config.load_all_packages);
     if(!package_registry){
         std::cerr << "Error initializing Rock-packages" <<std::endl;
@@ -102,7 +103,7 @@ bool OrocosCpp::initialize(const OrocosCppConfig& config)
 
     //Load Typekits
     if(config.load_typekits){
-        std::cout << "Loading Typekits.." << std::endl;
+        if(!quiet) std::cout << "\nLoading Typekits.." << std::endl;
         for(std::string tkn : package_registry->getRegisteredTypekitNames())
         {
             st = PluginHelper::loadTypekitAndTransports(tkn);
@@ -113,7 +114,7 @@ bool OrocosCpp::initialize(const OrocosCppConfig& config)
     //Init Type Registry
     type_registry = TypeRegistryPtr(new TypeRegistry());
     if(config.init_type_registry){
-        std::cout << "Loading Type Registry.." << std::endl;
+        if(!quiet) std::cout << "\nLoading Type Registry.." << std::endl;
         st = type_registry->loadTypeRegistries();
         if(!st){
             std::cerr << "Error during initialization of TypeRegistry" << std::endl;
@@ -123,7 +124,7 @@ bool OrocosCpp::initialize(const OrocosCppConfig& config)
 
     //Init Bundle
     if(config.init_bundle){
-        std::cout << "Initializing Bundle.." << std::endl;
+        if(!quiet) std::cout << "\nInitializing Bundle.." << std::endl;
         st = bundle->initialize(config.load_task_configs);
         if(!st){
             std::cerr << "Error during initialization of Bundle" << std::endl;
@@ -131,7 +132,17 @@ bool OrocosCpp::initialize(const OrocosCppConfig& config)
         }
     }
 
-    std::cout << "\nOrocosCPP initialization complete!"<<std::endl;
+    if(!quiet) std::cout << "\nOrocosCPP initialization complete!"<<std::endl;
     return true;
+}
+
+RTT::corba::TaskContextProxy *OrocosCpp::getTaskContext(std::string name)
+{
+    return RTT::corba::TaskContextProxy::Create(name);
+}
+
+bool OrocosCpp::loadAllTypekitsForModel(std::string packageOrTaskModelName)
+{
+    return orocos_cpp::PluginHelper::loadAllTypekitsForModel(packageOrTaskModelName);
 }
 }
