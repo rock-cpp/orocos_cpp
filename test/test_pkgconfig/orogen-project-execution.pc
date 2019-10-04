@@ -1,0 +1,12 @@
+prefix=/home/dfki.uni-bremen.de/dmronga/rock_kuka/install
+exec_prefix=${prefix}
+libdir=${prefix}/lib/orocos
+includedir=${prefix}/include/orocos
+
+project_name=execution
+deffile=${prefix}/share/orogen/execution.orogen
+type_registry=${prefix}/share/orogen/execution.tlb
+
+Name: execution
+Version: 0.1
+Description: the definition file for the orogen project itself

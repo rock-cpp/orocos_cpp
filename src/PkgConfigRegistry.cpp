@@ -172,7 +172,9 @@ std::vector<std::string> orocos_cpp::PkgConfigRegistry::getRegisteredOrogenNames
 orocos_cpp::PkgConfigRegistryPtr orocos_cpp::PkgConfigRegistry::get()
 {
     if(!__pkgcfgreg){
-        throw std::runtime_error("PkgConfigRegistry::get was called before initilizing it. Did you forget to call OrocosCpp::initialize?");
+        LOG_WARN_S << "PkgConfigRegistry::get was called before initializing it. This was okay in previous versions, but is deprecated now! Call PkgConfigRegistry::initialize once before using PkgConfigRegistry::get.";
+        return PkgConfigRegistry::initialize({}, false);
+        //throw std::runtime_error("PkgConfigRegistry::get was called before initializing it. Did you forget to call OrocosCpp::initialize?");
     }
     return __pkgcfgreg;
 }
