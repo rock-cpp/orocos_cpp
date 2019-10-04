@@ -34,7 +34,7 @@ bool TypeRegistry::loadTypeRegistries()
 
         std::string typeRegistryPath;
         if(!tpkg.typekit.getVariable("type_registry", typeRegistryPath)){
-            LOG_ERROR_S << "PkgConfig file of typekit " << typekitName << " does not specify the type_registry variable";
+            LOG_INFO_S << "PkgConfig file of typekit " << typekitName << " does not specify the type_registry variable";
             loadedAll = false;
             continue;
         }
