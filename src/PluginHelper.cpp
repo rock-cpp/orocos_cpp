@@ -33,7 +33,8 @@ std::vector< std::string > PluginHelper::getNeededTypekits(const std::string& co
     }
     std::string neededTypekitsString;
     if(!pkg.tasks.getVariable("typekits", neededTypekitsString)){
-        throw std::runtime_error("Tasks-PkgConfig file for component "+ componentName + " ("+pkg.tasks.sourceFile+") is expected to define the 'typekits' varibale, but it does not.");
+        std::cerr << "Tasks-PkgConfig file for component "+ componentName + " ("+pkg.tasks.sourceFile+") is expected to define the 'typekits' variable, but it does not. Trying to load self-named typekit" << std::endl;
+        neededTypekitsString = componentName;
     }
 
     std::vector<std::string> ret = PkgConfigHelper::vectorizeTokenSeparatedString(neededTypekitsString, " ");
