@@ -2,6 +2,8 @@
 
 #include <string>
 #include <map>
+#include <memory>
+
 
 namespace Typelib
 {
@@ -10,6 +12,9 @@ namespace Typelib
 
 namespace orocos_cpp
 {
+
+class TypeRegistry;
+typedef std::shared_ptr<TypeRegistry> TypeRegistryPtr;
 
 class TypeRegistry
 {
@@ -56,5 +61,4 @@ protected:
      */
     bool loadTypeToTypekitMapping(const std::string &path, const std::string &typekitName);
 };
-
 }
