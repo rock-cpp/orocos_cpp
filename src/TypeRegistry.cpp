@@ -14,7 +14,7 @@
 namespace orocos_cpp 
 {
 
-TypeRegistry::TypeRegistry()
+TypeRegistry::TypeRegistry(PkgConfigRegistryPtr pkgreg) : pkgreg(pkgreg)
 {
     typeToTypekit.insert(std::make_pair("int", "rtt-types"));
     typeToTypekit.insert(std::make_pair("bool", "rtt-types"));
@@ -22,40 +22,45 @@ TypeRegistry::TypeRegistry()
     typeToTypekit.insert(std::make_pair("double", "rtt-types"));
 }
 
+bool TypeRegistry::loadTypeRegistry(const std::string& typekitName)
+{
+    TypekitPkgConfig tpkg;
+    if(!pkgreg->getTypekit(typekitName, tpkg)){
+        LOG_ERROR_S << "Could not retrieve Tpekit from PkgConfigREgistry";
+        return false;
+    }
+
+    std::string typeRegistryPath;
+    if(!tpkg.typekit.getVariable("type_registry", typeRegistryPath)){
+        LOG_INFO_S << "PkgConfig file of typekit " << typekitName << " does not specify the type_registry variable";
+        return false;
+    }
+
+    // Load any states from the tlb to taskStateToID;
+    LOG_INFO_S << "Parsing Typlib file " << typeRegistryPath;
+    if (!loadStateToIDMapping(typeRegistryPath))
+    {
+        LOG_ERROR_S << "Could not parse Typelib file " << typeRegistryPath << " which was referred to as 'type_registriy' for typekit " << typekitName << " in " << tpkg.typekit.sourceFile;
+        return false;
+    }
+
+    // Load types to typeToTypekit.
+    boost::replace_last(typeRegistryPath, "tlb", "typelist");
+    LOG_INFO_S << "Parsing typelist file " <<typeRegistryPath;
+    if(!loadTypeToTypekitMapping(typeRegistryPath, typekitName))
+    {
+        LOG_ERROR_S << "Could not parse Typelist file " << typeRegistryPath;;
+        return false;
+    }
+    return true;
+}
+
 bool TypeRegistry::loadTypeRegistries()
 {
-    PkgConfigRegistryPtr pkgreg = PkgConfigRegistry::get();
-
     bool loadedAll = true;
 
     for(const std::string& typekitName :  pkgreg->getRegisteredTypekitNames()){
-        TypekitPkgConfig tpkg;
-        pkgreg->getTypekit(typekitName, tpkg);
-
-        std::string typeRegistryPath;
-        if(!tpkg.typekit.getVariable("type_registry", typeRegistryPath)){
-            LOG_INFO_S << "PkgConfig file of typekit " << typekitName << " does not specify the type_registry variable";
-            loadedAll = false;
-            continue;
-        }
-
-        // Load any states from the tlb to taskStateToID;
-        LOG_INFO_S << "Parsing Typlib file " << typeRegistryPath;
-        if (!loadStateToIDMapping(typeRegistryPath))
-        {
-            LOG_ERROR_S << "Could not parse Typelib file " << typeRegistryPath << " which was referred to as 'type_registriy' for typekit " << typekitName << " in " << tpkg.typekit.sourceFile;
-            loadedAll = false;
-            continue;
-        }
-
-        // Load types to typeToTypekit.
-        boost::replace_last(typeRegistryPath, "tlb", "typelist");
-        LOG_INFO_S << "Parsing typelist file " <<typeRegistryPath;
-        if(!loadTypeToTypekitMapping(typeRegistryPath, typekitName))
-        {
-            LOG_ERROR_S << "Could not parse Typelist file " << typeRegistryPath;;
-            loadedAll = false;
-        }
+        loadedAll &= loadTypeRegistry(typekitName);
     }
     return loadedAll;
 }
@@ -140,11 +145,17 @@ bool TypeRegistry::getTypekitDefiningType(const std::string& typeName, std::stri
     return true;
 }
 
-bool TypeRegistry::getStateID(const std::string &task_model_name, const std::string &state_name, unsigned int &id) const
+bool TypeRegistry::getStateID(const std::string &task_model_name, const std::string &state_name, unsigned int &id)
 {
-    auto state_it = taskStateToID.find(task_model_name + "_" + state_name);
-    if (state_it == taskStateToID.end())
-        return false;
+    std::map<std::string, unsigned>::const_iterator state_it = taskStateToID.find(task_model_name + "_" + state_name);
+    if (state_it == taskStateToID.end()){
+        std::string typekit_name = task_model_name.substr(0, task_model_name.find(":"));
+        if(!loadTypeRegistry(typekit_name)){
+            return false;
+        }else{
+            return getStateID(task_model_name, state_name, id);
+        }
+    }
     
     id = state_it->second;
     

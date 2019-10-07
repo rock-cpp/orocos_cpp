@@ -112,7 +112,7 @@ bool OrocosCpp::initialize(const OrocosCppConfig& config, bool quiet)
 
 
     //Init Type Registry
-    type_registry = TypeRegistryPtr(new TypeRegistry());
+    type_registry = TypeRegistryPtr(new TypeRegistry(package_registry));
     if(config.init_type_registry){
         if(!quiet) std::cout << "\nLoading Type Registry.." << std::endl;
         st = type_registry->loadTypeRegistries();

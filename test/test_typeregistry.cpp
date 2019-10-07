@@ -14,7 +14,7 @@ using namespace orocos_cpp;
 class TypeRegistryTest: public TypeRegistry
 {
 public:
-    TypeRegistryTest():TypeRegistry(){}
+    TypeRegistryTest(): TypeRegistry(PkgConfigRegistryPtr(new PkgConfigRegistry({}, false))){}
 
     void loadStatesFromCustomPath(const std::string &path)
     {
