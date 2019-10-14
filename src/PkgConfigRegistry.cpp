@@ -53,49 +53,99 @@ bool orocos_cpp::PkgConfig::isLoaded()
 }
 
 
-bool orocos_cpp::PkgConfigRegistry::initialize()
+bool orocos_cpp::PkgConfigRegistry::loadPackages(const std::vector<std::string>& packageNames, const std::vector<std::string>& searchPaths)
 {
-    LOG_INFO_S << "Scanning for PKGConfig files for orogen project, typekits, transports, tasks and deployments";
-    std::vector<std::string> searchPaths = PkgConfigHelper::getSearchPathsFromEnvVar();
-    scan(searchPaths);
-    LOG_INFO_S << "Scanning for PKG config files done.";
-    return true;
+    bool st = true;
+    for(const std::string& pname : packageNames ){
+        st &= findAndLoadPackage(pname, searchPaths);
+    }
+    return st;
 }
 
-bool orocos_cpp::PkgConfigRegistry::getDeployment(const std::string &name, orocos_cpp::PkgConfig &pkg)
+orocos_cpp::PkgConfigRegistryPtr orocos_cpp::PkgConfigRegistry::initialize(const std::vector<std::string>& packageNames, bool loadAllPackages)
+{
+    if(__pkgcfgreg){
+        LOG_WARN_S << "PkgConfigRegistry::initialize was already called earlier!";
+    }
+    __pkgcfgreg = PkgConfigRegistryPtr(new PkgConfigRegistry(packageNames, loadAllPackages));
+
+    return __pkgcfgreg;
+}
+
+bool orocos_cpp::PkgConfigRegistry::getDeployment(const std::string &name, orocos_cpp::PkgConfig &pkg, bool searchPackageIfNotLoaded)
 {
     std::map<std::string, PkgConfig>::iterator it = deployments.find(name);
     if(it == deployments.end()){
-        return false;
+        if(!searchPackageIfNotLoaded){
+            return false;
+        }
+        LOG_DEBUG_S << "Deployment Package " << name << " was requested but is not present in PkgConfigregistry. Trying to find it.";
+        bool st = findAndLoadPackage(name);
+        if(st){
+            return getDeployment(name, pkg, false);
+        }else{
+            return false;
+        }
     }
     pkg = it->second;
     return true;
 }
 
-bool orocos_cpp::PkgConfigRegistry::getTypekit(const std::string &name, orocos_cpp::TypekitPkgConfig &pkg)
+bool orocos_cpp::PkgConfigRegistry::getTypekit(const std::string &name, orocos_cpp::TypekitPkgConfig &pkg, bool searchPackageIfNotLoaded)
 {
     std::map<std::string, TypekitPkgConfig>::iterator it = typekits.find(name);
     if(it == typekits.end()){
-        return false;
+        if(!searchPackageIfNotLoaded){
+            return false;
+        }
+        LOG_DEBUG_S << "Typekit Package " << name << " was requested but is not present in PkgConfigregistry. Trying to find it.";
+        bool st = findAndLoadPackage(name);
+        if(st){
+            return getTypekit(name, pkg, false);
+        }else{
+            return false;
+        }
     }
     pkg = it->second;
     return true;
 }
 
-bool orocos_cpp::PkgConfigRegistry::getOrogen(const std::string &name, orocos_cpp::OrogenPkgConfig &pkg)
+bool orocos_cpp::PkgConfigRegistry::getOrogen(const std::string &name, orocos_cpp::OrogenPkgConfig &pkg, bool searchPackageIfNotLoaded)
 {
     std::map<std::string, OrogenPkgConfig>::iterator it = orogen.find(name);
     if(it == orogen.end()){
-        return false;
+        if(!searchPackageIfNotLoaded){
+            return false;
+        }
+        LOG_DEBUG_S << "Orogen Package " << name << " was requested but is not present in PkgConfigregistry. Trying to find it.";
+        bool st = findAndLoadPackage(name);
+        if(st){
+            return getOrogen(name, pkg, false);
+        }else{
+            return false;
+        }
     }
     pkg = it->second;
     return true;
 }
 
-bool orocos_cpp::PkgConfigRegistry::getOrocosRTT(orocos_cpp::PkgConfig &pkg)
+bool orocos_cpp::PkgConfigRegistry::getOrocosRTT(orocos_cpp::PkgConfig &pkg, bool searchPackageIfNotLoaded)
 {
-    pkg = orocosRTTPkg;
-    return orocosRTTPkg.isLoaded();
+    if(!orocosRTTPkg.isLoaded()){
+        if(!searchPackageIfNotLoaded){
+            return false;
+        }
+        LOG_DEBUG_S << "The Orocos-RTT Package was requested but is not present in PkgConfigregistry. Trying to find it.";
+        bool st = findAndLoadPackage("rtt");
+        if(st){
+            return getOrocosRTT(pkg, false);
+        }else{
+            return false;
+        }
+    }else{
+        pkg = orocosRTTPkg;
+        return true;
+    }
 }
 
 std::vector<std::string> orocos_cpp::PkgConfigRegistry::getRegisteredDeploymentNames()
@@ -122,10 +172,21 @@ std::vector<std::string> orocos_cpp::PkgConfigRegistry::getRegisteredOrogenNames
 orocos_cpp::PkgConfigRegistryPtr orocos_cpp::PkgConfigRegistry::get()
 {
     if(!__pkgcfgreg){
-        __pkgcfgreg = PkgConfigRegistryPtr(new PkgConfigRegistry());
-        __pkgcfgreg->initialize();
+        LOG_WARN_S << "PkgConfigRegistry::get was called before initializing it. This was okay in previous versions, but is deprecated now! Call PkgConfigRegistry::initialize once before using PkgConfigRegistry::get.";
+        return PkgConfigRegistry::initialize({}, false);
+        //throw std::runtime_error("PkgConfigRegistry::get was called before initializing it. Did you forget to call OrocosCpp::initialize?");
     }
     return __pkgcfgreg;
+}
+
+orocos_cpp::PkgConfigRegistry::PkgConfigRegistry(const std::vector<std::string> &packageNames, bool loadAllPackages)
+{
+    std::vector<std::string> searchPaths = PkgConfigHelper::getSearchPathsFromEnvVar();
+    if(loadAllPackages){
+        this->loadAllPackages(searchPaths);
+    }else{
+        loadPackages(packageNames, searchPaths);
+    }
 }
 
 bool orocos_cpp::PkgConfigRegistry::isTransportPkg(const std::string &filename, std::string &typekitName, std::string &transportName, std::string& arch)
@@ -355,11 +416,172 @@ bool orocos_cpp::PkgConfigRegistry::addFile(const std::string &filepath)
     }
 }
 
-void orocos_cpp::PkgConfigRegistry::scan(const std::vector<std::string> &searchPaths)
-{
-    namespace fs = boost::filesystem;
 
+bool load_pkg(const fs::path& pkg_path, orocos_cpp::PkgConfig& pkg)
+{
+    if(!fs::exists(pkg_path)){
+        LOG_WARN_S << "File " << pkg_path << " not found.";
+    }else{
+        bool st = pkg.load(pkg_path.string());
+        if(st){
+            LOG_INFO_S << "Loading PkgConfig " << pkg_path << "\t[OK]";
+        }else{
+            LOG_ERROR_S << "Loading PkgConfig " << pkg_path << "\t[FAILED]";
+        }
+        return st;
+    }
+    return false;
+}
+
+
+bool orocos_cpp::PkgConfigRegistry::loadOrogenPkg(const fs::path &filepath)
+{
+    //Extract name of orogen package, target and init transports
+    std::string filename = filepath.filename().string();
+    std::string package_name = filename.substr(std::string("orogen-project-").size(), filename.size()-std::string("orogen-project-").size()-std::string(".pc").size());
+    const fs::path pkg_search_path = filepath.parent_path();
+    std::string target = std::getenv("OROCOS_TARGET");
+    std::vector<std::string> known_transports = {"corba","mqueue","typelib"};
+
+    //Load PkgConfig file of OrogenProject
+    PkgConfig pkg_proj;
+    bool st = pkg_proj.load(filepath.string());
+    if(!st){
+        LOG_ERROR_S << "Error loading PkgConfig file of OroGen Project-package "<<package_name<<" from "<<filepath.string();
+        return st;
+    }
+    OrogenPkgConfig opkg;
+    opkg.project = pkg_proj;
+
+    //Load Tasks package, if it is defined
+    PkgConfig pkg;
+    fs::path pkg_path = pkg_search_path / (package_name + "-tasks-"+target+".pc");
+    st = load_pkg(pkg_path, pkg);
+    opkg.tasks = pkg;
+    //Load Proxies package, if it is defined
+    pkg_path = pkg_search_path / (package_name + "-proxies" + ".pc");
+    st = load_pkg(pkg_path, pkg);
+    opkg.proxies = pkg;
+
+    //store orogen package
+    orogen[package_name] = opkg;
+
+    //Load typekit-PkgConfig, if it is defined
+    pkg_path = pkg_search_path / (package_name + "-typekit-"+target+".pc");
+    st = load_pkg(pkg_path, pkg);
+    if(st){
+        TypekitPkgConfig tpkg;
+        tpkg.typekit = pkg;
+
+        //Load transports-PkgConfig, if it is defined
+        for(const std::string& t : known_transports){
+            pkg_path = pkg_search_path / (package_name + "-transport-" + t + "-"  +target + ".pc");
+            st = load_pkg(pkg_path, pkg);
+            if(st){
+                tpkg.transports[t] = pkg;
+            }
+        }
+        typekits[package_name] = tpkg;
+    }
+    return true;
+}
+
+bool orocos_cpp::PkgConfigRegistry::loadDeploymentPkg(const fs::path &filepath)
+{
+    //Extract name of orogen package, target and init transports
+    std::string filename = filepath.filename().string();
+    std::string package_name = filename.substr(std::string("orogen-").size(), filename.size()-std::string("orogen-").size()-std::string(".pc").size());
+
+    //Load deployment
+    PkgConfig pkg;
+    bool st = load_pkg(filepath, pkg);
+    deployments[package_name] = pkg;
+    return st;
+}
+
+bool orocos_cpp::PkgConfigRegistry::findAndLoadPackage(const std::string& pname, std::vector<std::string> searchPaths)
+{
+    if(searchPaths.size() == 0){
+        searchPaths = PkgConfigHelper::getSearchPathsFromEnvVar();
+    }
+    fs::path fpath;
+    bool found = false;
+
+    LOG_DEBUG_S << "Searching for package " << pname;
+    for(const fs::path& path : searchPaths){
+        if(!fs::is_directory(path)){
+            LOG_WARN_S << "Skipping directory " << path << " since it is not a valid directory";
+            continue;
+        }
+
+        //Check for rtt package
+        if(pname == "rtt" || pname == "orocos-rtt"){
+            std::string target = std::getenv("OROCOS_TARGET");
+            fpath = path / ("orocos-rtt-"+target+".pc");
+            if(fs::exists(fpath)){
+                LOG_DEBUG_S << "PkgConfig for RTT Package was found in file " << fpath;
+                PkgConfig pkg;
+                bool st = pkg.load(fpath.string());
+                if(st){
+                    LOG_INFO_S << "PkgConfig " << fpath << "  for the RTT Package was sucessfully loaded";
+                    orocosRTTPkg = pkg;
+                    found = true;
+                }else{
+                    LOG_ERROR_S << "Error loading Orocos-RTT PkgConfig file from " << fpath;
+                }
+
+                //load transports for rtt
+                TypekitPkgConfig tpkg;
+                std::vector<std::string> known_transports = {"corba","mqueue","typelib"};
+                for(const std::string& t : known_transports){
+                    fpath = path / ("orocos-rtt-"+t+"-"+target+".pc");
+                    if(pkg.load(fpath.string())){
+                        LOG_INFO_S << "Loaded transport " << t << " for RTT package from " << fpath;
+                        tpkg.transports[t] = pkg;
+                    }else{
+                        LOG_INFO_S << "Could not load transport " << t << " for RTT package from " << fpath;
+                    }
+                }
+                typekits["rtt"] = tpkg;
+                typekits["orocos-rtt"] = tpkg;
+            }
+        }
+
+        //Check for oroGen package
+        fpath = path / ("orogen-project-"+pname+".pc");
+        if(fs::exists(fpath)){
+            LOG_DEBUG_S << "PkgConfig for Orogen Package with name " << pname << " found in file " << fpath;
+            bool st = loadOrogenPkg(fpath);
+            if(st){
+                LOG_INFO_S << "PkgConfig " << fpath << "  for Orogen Package with name " << pname << " was sucessfully loaded";
+                found = true;
+            }else{
+                LOG_ERROR_S << "Error loading PkgConfig file " << fpath;
+            }
+        }
+
+        //Check for Deployment package
+        fpath = path / ("orogen-"+pname+".pc");
+        if(fs::exists(fpath)){
+            LOG_DEBUG_S << "PkgConfig for Orogen Deployment Package with name " << pname << " found in file " << fpath;
+            bool st = loadDeploymentPkg(fpath);
+            if(st){
+                LOG_INFO_S << "PkgConfig " << fpath << "  for Orogen Deployment Package with name " << pname << " was sucessfully loaded";
+                found = true;
+            }
+            else{
+                LOG_ERROR_S << "Error loading PkgConfig file of orogen deployment package " << fpath;
+            }
+        }
+    }
+    return found;
+}
+
+void orocos_cpp::PkgConfigRegistry::loadAllPackages(const std::vector<std::string> &searchPaths)
+{
+    LOG_INFO_S << "Loading all packages defined in search path";
     for(const std::string& path : searchPaths){
+        LOG_DEBUG_S << "Scanning " << path;
         if(!fs::is_directory(path)){
             LOG_WARN_S << "Skipping directory " << path << " since it is not a valid directory";
             continue;

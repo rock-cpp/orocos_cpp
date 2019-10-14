@@ -2,6 +2,9 @@
 
 #include <string>
 #include <map>
+#include <memory>
+#include "PkgConfigRegistry.hpp"
+
 
 namespace Typelib
 {
@@ -11,16 +14,25 @@ namespace Typelib
 namespace orocos_cpp
 {
 
+class TypeRegistry;
+typedef std::shared_ptr<TypeRegistry> TypeRegistryPtr;
+
 class TypeRegistry
 {
+protected:
     std::map<std::string, std::string> typeToTypekit;
     std::map<std::string, unsigned> taskStateToID;
+    PkgConfigRegistryPtr pkgreg;
 
 public:
-    TypeRegistry();
+    TypeRegistry(PkgConfigRegistryPtr pkgreg);
     
     /**
-     * Loads all type registries in order to receive the nessesary information.
+      * Load single TypeRegistry for a given typekit name
+      */
+    bool loadTypeRegistry(const std::string& typekitName);
+    /**
+     * Loads type registryies for all typekits defined in \var pkgreg
      */
     bool loadTypeRegistries();
     
@@ -28,13 +40,15 @@ public:
 
     /**
      * Returns the ID of a given state name of a task.
+     * If the task model was not added to the TypeRegistry, this function
+     * trigger the loading process.
      * @param task_model_name e.g. "auv_control::AccelerationController"
      * @param state_name e.g. "CONTROLLING"
      * @param id the corresponding state ID
      *
-     * @returns false if the state or the task is unknown
+     * @returns false if the state or the task is unknown and cant be loaded
      */
-    bool getStateID(const std::string &task_model_name, const std::string &state_name, unsigned& id) const;
+    bool getStateID(const std::string &task_model_name, const std::string &state_name, unsigned& id);
 
 protected:
     /**
@@ -56,5 +70,4 @@ protected:
      */
     bool loadTypeToTypekitMapping(const std::string &path, const std::string &typekitName);
 };
-
 }

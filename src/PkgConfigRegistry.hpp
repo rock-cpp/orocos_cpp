@@ -2,6 +2,9 @@
 #include <map>
 #include <vector>
 #include <memory>
+#include <boost/filesystem.hpp>
+
+namespace fs = boost::filesystem;
 
 namespace orocos_cpp{
 class PkgConfig
@@ -78,18 +81,48 @@ extern PkgConfigRegistryPtr __pkgcfgreg;
 class PkgConfigRegistry
 {
 public:
-    bool initialize();
-    bool getDeployment(const std::string& name, PkgConfig& pkg);
-    bool getTypekit(const std::string& name, TypekitPkgConfig &pkg);
-    bool getOrogen(const std::string& name, OrogenPkgConfig& pkg);
-    bool getOrocosRTT(PkgConfig& pkg);
+    //!
+    //! \brief Initialize PkgConfigRegistry
+    //!
+    //! Creates a singleton instance of the PkgConfigRegistry that can be
+    //! retrieved with PkgConfigRegistry::get()
+    //!
+    //! PkgConfigRegistry searches the PkgConfig search path for oroGen or
+    //! oroGenDeloyment Packages and loads them.
+    //! This function works in two differnt modes: Either all relevant packages
+    //! found in search path are loaded, or only a explicit selection of
+    //! packages is loaded.
+    //!
+    //! The folders where to look for packages is defined by the PKG_CONFIG_PATH
+    //! environment variable
+    //!
+    //! \param packageNames : Names of packages that should be searched and
+    //!                       loaded
+    //! \param load_all_packages : if \value true, all relevant packages found
+    //!                            in search path are loaded. In this case,
+    //!                            \var packageNames is ignored.
+    //! \return Pointer to the PkgConfigRegistry. Can be \value nullptr, if
+    //!         initialization failed
+    static PkgConfigRegistryPtr initialize(const std::vector<std::string>& packageNames, bool loadAllPackages=false);
+    //! Retrieve the singleton instance of PkgConfig, that was previously
+    //! initialized with PkgConfigRegistry::initialize
+    static PkgConfigRegistryPtr get();
+
+    //! Avoid using this constructor and use the singleton intialization
+    //! instead. \see PkgConfigRegistry::initialize
+    PkgConfigRegistry(const std::vector<std::string>& packageNames, bool loadAllPackages=false);
+
+    bool getDeployment(const std::string& name, PkgConfig& pkg, bool searchPackageIfNotLoaded=true);
+    bool getTypekit(const std::string& name, TypekitPkgConfig &pkg, bool searchPackageIfNotLoaded=true);
+    bool getOrogen(const std::string& name, OrogenPkgConfig& pkg, bool searchPackageIfNotLoaded=true);
+    bool getOrocosRTT(PkgConfig& pkg, bool searchPackageIfNotLoaded=true);
     std::vector<std::string> getRegisteredDeploymentNames();
     std::vector<std::string> getRegisteredTypekitNames();
     std::vector<std::string> getRegisteredOrogenNames();
-    static PkgConfigRegistryPtr get();
 
 protected:
-    //! To what kind of package a Pkgconfig file is related to is determined by its filename (NOT path, must be a file name!)
+    //! To what kind of package a Pkgconfig file is related to is determined by
+    //! its filename (NOT path, must be a file name!)
     bool isTransportPkg(const std::string& filename, std::string& typekitName, std::string& transportName, std::string &arch);
     bool isOrogenTasksPkg(const std::string& filename, std::string& orogenProjectName, std::string &arch);
     bool isOrogenProjectPkg(const std::string& filename, std::string& orogenProjectName);
@@ -98,15 +131,31 @@ protected:
     bool isDeploymentPkg(const std::string& filename, std::string& deploymentName);
     bool isOrocosRTTPkg(const std::string &filename, std::string &arch);
 
+    //! [[deprecated(Due to performance issues with the matching of regular
+    //!              expressions this function is now no longer used. Instead
+    //!             'scan' calls 'loadOrogenPkg and loadDeploymentPkg)]]
     bool addFile(const std::string& filepath);
-    void scan(const std::vector<std::string>& searchPaths);
+    bool loadOrogenPkg(const fs::path &filepath);
+    bool loadDeploymentPkg(const fs::path &filepath);
 
-    //Containers to store PkgConfig files for different categories of libraries used
-    //in Rock
+    //! Search of a specific package identified by \p pname in \p searchPaths
+    //! Tries to load oroGen, or deployment packages with related typekit and
+    //! transports
+    //! If \p searchPaths is an empty vector, it is determined from environment
+    //! variable \see PkgConfigHelper::getSearchPathsFromEnvVar()
+    bool findAndLoadPackage(const std::string& pname, std::vector<std::string> searchPaths = std::vector<std::string>());
+    //! Load the packages defined in /p module_whitelist
+    bool loadPackages(const std::vector<std::string> &packageNames, const std::vector<std::string> &searchPaths);
+    //! Scans all folders in searchPath for orogen, and Deploment packages and
+    //! loads them
+    void loadAllPackages(const std::vector<std::string>& searchPaths);
+
+    //! Containers to store PkgConfig files for different categories of
+    //! libraries used in Rock
     std::map<std::string, PkgConfig> deployments;
     std::map<std::string, OrogenPkgConfig> orogen;
     std::map<std::string, TypekitPkgConfig> typekits;
-    //orocos-rtt library does not fit the other categories above
+    //! orocos-rtt library does not fit the other categories above
     PkgConfig orocosRTTPkg;
 };
 
