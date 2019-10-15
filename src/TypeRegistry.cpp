@@ -22,6 +22,10 @@ TypeRegistry::TypeRegistry(PkgConfigRegistryPtr pkgreg) : pkgreg(pkgreg)
     typeToTypekit.insert(std::make_pair("double", "rtt-types"));
 }
 
+TypeRegistry::TypeRegistry() : TypeRegistry(PkgConfigRegistry::get())
+{
+}
+
 bool TypeRegistry::loadTypeRegistry(const std::string& typekitName)
 {
     TypekitPkgConfig tpkg;

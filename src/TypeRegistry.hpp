@@ -26,6 +26,7 @@ protected:
 
 public:
     TypeRegistry(PkgConfigRegistryPtr pkgreg);
+    TypeRegistry();
     
     /**
       * Load single TypeRegistry for a given typekit name
