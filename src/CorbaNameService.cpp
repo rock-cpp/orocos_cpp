@@ -122,10 +122,16 @@ std::vector< std::string > CorbaNameService::getRegisteredTasks()
                 CORBA::Object_var task_object = rootContext->resolve(serverName);
                 RTT::corba::CTaskContext_var mtask = RTT::corba::CTaskContext::_narrow (task_object.in ());
                 
-                //std::cout << "Connection test to " << name << std::endl;
+                //This is a hack: orocosrb-tasks can make the program execution stall (wait forever),
+                //if they are ghost and it is tried to connect to them via getName,
+                //isActive or so. this is true at least in the case where they are retrieved from remote.
+                //This hack omits all orocosrb tasks, because I don't kow about a better way
+                //to omit these tasks.
+                if(name.find("orocosrb") != std::string::npos )
+                    continue;
                 
                 // force connect to object.
-                CORBA::String_var nm = mtask->getName(); 
+                CORBA::String_var nm = mtask->getName();
                 task_names.push_back(name);
                 }
             catch (...)
