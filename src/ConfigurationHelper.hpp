@@ -2,6 +2,9 @@
 
 #include <rtt/TaskContext.hpp>
 #include <lib_config/Configuration.hpp>
+#include <yaml-cpp/yaml.h>
+#include <typelib/typemodel.hh>
+#include <lib_config/YAMLConfiguration.hpp>
 
 
 //forwards:
@@ -10,8 +13,11 @@ namespace Typelib{
     class Value;
 }
 
+YAML::Emitter &operator <<(YAML::Emitter &out, const Typelib::Value &value);
+
 namespace orocos_cpp
 {
+
 
 class ConfigurationHelper
 {
@@ -41,11 +47,37 @@ public:
      */
     bool applyConfigValueOnDSB(RTT::base::DataSourceBase::shared_ptr dsb,
             const RTT::types::TypeInfo* typeInfo, const libConfig::ConfigValue& value);
+    bool applyConfOnTyplibValue(Typelib::Value &value, const libConfig::ConfigValue& conf);
+    /**
+     * @brief Convinience functions to load data samples from YAML
+     * T value should be serializable data type such as base::samples::RigidBodyState_m (not opaque types)
+     */
+    template<typename T>
+    bool loadTypeFromYaml(T &result, const libConfig::ConfigValue& conf, const Typelib::Type& typemodel){
+        Typelib::Value value((void*)&result, typemodel);
+        return applyConfOnTyplibValue(value, conf);
+    }
+    template<typename T>
+    bool loadTypeFromYaml(T &result, const YAML::Node& node, const Typelib::Type& typemodel){
+        libConfig::YAMLConfigParser parser;
+        std::shared_ptr<libConfig::ConfigValue> conf =  parser.getConfigValue(node);
+        return loadTypeFromYaml(result, *conf, typemodel);
+    }
+    template<typename T>
+    bool loadTypeFromYaml(T &result, const std::string& yamlstring, const Typelib::Type& typemodel){
+        YAML::Node docs = YAML::Load(yamlstring);
+        return loadTypeFromYaml(result, docs, typemodel);
+    }
+    bool applyConfToProperty(RTT::TaskContext* context, const std::string &propertyName, const libConfig::ConfigValue &value);
+
+
+    std::string getYamlString(Typelib::Value &value);
 
 private:
     std::map<std::string, libConfig::Configuration> overrides;
-    bool applyConfToProperty(RTT::TaskContext* context, const std::string &propertyName, const libConfig::ConfigValue &value);
 };
 
+
 }//end of namespace
+
 

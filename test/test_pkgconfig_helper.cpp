@@ -6,7 +6,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/test/execution_monitor.hpp>
 
-#include <orocos_cpp/PkgConfigHelper.hpp>
+#include "PkgConfigHelper.hpp"
 #include <stdlib.h>
 
 using namespace orocos_cpp;

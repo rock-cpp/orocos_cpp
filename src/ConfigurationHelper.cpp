@@ -219,7 +219,7 @@ bool applyConfOnTypelibNumeric(Typelib::Value &value, const SimpleConfigValue& c
 }
 
 
-bool applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
+bool ConfigurationHelper::applyConfOnTyplibValue(Typelib::Value &value, const ConfigValue& conf)
 {
     switch(value.getType().getCategory())
     {
@@ -552,5 +552,185 @@ bool ConfigurationHelper::registerOverride(const std::string& taskName, Configur
     }
     
     return false;
+}
+
+YAML::Emitter &toYAML(YAML::Emitter &out, const Typelib::Numeric &type, const Typelib::Value &value){
+
+    switch(type.getNumericCategory())
+    {
+    case Typelib::Numeric::Float:
+        if(type.getSize() == sizeof(float))
+        {
+            out << *(static_cast<float *>(value.getData()));
+        }
+        else
+        {
+            out << *(static_cast<double *>(value.getData()));
+        }
+        break;
+    case Typelib::Numeric::SInt:
+        switch(type.getSize())
+        {
+        case sizeof(int8_t):
+            out << *(static_cast<int8_t *>(value.getData()));
+            break;
+        case sizeof(int16_t):
+            out << *(static_cast<int16_t *>(value.getData()));
+            break;
+        case sizeof(int32_t):
+            out << *(static_cast<int32_t *>(value.getData()));
+            break;
+        case sizeof(int64_t):
+            out << *(static_cast<int64_t *>(value.getData()));
+            break;
+        default:
+            std::cerr << "Error, got integer of unexpected size " << type.getSize() << std::endl;
+            throw std::runtime_error("got integer of unexpected size " + type.getSize());
+            break;
+        }
+        break;
+    case Typelib::Numeric::UInt:
+    {
+        switch(type.getSize())
+        {
+        case sizeof(uint8_t):
+            out << *(static_cast<uint8_t *>(value.getData()));
+            break;
+        case sizeof(uint16_t):
+            out << *(static_cast<uint16_t *>(value.getData()));
+            break;
+        case sizeof(uint32_t):
+            out << *(static_cast<uint32_t *>(value.getData()));
+            break;
+        case sizeof(uint64_t):
+            out << *(static_cast<uint64_t *>(value.getData()));
+            break;
+        default:
+            std::cout << "Error, got integer of unexpected size " << type.getSize() << std::endl;
+            throw std::runtime_error("got integer of unexpected size " + type.getSize());
+            break;
+        }
+    }
+        break;
+    case Typelib::Numeric::NumberOfValidCategories:
+        throw std::runtime_error("Internal Error: Got invalid Category");
+        break;
+    }
+
+    return out;
+}
+
+YAML::Emitter &toYAML(YAML::Emitter &out, const Typelib::Container &type, const Typelib::Value &value){
+
+    const size_t size = type.getElementCount(value.getData());
+
+    if(type.kind() == "/std/string")
+    {
+        const std::string *content = static_cast<const std::string *>(value.getData());
+
+        out << *content;
+        return out;
+    }
+
+    //std::vector
+    out << YAML::BeginSeq;
+    for(size_t i = 0; i < size; i++)
+    {
+        Typelib::Value elem = type.getElement(value.getData(), i);
+        out << elem;
+    }
+    out << YAML::EndSeq;
+
+    return out;
+}
+
+YAML::Emitter &toYAML(YAML::Emitter &out, const Typelib::Compound &type, const Typelib::Value &value){
+    out << YAML::BeginMap;
+
+    uint8_t *data = static_cast<uint8_t *>( value.getData());
+
+    Typelib::Compound::FieldList const fields = type.getFields();
+    for(const Typelib::Field &field: fields)
+    {
+        Typelib::Value fieldV(data + field.getOffset(), field.getType());
+        out << YAML::Key << field.getName();
+        out << YAML::Value << fieldV;
+    }
+
+    out << YAML::EndMap;
+
+    return out;
+}
+
+YAML::Emitter &toYAML(YAML::Emitter &out, const Typelib::Array &type, const Typelib::Value &value){
+    out << YAML::Flow;
+    out << YAML::BeginSeq;
+
+    const Typelib::Type &indirect(type.getIndirection());
+    for(size_t i = 0; i < type.getDimension(); i++)
+    {
+        Typelib::Value arrayV(static_cast<uint8_t *>(value.getData()) + i * indirect.getSize(), indirect);
+        out << arrayV;
+    }
+    out << YAML::EndSeq;
+    return out;
+}
+
+YAML::Emitter &toYAML(YAML::Emitter &out, const Typelib::Enum &type, const Typelib::Value &value){
+    Typelib::Enum::integral_type *intVal = (static_cast<Typelib::Enum::integral_type *>(value.getData()));
+    out << type.get(*intVal);
+    return out;
+}
+
+//Duplicates logic from std::shared_ptr< ConfigValue > TypelibConfiguration::getFromValue(Typelib::Value& value)
+//Problem with the ConfigValue type is, that it does not contain any details
+//about the SimpleType, i.e. if it's a float, string, int, bool, enum.
+//This type information is present in Typelib::Value, bot no more in ConfigValue
+//so theres no way for proper YAML serialization of ConfigValues
+YAML::Emitter &operator <<(YAML::Emitter &out, const Typelib::Value &value)
+{
+    const Typelib::Type& type = value.getType();
+    if(type.getCategory() == Typelib::Type::Array){
+        const Typelib::Array &array = static_cast<const Typelib::Array &>(value.getType());
+        toYAML(out, array, value);
+    }
+    else if(type.getCategory() == Typelib::Type::Compound){
+        const Typelib::Compound &compound = static_cast<const Typelib::Compound &>(value.getType());
+        toYAML(out, compound, value);
+    }
+    else if(type.getCategory() == Typelib::Type::Container){
+        const Typelib::Container &container = static_cast<const Typelib::Container &>(value.getType());
+        toYAML(out, container, value);
+    }
+    else if(type.getCategory() == Typelib::Type::Enum){
+        const Typelib::Enum &en = static_cast<const Typelib::Enum &>(value.getType());
+        toYAML(out, en, value);
+    }
+    else if(type.getCategory() == Typelib::Type::Numeric){
+        const Typelib::Numeric &num = static_cast<const Typelib::Numeric &>(value.getType());
+        toYAML(out, num, value);
+    }
+    else if(type.getCategory() == Typelib::Type::NullType){
+        throw std::runtime_error("Got Unsupported Category: NullType");
+    }
+    else if(type.getCategory() == Typelib::Type::Opaque){
+        throw std::runtime_error("Got Unsupported Category: Opaque");
+    }
+    else if(type.getCategory() == Typelib::Type::Pointer){
+        throw std::runtime_error("Got Unsupported Category: Pointer");
+    }
+    else{
+        throw std::runtime_error(std::string("Got Unexpected Category: ")+std::to_string(type.getCategory()));
+    }
+    return out;
+}
+
+
+std::string ConfigurationHelper::getYamlString(Typelib::Value &value)
+{
+    YAML::Emitter out;
+
+    out << value;
+    return out.c_str();
 }
 
