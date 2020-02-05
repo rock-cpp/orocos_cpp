@@ -14,7 +14,8 @@
 namespace orocos_cpp 
 {
 
-TypeRegistry::TypeRegistry(PkgConfigRegistryPtr pkgreg) : pkgreg(pkgreg)
+TypeRegistry::TypeRegistry(PkgConfigRegistryPtr pkgreg) :
+    pkgreg(pkgreg), registry(new Typelib::Registry())
 {
     typeToTypekit.insert(std::make_pair("int", "rtt-types"));
     typeToTypekit.insert(std::make_pair("bool", "rtt-types"));
@@ -28,6 +29,7 @@ TypeRegistry::TypeRegistry() : TypeRegistry(PkgConfigRegistry::get())
 
 bool TypeRegistry::loadTypeRegistry(const std::string& typekitName)
 {
+    //Resolve bath to TLB file
     TypekitPkgConfig tpkg;
     if(!pkgreg->getTypekit(typekitName, tpkg)){
         LOG_ERROR_S << "Could not retrieve Tpekit from PkgConfigREgistry";
@@ -40,8 +42,15 @@ bool TypeRegistry::loadTypeRegistry(const std::string& typekitName)
         return false;
     }
 
-    // Load any states from the tlb to taskStateToID;
+    //load TLB file into
     LOG_INFO_S << "Parsing Typlib file " << typeRegistryPath;
+    if (!loadTypelibRegistry(typeRegistryPath))
+    {
+        LOG_ERROR_S << "Could not load tlb path: " << typeRegistryPath;
+        return false;
+    }
+
+    // Load any states from the tlb to taskStateToID;
     if (!loadStateToIDMapping(typeRegistryPath))
     {
         LOG_ERROR_S << "Could not parse Typelib file " << typeRegistryPath << " which was referred to as 'type_registriy' for typekit " << typekitName << " in " << tpkg.typekit.sourceFile;
@@ -69,10 +78,10 @@ bool TypeRegistry::loadTypeRegistries()
     return loadedAll;
 }
 
-bool TypeRegistry::loadRegistry(const std::string &path, Typelib::Registry* registry)
+bool TypeRegistry::loadTypelibRegistry(const std::string &path)
 {
     try{
-        Typelib::PluginManager::load("tlb", path, *registry);
+        Typelib::PluginManager::load("tlb", path, *registry.get());
     } catch (const Typelib::ImportError& e){
         return false;
     }
@@ -81,13 +90,6 @@ bool TypeRegistry::loadRegistry(const std::string &path, Typelib::Registry* regi
 
 bool TypeRegistry::loadStateToIDMapping(const std::string &path)
 {
-    std::unique_ptr<Typelib::Registry> registry = std::unique_ptr<Typelib::Registry>(new Typelib::Registry());
-    if (!loadRegistry(path, registry.get()))
-    {
-        std::cerr << "Could not load tlb path: " << path << std::endl;
-        return false;
-    }
-
     Typelib::RegistryIterator it = registry->begin();
     Typelib::RegistryIterator itEnd = registry->end();
     for (; it != itEnd; ++it)
@@ -147,6 +149,16 @@ bool TypeRegistry::getTypekitDefiningType(const std::string& typeName, std::stri
     typekitName = it->second;
     
     return true;
+}
+
+bool TypeRegistry::hasType(const std::string &typeName)
+{
+    return registry->has(typeName, true);
+}
+
+const Typelib::Type *TypeRegistry::getTypeModel(const std::string &typeName)
+{
+    return registry->get(typeName);
 }
 
 bool TypeRegistry::getStateID(const std::string &task_model_name, const std::string &state_name, unsigned int &id)

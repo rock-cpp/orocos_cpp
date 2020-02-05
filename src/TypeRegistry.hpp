@@ -4,6 +4,7 @@
 #include <map>
 #include <memory>
 #include "PkgConfigRegistry.hpp"
+#include <typelib/typemodel.hh>
 
 
 namespace Typelib
@@ -50,13 +51,17 @@ public:
      * @returns false if the state or the task is unknown and cant be loaded
      */
     bool getStateID(const std::string &task_model_name, const std::string &state_name, unsigned& id);
+    bool hasType(const std::string& typeName);
+    const Typelib::Type *getTypeModel(const std::string& typeName);
+    std::shared_ptr<Typelib::Registry> registry;
 
 protected:
     /**
-     * Loads a tlb file to the registry.
+     * Loads a tlb file into meber varibale
+     * std::shared_ptr<Typelib::Registry> registry
      * @param path the path to the tlb file
      */
-    bool loadRegistry(const std::string &path, Typelib::Registry* registry);
+    bool loadTypelibRegistry(const std::string &path);
 
     /**
      * Saves the stateToIDMapping from a given tlb file.
