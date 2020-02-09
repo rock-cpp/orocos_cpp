@@ -726,7 +726,7 @@ YAML::Emitter &operator <<(YAML::Emitter &out, const Typelib::Value &value)
 }
 
 
-std::string ConfigurationHelper::getYamlString(Typelib::Value &value)
+std::string ConfigurationHelper::getYamlString(const Typelib::Value &value)
 {
     YAML::Emitter out;
 

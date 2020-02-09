@@ -71,7 +71,7 @@ public:
     bool applyConfToProperty(RTT::TaskContext* context, const std::string &propertyName, const libConfig::ConfigValue &value);
 
 
-    std::string getYamlString(Typelib::Value &value);
+    std::string getYamlString(const Typelib::Value &value);
 
 private:
     std::map<std::string, libConfig::Configuration> overrides;
