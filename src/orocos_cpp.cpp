@@ -129,6 +129,7 @@ bool OrocosCpp::initialize(const OrocosCppConfig& config, bool quiet)
         st = bundle->initialize(config.load_task_configs);
         if(!st){
             std::cerr << "Error during initialization of Bundle" << std::endl;
+            bundle.reset();
             return false;
         }
     }
