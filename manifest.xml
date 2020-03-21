@@ -6,7 +6,7 @@
   <maintainer></maintainer>
   <license></license>
   <url>https://github.com/rock-cpp/orocos_cpp</url>
-  <tag>needs_opt</tag>
+  <tags>needs_opt</tags>
   <depend package="base/cmake" />
   <depend package="rtt" />
   <depend package="rtt_typelib" />
