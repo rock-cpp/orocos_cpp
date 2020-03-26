@@ -161,6 +161,11 @@ Spawner::ProcessHandle::ProcessHandle(Deployment *deploment, bool redirectOutput
         argv[i + 1] = const_cast<char *>(args[i].c_str());
     }
     
+    std::cout << "Executing " << cmd;
+    for(const std::string& arg : args){
+        std::cout << arg << " ";
+    }
+    std::cout << std::endl;
     execvp(cmd.c_str(), argv);
     
     //failure case
