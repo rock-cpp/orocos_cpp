@@ -166,10 +166,14 @@ bool TypeRegistry::getStateID(const std::string &task_model_name, const std::str
     std::map<std::string, unsigned>::const_iterator state_it = taskStateToID.find(task_model_name + "_" + state_name);
     if (state_it == taskStateToID.end()){
         std::string typekit_name = task_model_name.substr(0, task_model_name.find(":"));
-        if(!loadTypeRegistry(typekit_name)){
+        if(!loadTypeRegistry(typekit_name))
             return false;
-        }else{
-            return getStateID(task_model_name, state_name, id);
+
+        state_it = taskStateToID.find(task_model_name + "_" + state_name);
+        if(state_it == taskStateToID.end())
+        {
+            LOG_ERROR_S << "Task state " << state_name << " is missing in typekit " << typekit_name;
+            return false;
         }
     }
     
