@@ -1,6 +1,7 @@
 #include "orocos_cpp.hpp"
 #include <orocos_cpp/CorbaNameService.hpp>
 #include <rtt/transports/corba/TaskContextServer.hpp>
+#include <lib_config/YAMLConfiguration.hpp>
 #include "PluginHelper.hpp"
 
 
@@ -146,5 +147,10 @@ RTT::corba::TaskContextProxy *OrocosCpp::getTaskContext(std::string name)
 bool OrocosCpp::loadAllTypekitsForModel(std::string packageOrTaskModelName)
 {
     return orocos_cpp::PluginHelper::loadAllTypekitsForModel(packageOrTaskModelName);
+}
+
+std::string OrocosCpp::applyStringVariableInsertions(const std::string &cnd_yaml)
+{
+    return libConfig::YAMLConfigParser::applyStringVariableInsertions(cnd_yaml);
 }
 }

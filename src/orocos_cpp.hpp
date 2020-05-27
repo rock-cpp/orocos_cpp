@@ -19,6 +19,7 @@ public:
     bool initialize(const OrocosCppConfig& config, bool quiet=true);
     RTT::corba::TaskContextProxy* getTaskContext(std::string name);
     inline bool loadAllTypekitsForModel(std::string packageOrTaskModelName);
+    static std::string applyStringVariableInsertions(const std::string& cnd_yaml);
 
     PkgConfigRegistryPtr package_registry;
     TypeRegistryPtr type_registry;
