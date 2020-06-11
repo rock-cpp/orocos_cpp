@@ -3,17 +3,16 @@
     Cpp helper library for Orocos RTT
   </description>
   <author>Janosch Machowinski/janosch.machowinski@dfki.de</author>
-  <maintainer></maintainer>
+  <author>Malte Wirkus/malte.wirkus@dfki.de</author>
+  <maintainer>Malte Wirkus/malte.wirkus@dfki.de</maintainer>
   <license></license>
   <url>https://github.com/rock-cpp/orocos_cpp</url>
   <tags>needs_opt</tags>
   <depend package="base/cmake" />
   <depend package="rtt" />
   <depend package="rtt_typelib" />
-  <depend package="tools/smurf" />
   <depend package="tools/backward" />
   <depend package="tools/orocos_cpp_base" />
-  <depend package="drivers/orogen/transformer" />
   <depend package="tools/logger" />
   <depend package="tools/lib_config" />
 </package>
