@@ -4,6 +4,7 @@
 #include <lib_config/Configuration.hpp>
 #include <yaml-cpp/yaml.h>
 #include <typelib/typemodel.hh>
+#include <typelib/value.hh>
 #include <lib_config/YAMLConfiguration.hpp>
 
 
