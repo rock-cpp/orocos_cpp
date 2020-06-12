@@ -15,68 +15,16 @@
 #include <boost/filesystem.hpp>
 #include "CorbaNameService.hpp"
 #include <lib_config/Bundle.hpp>
-#include <signal.h>
 #include <backward/backward.hpp>
 #include <rtt/transports/corba/TaskContextProxy.hpp>
 
 using namespace orocos_cpp;
 using namespace libConfig;
 
-struct sigaction originalSignalHandler[SIGTERM + 1];
-
-backward::SignalHandling sh;
-
-void shutdownHandler(int signum, siginfo_t *info, void *data);
-
-void restoreSignalHandler(int signum)
-{
-    if(sigaction(signum, originalSignalHandler + signum, nullptr))
-    {
-        throw std::runtime_error("Error, failed to reregister original signal handler");
-    }    
-}
-
-void setSignalHandler(int signum)
-{
-    struct sigaction act;
-
-    act.sa_sigaction = shutdownHandler;
-    
-    /* The SA_SIGINFO flag tells sigaction() to use the sa_sigaction field, not sa_handler. */
-    act.sa_flags = SA_SIGINFO;
-    
-    if(sigaction(signum, &act, originalSignalHandler + signum))
-    {
-        throw std::runtime_error("Error, failed to register signal handler");
-    }
-}
-
-void shutdownHandler(int signum, siginfo_t *info, void *data)
-{
-    std::cout << "Shutdown: trying to kill all childs" << std::endl;
-    
-    try {
-        Spawner::getInstace().killAll();
-        std::cout << "Done " << std::endl;
-    } catch (...)
-    {
-        std::cout << "Error, during killall" << std::endl;
-    }
-    restoreSignalHandler(signum);
-    raise(signum);
-    
-}
-
 Spawner::Spawner()
 {
     nameService = new CorbaNameService();
     nameService->connect();
-
-    setSignalHandler(SIGINT);
-    setSignalHandler(SIGQUIT);
-    setSignalHandler(SIGABRT);
-    setSignalHandler(SIGSEGV);
-    setSignalHandler(SIGTERM);
 }
 
 Spawner& Spawner::getInstace()
