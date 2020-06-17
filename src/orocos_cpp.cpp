@@ -73,7 +73,7 @@ bool setMaxMessageSize(size_t bytes){
     return set_env("ORBgiopMaxMsgSize", std::to_string(bytes));
 }
 
-bool initializeCORBA(int argc, char**argv, std::string host="")
+bool initializeCORBA(int argc, char**argv, std::string host="", size_t max_message_size=DEFAULT_OROCOS_MAX_MESSAGE_SIZE)
 {
     //Set set CORBA nameserver
     if(!host.empty()){
@@ -81,12 +81,7 @@ bool initializeCORBA(int argc, char**argv, std::string host="")
     }
 
     //Set CORBA max message size only if it was not set by the user
-    if(getenv("ORBgiopMaxMsgSize")) {
-        //It's already set by the user. Don't do anything
-    } else {
-        //Set to 100MB
-        bool st = setMaxMessageSize(100*1000*1000);
-    }
+    setMaxMessageSize(max_message_size);
 
     //Do the initialization
     bool orb_st = RTT::corba::ApplicationServer::InitOrb(argc, argv);
@@ -109,7 +104,7 @@ bool OrocosCpp::initialize(const OrocosCppConfig& config, bool quiet)
     //Init CORBA
     if(config.init_corba){
         if(!quiet) std::cout << "Initializing CORBA.. " << std::endl;
-        st = initializeCORBA(0, {}, config.corba_host);
+        st = initializeCORBA(0, {}, config.corba_host, config.max_message_size);
         if(!st){
             std::cerr << "Failed to initialze CORBA" << std::endl;
             return false;

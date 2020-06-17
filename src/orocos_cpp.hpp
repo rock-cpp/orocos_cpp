@@ -6,6 +6,7 @@
 #include <rtt/transports/corba/TaskContextProxy.hpp>
 
 
+#define DEFAULT_OROCOS_MAX_MESSAGE_SIZE 1000000000
 namespace orocos_cpp {
 
 //Harmonize namespace for simpler API usage

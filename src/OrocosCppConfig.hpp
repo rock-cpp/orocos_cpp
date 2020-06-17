@@ -13,7 +13,8 @@ public:
         init_type_registry(false),
         load_typekits(true),
         corba_host(""),
-        init_corba(true)
+        init_corba(true),
+        max_message_size(-1)
     {}
     //! Specifies the names of oroGen packages that should be loaded at
     //! initialization time.
@@ -64,5 +65,9 @@ public:
     //! Should CORBA be initialized.
     //! If set to false no interaction with TaskContexts can be carreid out!
     bool init_corba;
+
+    //! Max size of message that can be marshalled via CORBA.
+    //! The size is given in bytes.
+    int max_message_size;
 };
 }
