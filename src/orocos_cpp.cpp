@@ -62,11 +62,33 @@ bool set_corba_ns_host(std::string hostname_or_ip){
     return ret;
 }
 
+bool setMaxMessageSize(size_t bytes){
+    std::string env_str = "ORBgiopMaxMsgSize="+std::to_string(bytes);
+    char *cstr = &(env_str[0]);
+    if( putenv(cstr) !=0 )
+    {
+        fprintf(stderr,"putenv failed\n");
+        return false;
+    }
+    return true;
+}
+
 bool initializeCORBA(int argc, char**argv, std::string host="")
 {
+    //Set set CORBA nameserver
     if(!host.empty()){
         set_corba_ns_host(host);
     }
+
+    //Set CORBA max message size only if it was not set by the user
+    if(getenv("ORBgiopMaxMsgSize")) {
+        //It's already set by the user. Don't do anything
+    } else {
+        //Set to 100MB
+        bool st = setMaxMessageSize(100*1000*1000);
+    }
+
+    //Do the initialization
     bool orb_st = RTT::corba::ApplicationServer::InitOrb(argc, argv);
     if(!orb_st){
 
