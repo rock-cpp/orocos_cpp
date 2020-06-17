@@ -56,21 +56,21 @@ bool validateNameServiceClient(std::string hostname, std::string port=""){
     return getNameService(hostname, port);
 }
 
-bool set_corba_ns_host(std::string hostname_or_ip){
-    char* envi = strdup(("ORBInitRef=NameService=corbaname::"+hostname_or_ip).c_str());
-    int ret = putenv(envi);
-    return ret;
-}
-
-bool setMaxMessageSize(size_t bytes){
-    std::string env_str = "ORBgiopMaxMsgSize="+std::to_string(bytes);
-    char *cstr = &(env_str[0]);
-    if( putenv(cstr) !=0 )
+bool set_env(std::string var, std::string value, bool overwrite=true){
+    if( setenv(var.c_str(), value.c_str(), overwrite) !=0 )
     {
         fprintf(stderr,"putenv failed\n");
         return false;
     }
     return true;
+}
+
+bool set_corba_ns_host(std::string hostname_or_ip){
+    return set_env("ORBInitRef", "NameService=corbaname::"+hostname_or_ip);
+}
+
+bool setMaxMessageSize(size_t bytes){
+    return set_env("ORBgiopMaxMsgSize", std::to_string(bytes));
 }
 
 bool initializeCORBA(int argc, char**argv, std::string host="")
@@ -124,6 +124,19 @@ bool OrocosCpp::initialize(const OrocosCppConfig& config, bool quiet)
         return false;
     }
 
+    //Init Bundle
+    if(config.init_bundle){
+        if(!quiet) std::cout << "\nInitializing Bundle.." << std::endl;
+        bundle.reset(new Bundle);
+        st = bundle->initialize(config.load_task_configs);
+        if(!st){
+            std::cerr << "Error during initialization of Bundle" << std::endl;
+            bundle.reset();
+            return false;
+        }
+        st = set_env("ORO_LOGFILE", bundle->getLogDirectory()+"/orocos.log", true);
+    }
+
     //Load Typekits
     if(config.load_typekits){
         if(!quiet) std::cout << "\nLoading Typekits.." << std::endl;
@@ -141,18 +154,6 @@ bool OrocosCpp::initialize(const OrocosCppConfig& config, bool quiet)
         st = type_registry->loadTypeRegistries();
         if(!st){
             std::cerr << "Error during initialization of TypeRegistry" << std::endl;
-            return false;
-        }
-    }
-
-    //Init Bundle
-    if(config.init_bundle){
-        if(!quiet) std::cout << "\nInitializing Bundle.." << std::endl;
-        bundle.reset(new Bundle);
-        st = bundle->initialize(config.load_task_configs);
-        if(!st){
-            std::cerr << "Error during initialization of Bundle" << std::endl;
-            bundle.reset();
             return false;
         }
     }
