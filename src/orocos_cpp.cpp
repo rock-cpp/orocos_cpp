@@ -1,6 +1,7 @@
 #include "orocos_cpp.hpp"
 #include <orocos_cpp/CorbaNameService.hpp>
 #include <rtt/transports/corba/TaskContextServer.hpp>
+#include <lib_config/YAMLConfiguration.hpp>
 #include "PluginHelper.hpp"
 
 
@@ -55,17 +56,34 @@ bool validateNameServiceClient(std::string hostname, std::string port=""){
     return getNameService(hostname, port);
 }
 
-bool set_corba_ns_host(std::string hostname_or_ip){
-    char* envi = strdup(("ORBInitRef=NameService=corbaname::"+hostname_or_ip).c_str());
-    int ret = putenv(envi);
-    return ret;
+bool set_env(std::string var, std::string value, bool overwrite=true){
+    if( setenv(var.c_str(), value.c_str(), overwrite) !=0 )
+    {
+        fprintf(stderr,"putenv failed\n");
+        return false;
+    }
+    return true;
 }
 
-bool initializeCORBA(int argc, char**argv, std::string host="")
+bool set_corba_ns_host(std::string hostname_or_ip){
+    return set_env("ORBInitRef", "NameService=corbaname::"+hostname_or_ip);
+}
+
+bool setMaxMessageSize(size_t bytes){
+    return set_env("ORBgiopMaxMsgSize", std::to_string(bytes));
+}
+
+bool initializeCORBA(int argc, char**argv, std::string host="", size_t max_message_size=DEFAULT_OROCOS_MAX_MESSAGE_SIZE)
 {
+    //Set set CORBA nameserver
     if(!host.empty()){
         set_corba_ns_host(host);
     }
+
+    //Set CORBA max message size only if it was not set by the user
+    setMaxMessageSize(max_message_size);
+
+    //Do the initialization
     bool orb_st = RTT::corba::ApplicationServer::InitOrb(argc, argv);
     if(!orb_st){
 
@@ -86,7 +104,7 @@ bool OrocosCpp::initialize(const OrocosCppConfig& config, bool quiet)
     //Init CORBA
     if(config.init_corba){
         if(!quiet) std::cout << "Initializing CORBA.. " << std::endl;
-        st = initializeCORBA(0, {}, config.corba_host);
+        st = initializeCORBA(0, {}, config.corba_host, config.max_message_size);
         if(!st){
             std::cerr << "Failed to initialze CORBA" << std::endl;
             return false;
@@ -99,6 +117,19 @@ bool OrocosCpp::initialize(const OrocosCppConfig& config, bool quiet)
     if(!package_registry){
         std::cerr << "Error initializing Rock-packages" <<std::endl;
         return false;
+    }
+
+    //Init Bundle
+    if(config.init_bundle){
+        if(!quiet) std::cout << "\nInitializing Bundle.." << std::endl;
+        bundle.reset(new Bundle);
+        st = bundle->initialize(config.load_task_configs);
+        if(!st){
+            std::cerr << "Error during initialization of Bundle" << std::endl;
+            bundle.reset();
+            return false;
+        }
+        st = set_env("ORO_LOGFILE", bundle->getLogDirectory()+"/orocos.log", true);
     }
 
     //Load Typekits
@@ -122,18 +153,6 @@ bool OrocosCpp::initialize(const OrocosCppConfig& config, bool quiet)
         }
     }
 
-    //Init Bundle
-    if(config.init_bundle){
-        if(!quiet) std::cout << "\nInitializing Bundle.." << std::endl;
-        bundle.reset(new Bundle);
-        st = bundle->initialize(config.load_task_configs);
-        if(!st){
-            std::cerr << "Error during initialization of Bundle" << std::endl;
-            bundle.reset();
-            return false;
-        }
-    }
-
     if(!quiet) std::cout << "\nOrocosCPP initialization complete!"<<std::endl;
     return true;
 }
@@ -146,5 +165,10 @@ RTT::corba::TaskContextProxy *OrocosCpp::getTaskContext(std::string name)
 bool OrocosCpp::loadAllTypekitsForModel(std::string packageOrTaskModelName)
 {
     return orocos_cpp::PluginHelper::loadAllTypekitsForModel(packageOrTaskModelName);
+}
+
+std::string OrocosCpp::applyStringVariableInsertions(const std::string &cnd_yaml)
+{
+    return libConfig::YAMLConfigParser::applyStringVariableInsertions(cnd_yaml);
 }
 }

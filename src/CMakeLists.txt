@@ -2,7 +2,6 @@ find_package( Boost COMPONENTS thread system filesystem regex)
 rock_library(orocos_cpp
     SOURCES 
         ConfigurationHelper.cpp
-        TransformerHelper.cpp
         TypeRegistry.cpp
         LoggingHelper.cpp
         LoggerProxy.cpp
@@ -17,7 +16,6 @@ rock_library(orocos_cpp
         OrocosCppConfig.hpp
     HEADERS 
         ConfigurationHelper.hpp
-        TransformerHelper.hpp
         TypeRegistry.hpp
         LoggingHelper.hpp
         Spawner.hpp
@@ -26,7 +24,6 @@ rock_library(orocos_cpp
         Deployment.hpp
         PkgConfigHelper.hpp
         PluginHelper.hpp
-        TransformationProvider.hpp
         PkgConfigRegistry.hpp
         orocos_cpp.hpp
         OrocosCppConfig.hpp
@@ -37,9 +34,6 @@ rock_library(orocos_cpp
         orocos-rtt-mqueue-${OROCOS_TARGET}
         orocos-rtt-corba-${OROCOS_TARGET}
         typelib
-        transformer
-        transformer-typekit-gnulinux
-        smurf
         lib_config
         backward
     DEPS_PLAIN 

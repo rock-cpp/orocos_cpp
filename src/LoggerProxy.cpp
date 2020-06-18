@@ -5,7 +5,6 @@
 #include <rtt/transports/mqueue/TransportPlugin.hpp>
 
 #include <rtt/types/TypekitPlugin.hpp>
-#include <logger/typekit/Plugin.hpp>
     
 #include "PluginHelper.hpp"
 

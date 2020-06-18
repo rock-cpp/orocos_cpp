@@ -3,7 +3,7 @@
 #include <rtt/transports/corba/TaskContextServer.hpp>
 
 #include "Spawner.hpp"
-#include "TransformerHelper.hpp"
+//#include "TransformerHelper.hpp"
 #include "PluginHelper.hpp"
 
 using namespace orocos_cpp;
@@ -36,10 +36,10 @@ int main(int argc, char**argv)
     
     ConfigurationHelper helper;
 
-    smurf::Robot foo;
-    TransformerHelper trHelper(foo);
+//    smurf::Robot foo;
+//    TransformerHelper trHelper(foo);
     
-    trHelper.configureTransformer(proxy);
+//    trHelper.configureTransformer(proxy);
     
     if(!helper.applyConfig(proxy, "default", "ground_based_sweeping"))
         std::cout << "APPLY FAILED" << std::endl;

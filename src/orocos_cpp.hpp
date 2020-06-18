@@ -6,6 +6,7 @@
 #include <rtt/transports/corba/TaskContextProxy.hpp>
 
 
+#define DEFAULT_OROCOS_MAX_MESSAGE_SIZE 1000000000
 namespace orocos_cpp {
 
 //Harmonize namespace for simpler API usage
@@ -19,6 +20,7 @@ public:
     bool initialize(const OrocosCppConfig& config, bool quiet=true);
     RTT::corba::TaskContextProxy* getTaskContext(std::string name);
     inline bool loadAllTypekitsForModel(std::string packageOrTaskModelName);
+    static std::string applyStringVariableInsertions(const std::string& cnd_yaml);
 
     PkgConfigRegistryPtr package_registry;
     TypeRegistryPtr type_registry;
