@@ -137,7 +137,11 @@ bool OrocosCpp::initialize(const OrocosCppConfig& config, bool quiet)
         if(!quiet) std::cout << "\nLoading Typekits.." << std::endl;
         for(std::string tkn : package_registry->getRegisteredTypekitNames())
         {
-            st = PluginHelper::loadTypekitAndTransports(tkn);
+            try{
+                st = PluginHelper::loadTypekitAndTransports(tkn);
+            }catch(std::runtime_error ex){
+                std::cerr << ex.what() << std::endl;
+            }
         }
     }
 
