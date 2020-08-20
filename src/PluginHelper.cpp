@@ -28,6 +28,7 @@ std::vector< std::string > PluginHelper::getNeededTypekits(const std::string& co
         return it->second;
 
     PkgConfigRegistryPtr pkgreg = PkgConfigRegistry::get();
+
     OrogenPkgConfig pkg;
     if(!pkgreg->getOrogen(componentName, pkg)){
         throw std::runtime_error("Could not load pkgConfig file for typekit for component " + componentName);
@@ -163,7 +164,6 @@ bool PluginHelper::loadTypekitAndTransports(const std::string& typekitName)
     return true;
 }
 
-//This method loads all typkits required for a task model.
 bool PluginHelper::loadAllTypekitsForModel(const std::string &modelName){
     std::string componentName = modelName.substr(0, modelName.find_first_of(':'));
 

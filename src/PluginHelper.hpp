@@ -3,6 +3,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include "PkgConfigRegistry.hpp"
 
 namespace orocos_cpp
 {
@@ -31,6 +32,7 @@ public:
      * @param modelName The Name of a task model, e.g., "camera_usb::Task"
      * @return Returns True if new task models were loaded. Returns False if no
      * model was loaded (also if no load was required)!
+     * @throws std::runtime_error if errors during loading of a typekit occur
      */
     static bool loadAllTypekitsForModel(const std::string &modelName);
 
