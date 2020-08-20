@@ -18,6 +18,11 @@ namespace orocos_cpp
 class TypeRegistry;
 typedef std::shared_ptr<TypeRegistry> TypeRegistryPtr;
 
+/*!
+ * \brief The TypeRegistry class goves access to content from TLB files
+ *
+ * Note that it does not handle the loading of transports.
+ */
 class TypeRegistry
 {
 protected:
@@ -29,12 +34,32 @@ public:
     TypeRegistry(PkgConfigRegistryPtr pkgreg);
     TypeRegistry();
     
-    /**
-      * Load single TypeRegistry for a given typekit name
-      */
-    bool loadTypeRegistry(const std::string& typekitName);
-    /**
-     * Loads type registryies for all typekits defined in \var pkgreg
+    /*!
+     * \brief Load the registry for a typekit identified by its name
+     *
+     * The function keeps track of all registries that have been loade successfully
+     * and only loads them, if they have not been laoded before, or \p force
+     * is set to true.
+     *
+     * Typekits contain all types that are required from a orogen Packages,
+     * including this that originate from other typekits. Thus it's not needed
+     * to explicitly load all imported typekits explicitly.
+     *
+     * \param typekitName : Typekit to load
+     * \param force : Forcefully load the Typekit registry, even if it was loaded before
+     * \return True if typekit registry was successfully loaded, or was already loaded before
+     */
+    bool loadTypeRegistry(const std::string& typekitName, bool force=false);
+
+    /*!
+     * \brief Load all Typekits that are registered in \p pkgreg
+     *
+     * Note that this function does not load all typekit that are presetn on the
+     * system, but only those which have been loaded in the PkgConfigRegistry.
+     * To load all typekits, pass a PkgConfigRegistry, where all pakcages have
+     * been loaded.
+     *
+     * \return true if all Typekits have been loaded successfully
      */
     bool loadTypeRegistries();
     
@@ -54,6 +79,7 @@ public:
     bool hasType(const std::string& typeName);
     const Typelib::Type *getTypeModel(const std::string& typeName);
     std::shared_ptr<Typelib::Registry> registry;
+    std::vector<std::string> loadedTypekits;
 
 protected:
     /**

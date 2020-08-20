@@ -27,12 +27,16 @@ TypeRegistry::TypeRegistry() : TypeRegistry(PkgConfigRegistry::get())
 {
 }
 
-bool TypeRegistry::loadTypeRegistry(const std::string& typekitName)
+bool TypeRegistry::loadTypeRegistry(const std::string& typekitName, bool force)
 {
+    if(std::find(loadedTypekits.begin(), loadedTypekits.end(), typekitName) != loadedTypekits.end() && !force){
+        return true;
+    }
+
     //Resolve bath to TLB file
     TypekitPkgConfig tpkg;
     if(!pkgreg->getTypekit(typekitName, tpkg)){
-        LOG_ERROR_S << "Could not retrieve Tpekit from PkgConfigREgistry";
+        LOG_ERROR_S << "Could not retrieve Tpekit from PkgConfigRegistry";
         return false;
     }
 
@@ -65,6 +69,8 @@ bool TypeRegistry::loadTypeRegistry(const std::string& typekitName)
         LOG_ERROR_S << "Could not parse Typelist file " << typeRegistryPath;;
         return false;
     }
+
+    loadedTypekits.push_back(typekitName);
     return true;
 }
 
