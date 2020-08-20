@@ -128,8 +128,9 @@ bool OrocosCpp::initialize(const OrocosCppConfig& config, bool quiet)
             std::cerr << "Error during initialization of Bundle" << std::endl;
             bundle.reset();
             return false;
+        }else{
+            st = set_env("ORO_LOGFILE", bundle->getLogDirectory()+"/orocos.log", true);
         }
-        st = set_env("ORO_LOGFILE", bundle->getLogDirectory()+"/orocos.log", true);
     }
 
     //Load Typekits
