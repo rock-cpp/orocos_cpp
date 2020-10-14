@@ -225,15 +225,15 @@ bool ConfigurationHelper::applyConfOnTyplibValue(Typelib::Value &value, const Co
     {
         case Typelib::Type::Array:
         {
-            const ArrayConfigValue &arrayConfig = dynamic_cast<const ArrayConfigValue &>(conf);
-            const Typelib::Array &array = dynamic_cast<const Typelib::Array &>(value.getType());
-            const Typelib::Type &indirect = array.getIndirection();
+            const ArrayConfigValue *arrayConfig = dynamic_cast<const ArrayConfigValue *>(&conf);
+            const Typelib::Array *array = dynamic_cast<const Typelib::Array *>(&value.getType());
+            const Typelib::Type &indirect = array->getIndirection();
             
-            size_t arraySize = array.getDimension();
+            size_t arraySize = array->getDimension();
             
-            if(arrayConfig.getValues().size() != arraySize)
+            if(arrayConfig->getValues().size() != arraySize)
             {
-                std::cout << "Error: Array " << arrayConfig.getName() << " of properties has different size than array in config file" << std::endl;
+                std::cout << "Error: Array " << arrayConfig->getName() << " of properties has different size than array in config file" << std::endl;
                 return false;
             }
             
@@ -241,19 +241,19 @@ bool ConfigurationHelper::applyConfOnTyplibValue(Typelib::Value &value, const Co
             {
                 size_t offset =  indirect.getSize() * i;
                 Typelib::Value v( reinterpret_cast<uint8_t *>(value.getData()) + offset , indirect);
-                if(!applyConfOnTyplibValue(v, *(arrayConfig.getValues()[i])))
+                if(!applyConfOnTyplibValue(v, *(arrayConfig->getValues()[i])))
                     return false;
             }
         }
         break;
         case Typelib::Type::Compound:
         {
-            const Typelib::Compound &comp = dynamic_cast<const Typelib::Compound &>(value.getType());
-            Typelib::Compound::FieldList::const_iterator it = comp.getFields().begin();
-            const ComplexConfigValue &cpx = dynamic_cast<const ComplexConfigValue &>(conf);
-            auto confValues = cpx.getValues();
+            const Typelib::Compound *comp = dynamic_cast<const Typelib::Compound *>(&value.getType());
+            Typelib::Compound::FieldList::const_iterator it = comp->getFields().begin();
+            const ComplexConfigValue *cpx = dynamic_cast<const ComplexConfigValue *>(&conf);
+            auto confValues = cpx->getValues();
             
-            for(;it != comp.getFields().end(); it++)
+            for(;it != comp->getFields().end(); it++)
             {
                 std::map<std::string, std::shared_ptr<ConfigValue> >::const_iterator confIt = confValues.find(it->getName());
                 Typelib::Value fieldValue(((uint8_t *) value.getData()) + it->getOffset(), it->getType());
@@ -278,17 +278,17 @@ bool ConfigurationHelper::applyConfOnTyplibValue(Typelib::Value &value, const Co
                 {
                     std::cout << "  " << it->first << std::endl;
                 }
-                std::cout << "is/are not members of " << comp.getName() << std::endl;
+                std::cout << "is/are not members of " << comp->getName() << std::endl;
                 return false;
             }
         }
             break;
         case Typelib::Type::Container:
             {
-                const Typelib::Container &cont = dynamic_cast<const Typelib::Container &>(value.getType());
+                const Typelib::Container *cont = dynamic_cast<const Typelib::Container *>(&(value.getType()));
                 Typelib::zero(value);
-                const Typelib::Type &indirect = cont.getIndirection();
-                if(cont.kind() == "/std/string")
+                const Typelib::Type &indirect = cont->getIndirection();
+                if(cont->kind() == "/std/string")
                 {
                     if(conf.getType() != ConfigValue::SIMPLE)
                     {
@@ -296,13 +296,13 @@ bool ConfigurationHelper::applyConfOnTyplibValue(Typelib::Value &value, const Co
                         std::cout << "Error, got container in property, but config value is not a String " << std::endl;
                         return false;
                     }
-                    const SimpleConfigValue &sconf = dynamic_cast<const SimpleConfigValue &>(conf);
+                    const SimpleConfigValue *sconf = dynamic_cast<const SimpleConfigValue *>(&conf);
 
-                    size_t chars = sconf.getValue().size();
+                    size_t chars = sconf->getValue().size();
                     for(size_t i = 0; i < chars; i++)
                     {
-                    	Typelib::Value singleChar((void *)( sconf.getValue().c_str() + i), indirect);
-                        cont.push(value.getData(), singleChar);
+                        Typelib::Value singleChar((void *)( sconf->getValue().c_str() + i), indirect);
+                        cont->push(value.getData(), singleChar);
                     }
                     break;
                 }
@@ -314,10 +314,9 @@ bool ConfigurationHelper::applyConfOnTyplibValue(Typelib::Value &value, const Co
                         std::cout << "Error, got container in property, but config value is not an array " << std::endl;
                         return false;
                     }
-                    const ArrayConfigValue &array = dynamic_cast<const ArrayConfigValue &>(conf);
-                    
+                    const ArrayConfigValue *array = dynamic_cast<const ArrayConfigValue *>(&conf);
 
-                    for(const std::shared_ptr<ConfigValue> val: array.getValues())
+                    for(const std::shared_ptr<ConfigValue> val: array->getValues())
                     {
                         
                         //TODO check, this may be a memory leak
@@ -330,7 +329,7 @@ bool ConfigurationHelper::applyConfOnTyplibValue(Typelib::Value &value, const Co
                             return false;
                         }
                         
-                        cont.push(value.getData(), v);
+                        cont->push(value.getData(), v);
                     }
                 }
             }
