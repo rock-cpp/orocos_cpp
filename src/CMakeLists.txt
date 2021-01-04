@@ -35,10 +35,14 @@ rock_library(orocos_cpp
         orocos-rtt-corba-${OROCOS_TARGET}
         typelib
         lib_config
-        backward
     DEPS_PLAIN 
         Boost_SYSTEM Boost_FILESYSTEM Boost_REGEX Boost_THREAD
     )
+
+find_package(Backward)
+if(Backward_FOUND)
+    target_link_libraries(orocos_cpp PUBLIC Backward::Backward)
+endif()
 
 rock_executable(listAll Main.cpp
     DEPS orocos_cpp
