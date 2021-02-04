@@ -30,7 +30,6 @@ class Spawner : public boost::noncopyable
 public:
     class ProcessHandle
     {
-        mutable bool isRunning;
         pid_t pid;
         void redirectOutput(const std::string &filename);
         std::string processName;

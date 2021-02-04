@@ -92,7 +92,7 @@ Spawner& Spawner::getInstace()
 }
 
 
-Spawner::ProcessHandle::ProcessHandle(Deployment *deploment, bool redirectOutputv, const std::string &logDir) : isRunning(true), deployment(deploment)
+Spawner::ProcessHandle::ProcessHandle(Deployment *deploment, bool redirectOutputv, const std::string &logDir) : deployment(deploment)
 {
     std::string cmd;
     std::vector< std::string > args;
@@ -178,54 +178,18 @@ Spawner::ProcessHandle::ProcessHandle(Deployment *deploment, bool redirectOutput
 
 bool Spawner::ProcessHandle::alive() const
 {
-    //if it was already determined before that the process is already dead,
-    //we can stop here. Otherwise waitpid would fail!
-    if(!isRunning){
-        return isRunning;
-    }
-
     int status = 0;
     pid_t ret = waitpid(pid, &status, WNOHANG);
     
-    if(ret < 0 )
-    {
-        throw std::runtime_error(std::string("WaitPid failed ") + strerror(errno));
-    }
-    
-    if(!status)
-    {
-        return isRunning;
-    }
-    
-    if(WIFEXITED(status))
-    {
-        int exitStatus = WEXITSTATUS(status);
-        std::cout << "Process " << pid << " terminated normaly, return code " << exitStatus << std::endl;
-        isRunning = false;
-    }
-    
-    if(WIFSIGNALED(status))
-    {
-        isRunning = false;
-        
-        int sigNum = WTERMSIG(status);
-        
-        if(sigNum == SIGSEGV)
-        {
-            
-            std::cout << "Process " << processName << " segfaulted " << std::endl;            
-        }
-        else
-        {
-            std::cout << "Process " << processName << " was terminated by SIG " << sigNum << std::endl;                        
-        }
-        
-    }
-    
-    return isRunning;
+    if(ret == 0)
+        return true;
+    else if(ret == pid)
+        return false;
+    else if(ret == -1 )
+        throw std::runtime_error(std::string("waitpid failed: ") + strerror(errno));
+    else
+        throw std::runtime_error("waitpid returned undocumented value");
 }
-
-
 
 const Deployment& Spawner::ProcessHandle::getDeployment() const
 {
