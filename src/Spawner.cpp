@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <iostream>
+#include <sstream>
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
@@ -191,6 +192,18 @@ bool Spawner::ProcessHandle::alive() const
         throw std::runtime_error("waitpid returned undocumented value");
 }
 
+bool Spawner::ProcessHandle::wait(int cycles, int usecs_between_cycles) const
+{
+    while(alive())
+    {
+        usleep(usecs_between_cycles);
+        cycles --;
+        if(cycles <= 0)
+            return false;
+    }
+    return true;
+}
+
 const Deployment& Spawner::ProcessHandle::getDeployment() const
 {
     return *deployment;
@@ -220,7 +233,41 @@ void Spawner::ProcessHandle::sendSigTerm() const
     }
 }
 
+bool Spawner::ProcessHandle::end()
+{
+    if(kill(pid, SIGINT))
+    {
+        std::stringstream msg;
+        msg << "Error sending of SIGINT to pid " << pid << " failed:" << strerror(errno);
+        throw std::runtime_error(msg.str());
+    }
+    
+    int cycles = 500;
+    bool finished = false;
+    while(!finished && cycles > 0)
+    {
+        usleep(500);
+        cycles--;
+        finished = !alive();
+    }
+    
+    if(finished)
+        return true;
 
+    if(kill(pid, SIGKILL))
+    {
+         std::cout << "Error sending of SIGKILL to pid " << pid << " failed:" << strerror(errno) << std::endl;
+    }
+
+    while(!finished && cycles > 0)
+    {
+        usleep(500);
+        cycles--;
+        finished = !alive();
+    }
+    
+    return finished;
+}
 
 Spawner::ProcessHandle &Spawner::spawnTask(const std::string& cmp1, const std::string& as, bool redirectOutput)
 {
@@ -236,6 +283,13 @@ Spawner::ProcessHandle& Spawner::spawnDeployment(Deployment* deployment, bool re
         logDir = Bundle::getInstance().getLogDirectory();
     }
 
+    // rename the logger of default deployments
+    // this guarantees that every task has it's own logger
+    if(deployment->getName().find("orogen_default_") == 0)
+    {
+        deployment->renameTask(deployment->getLoggerName(), deployment->getName() + "_Logger");
+    }
+
     ProcessHandle *handle = new ProcessHandle(deployment, redirectOutput, logDir);
     
     handles.push_back(handle);
@@ -246,6 +300,16 @@ Spawner::ProcessHandle& Spawner::spawnDeployment(Deployment* deployment, bool re
     }
     
     return *handle;
+}
+
+Spawner::ProcessHandle& Spawner::getDeployment(const std::string& dplName)
+{
+    for(Spawner::ProcessHandle* h : handles)
+    {
+        if(h->getDeployment().getName() == dplName)
+            return *h;
+    }
+    throw std::runtime_error(std::string("Deployment does not exist: ") + dplName);
 }
 
 Spawner::ProcessHandle& Spawner::spawnDeployment(const std::string& dplName, bool redirectOutput)
@@ -306,6 +370,24 @@ void Spawner::waitUntilAllReady(const base::Time& timeout)
             throw std::runtime_error("Spawner::waitUntilAllReady: Error timeout while waiting for tasks to register at nameservice");
         }
     }
+}
+
+bool Spawner::killDeployment(const std::string &dplName)
+{
+    Spawner::ProcessHandle &handle = getDeployment(dplName);
+
+    handle.sendSigInt();
+    if(!handle.wait())
+    {
+        std::cout << "Failed to terminate deployment '" << dplName << "', trying to kill..." << std::endl;
+        handle.sendSigKill();
+        if(!handle.wait())
+        {
+            std::cout << "Failed to kill deployment '" << dplName << "'." << std::endl;
+            return false;
+        }
+    }
+    return true;
 }
 
 void Spawner::killAll()

@@ -140,6 +140,11 @@ const std::vector< std::string >& Deployment::getTaskNames() const
     return tasks;
 }
 
+const std::map<std::string, std::string>& Deployment::getRenameMap() const
+{
+    return renameMap;
+}
+
 const std::vector< std::string >& Deployment::getNeededTypekits() const
 {
     return typekits;
