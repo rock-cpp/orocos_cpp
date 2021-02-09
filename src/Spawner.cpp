@@ -233,42 +233,6 @@ void Spawner::ProcessHandle::sendSigTerm() const
     }
 }
 
-bool Spawner::ProcessHandle::end()
-{
-    if(kill(pid, SIGINT))
-    {
-        std::stringstream msg;
-        msg << "Error sending of SIGINT to pid " << pid << " failed:" << strerror(errno);
-        throw std::runtime_error(msg.str());
-    }
-    
-    int cycles = 500;
-    bool finished = false;
-    while(!finished && cycles > 0)
-    {
-        usleep(500);
-        cycles--;
-        finished = !alive();
-    }
-    
-    if(finished)
-        return true;
-
-    if(kill(pid, SIGKILL))
-    {
-         std::cout << "Error sending of SIGKILL to pid " << pid << " failed:" << strerror(errno) << std::endl;
-    }
-
-    while(!finished && cycles > 0)
-    {
-        usleep(500);
-        cycles--;
-        finished = !alive();
-    }
-    
-    return finished;
-}
-
 Spawner::ProcessHandle &Spawner::spawnTask(const std::string& cmp1, const std::string& as, bool redirectOutput)
 {
     Deployment *dpl = new Deployment(cmp1, as);

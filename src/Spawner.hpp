@@ -41,7 +41,6 @@ public:
         const Deployment &getDeployment() const;
         bool alive() const;
         bool wait(int cycles=500, int usecs_between_cycles=500) const;
-        bool end();
         void sendSigInt() const;
         void sendSigTerm() const;
         void sendSigKill() const;
