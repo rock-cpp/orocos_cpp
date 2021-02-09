@@ -57,7 +57,7 @@ void shutdownHandler(int signum, siginfo_t *info, void *data)
     std::cout << "Shutdown: trying to kill all childs" << std::endl;
     
     try {
-        Spawner::getInstace().killAll();
+        Spawner::getInstance().killAll();
         std::cout << "Done " << std::endl;
     } catch (...)
     {
@@ -80,7 +80,7 @@ Spawner::Spawner()
     setSignalHandler(SIGTERM);
 }
 
-Spawner& Spawner::getInstace()
+Spawner& Spawner::getInstance()
 {
     static Spawner *instance = nullptr;
     

@@ -52,7 +52,7 @@ public:
      * Singleton pattern, returns the ONE instance of
      * the spawner.
      * */
-    static Spawner &getInstace();
+    static Spawner &getInstance();
     
     /**
      * This method spawns a default deployment matching the given componente description.

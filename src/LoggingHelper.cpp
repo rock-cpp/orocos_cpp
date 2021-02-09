@@ -28,7 +28,7 @@ bool LoggingHelper::logTasks()
 
 bool LoggingHelper::logTasks(const std::map<std::string, bool> &loggingEnabledTaskMap, bool logAll)
 {
-    Spawner &spawner(Spawner::getInstace());
+    Spawner &spawner(Spawner::getInstance());
     
     std::vector<const Deployment *> depls = spawner.getRunningDeployments();
     
@@ -89,7 +89,7 @@ bool LoggingHelper::logTasks(const std::map<std::string, bool> &loggingEnabledTa
 
 bool LoggingHelper::logTasks(const std::vector< std::string >& excludeList)
 {
-    Spawner &spawner(Spawner::getInstace());
+    Spawner &spawner(Spawner::getInstance());
     
     std::vector<const Deployment *> depls = spawner.getRunningDeployments();
     
