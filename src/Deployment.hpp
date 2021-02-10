@@ -44,6 +44,8 @@ public:
      * */
     const std::vector<std::string> &getTaskNames() const;
     
+    const std::map<std::string, std::string> &getRenameMap() const;
+    
     const std::vector<std::string> &getNeededTypekits() const;
     
     /**

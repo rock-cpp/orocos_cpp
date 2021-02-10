@@ -30,7 +30,6 @@ class Spawner : public boost::noncopyable
 public:
     class ProcessHandle
     {
-        mutable bool isRunning;
         pid_t pid;
         void redirectOutput(const std::string &filename);
         std::string processName;
@@ -41,6 +40,7 @@ public:
         
         const Deployment &getDeployment() const;
         bool alive() const;
+        bool wait(int cycles=500, int usecs_between_cycles=500) const;
         void sendSigInt() const;
         void sendSigTerm() const;
         void sendSigKill() const;
@@ -52,7 +52,7 @@ public:
      * Singleton pattern, returns the ONE instance of
      * the spawner.
      * */
-    static Spawner &getInstace();
+    static Spawner &getInstance();
     
     /**
      * This method spawns a default deployment matching the given componente description.
@@ -86,6 +86,12 @@ public:
     ProcessHandle &spawnDeployment(Deployment *deployment, bool redirectOutput = true);
     
     /**
+     * Get a deployment by its name
+     * @arg dplName
+     */
+    ProcessHandle &getDeployment(const std::string &dplName);
+
+    /**
      * This method checks if all spawened processes are still alive
      * @return false if any process died
      * */
@@ -105,6 +111,12 @@ public:
      * */
     void waitUntilAllReady(const base::Time &timeout);
     
+    /**
+     * Kill deployment with the given name
+     * @arg dplName
+     */
+    bool killDeployment(const std::string &dplName);
+
     /**
      * This method first sends a sigterm to all processes
      * and waits for the processes to terminate. If this

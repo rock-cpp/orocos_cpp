@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <iostream>
+#include <sstream>
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
@@ -56,7 +57,7 @@ void shutdownHandler(int signum, siginfo_t *info, void *data)
     std::cout << "Shutdown: trying to kill all childs" << std::endl;
     
     try {
-        Spawner::getInstace().killAll();
+        Spawner::getInstance().killAll();
         std::cout << "Done " << std::endl;
     } catch (...)
     {
@@ -79,7 +80,7 @@ Spawner::Spawner()
     setSignalHandler(SIGTERM);
 }
 
-Spawner& Spawner::getInstace()
+Spawner& Spawner::getInstance()
 {
     static Spawner *instance = nullptr;
     
@@ -92,7 +93,7 @@ Spawner& Spawner::getInstace()
 }
 
 
-Spawner::ProcessHandle::ProcessHandle(Deployment *deploment, bool redirectOutputv, const std::string &logDir) : isRunning(true), deployment(deploment)
+Spawner::ProcessHandle::ProcessHandle(Deployment *deploment, bool redirectOutputv, const std::string &logDir) : deployment(deploment)
 {
     std::string cmd;
     std::vector< std::string > args;
@@ -178,54 +179,30 @@ Spawner::ProcessHandle::ProcessHandle(Deployment *deploment, bool redirectOutput
 
 bool Spawner::ProcessHandle::alive() const
 {
-    //if it was already determined before that the process is already dead,
-    //we can stop here. Otherwise waitpid would fail!
-    if(!isRunning){
-        return isRunning;
-    }
-
     int status = 0;
     pid_t ret = waitpid(pid, &status, WNOHANG);
     
-    if(ret < 0 )
-    {
-        throw std::runtime_error(std::string("WaitPid failed ") + strerror(errno));
-    }
-    
-    if(!status)
-    {
-        return isRunning;
-    }
-    
-    if(WIFEXITED(status))
-    {
-        int exitStatus = WEXITSTATUS(status);
-        std::cout << "Process " << pid << " terminated normaly, return code " << exitStatus << std::endl;
-        isRunning = false;
-    }
-    
-    if(WIFSIGNALED(status))
-    {
-        isRunning = false;
-        
-        int sigNum = WTERMSIG(status);
-        
-        if(sigNum == SIGSEGV)
-        {
-            
-            std::cout << "Process " << processName << " segfaulted " << std::endl;            
-        }
-        else
-        {
-            std::cout << "Process " << processName << " was terminated by SIG " << sigNum << std::endl;                        
-        }
-        
-    }
-    
-    return isRunning;
+    if(ret == 0)
+        return true;
+    else if(ret == pid)
+        return false;
+    else if(ret == -1 )
+        throw std::runtime_error(std::string("waitpid failed: ") + strerror(errno));
+    else
+        throw std::runtime_error("waitpid returned undocumented value");
 }
 
-
+bool Spawner::ProcessHandle::wait(int cycles, int usecs_between_cycles) const
+{
+    while(alive())
+    {
+        usleep(usecs_between_cycles);
+        cycles --;
+        if(cycles <= 0)
+            return false;
+    }
+    return true;
+}
 
 const Deployment& Spawner::ProcessHandle::getDeployment() const
 {
@@ -256,8 +233,6 @@ void Spawner::ProcessHandle::sendSigTerm() const
     }
 }
 
-
-
 Spawner::ProcessHandle &Spawner::spawnTask(const std::string& cmp1, const std::string& as, bool redirectOutput)
 {
     Deployment *dpl = new Deployment(cmp1, as);
@@ -272,6 +247,13 @@ Spawner::ProcessHandle& Spawner::spawnDeployment(Deployment* deployment, bool re
         logDir = Bundle::getInstance().getLogDirectory();
     }
 
+    // rename the logger of default deployments
+    // this guarantees that every task has it's own logger
+    if(deployment->getName().find("orogen_default_") == 0)
+    {
+        deployment->renameTask(deployment->getLoggerName(), deployment->getName() + "_Logger");
+    }
+
     ProcessHandle *handle = new ProcessHandle(deployment, redirectOutput, logDir);
     
     handles.push_back(handle);
@@ -282,6 +264,16 @@ Spawner::ProcessHandle& Spawner::spawnDeployment(Deployment* deployment, bool re
     }
     
     return *handle;
+}
+
+Spawner::ProcessHandle& Spawner::getDeployment(const std::string& dplName)
+{
+    for(Spawner::ProcessHandle* h : handles)
+    {
+        if(h->getDeployment().getName() == dplName)
+            return *h;
+    }
+    throw std::runtime_error(std::string("Deployment does not exist: ") + dplName);
 }
 
 Spawner::ProcessHandle& Spawner::spawnDeployment(const std::string& dplName, bool redirectOutput)
@@ -342,6 +334,24 @@ void Spawner::waitUntilAllReady(const base::Time& timeout)
             throw std::runtime_error("Spawner::waitUntilAllReady: Error timeout while waiting for tasks to register at nameservice");
         }
     }
+}
+
+bool Spawner::killDeployment(const std::string &dplName)
+{
+    Spawner::ProcessHandle &handle = getDeployment(dplName);
+
+    handle.sendSigInt();
+    if(!handle.wait())
+    {
+        std::cout << "Failed to terminate deployment '" << dplName << "', trying to kill..." << std::endl;
+        handle.sendSigKill();
+        if(!handle.wait())
+        {
+            std::cout << "Failed to kill deployment '" << dplName << "'." << std::endl;
+            return false;
+        }
+    }
+    return true;
 }
 
 void Spawner::killAll()

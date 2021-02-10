@@ -15,7 +15,7 @@ int main(int argc, char**argv)
     PluginHelper::loadAllPluginsInDir("/home/scotch/coyote/install/lib/orocos/gnulinux/types/");
     PluginHelper::loadAllPluginsInDir("/home/scotch/coyote/install/lib/orocos/types/");
 
-    Spawner &spawner(Spawner::getInstace());
+    Spawner &spawner(Spawner::getInstance());
     
     spawner.spawnTask("hokuyo::Task", "hokuyo");
 
