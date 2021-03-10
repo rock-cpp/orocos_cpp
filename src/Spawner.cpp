@@ -186,40 +186,47 @@ bool Spawner::ProcessHandle::alive() const
 
     int status = 0;
     pid_t ret = waitpid(pid, &status, WNOHANG);
-    
-    if(ret < 0 )
+    //waitpid(): on success, returns the process ID of the child whose state has
+    //changed; if WNOHANG was specified and one or more child(ren) specified by
+    //pid exist, but have not yet changed state, then 0 is returned.
+    //On error, -1 is returned.
+    if(ret == -1 )
     {
         throw std::runtime_error(std::string("WaitPid failed ") + strerror(errno));
     }
-    
-    if(!status)
-    {
+    else if(ret == 0){
+        //Not yet terminated, but also no error.. so it's still alive
+        std::cout << "Process " << pid << " is still running" << std::endl;
         return isRunning;
     }
-    
-    if(WIFEXITED(status))
-    {
-        int exitStatus = WEXITSTATUS(status);
-        std::cout << "Process " << pid << " terminated normaly, return code " << exitStatus << std::endl;
-        isRunning = false;
+    else if(ret == pid){
+        //Its terminated. Check for status.
+        if(WIFEXITED(status))
+        {
+            int exitStatus = WEXITSTATUS(status);
+            std::cout << "Process " << pid << " terminated normaly, return code " << exitStatus << std::endl;
+            isRunning = false;
+        }
+
+        if(WIFSIGNALED(status))
+        {
+            isRunning = false;
+
+            int sigNum = WTERMSIG(status);
+
+            if(sigNum == SIGSEGV)
+            {
+
+                std::cout << "Process " << processName << " segfaulted " << std::endl;
+            }
+            else
+            {
+                std::cout << "Process " << processName << " was terminated by SIG " << sigNum << std::endl;
+            }
+        }
     }
-    
-    if(WIFSIGNALED(status))
-    {
-        isRunning = false;
-        
-        int sigNum = WTERMSIG(status);
-        
-        if(sigNum == SIGSEGV)
-        {
-            
-            std::cout << "Process " << processName << " segfaulted " << std::endl;            
-        }
-        else
-        {
-            std::cout << "Process " << processName << " was terminated by SIG " << sigNum << std::endl;                        
-        }
-        
+    else{
+        std::runtime_error("waitpid returned unexpected return value "+std::to_string(ret));
     }
     
     return isRunning;
