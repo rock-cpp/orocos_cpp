@@ -18,6 +18,7 @@
 #include <signal.h>
 #include <backward/backward.hpp>
 #include <rtt/transports/corba/TaskContextProxy.hpp>
+#include <base-logging/Logging.hpp>
 
 using namespace orocos_cpp;
 using namespace libConfig;
@@ -53,14 +54,14 @@ void setSignalHandler(int signum)
 
 void shutdownHandler(int signum, siginfo_t *info, void *data)
 {
-    std::cout << "Shutdown: trying to kill all childs" << std::endl;
+    LOG_INFO_S << "Shutdown: trying to kill all childs";
     
     try {
         Spawner::getInstace().killAll();
-        std::cout << "Done " << std::endl;
+        LOG_INFO_S << "Done ";
     } catch (...)
     {
-        std::cout << "Error, during killall" << std::endl;
+        LOG_ERROR_S << "Error, during killall";
     }
     restoreSignalHandler(signum);
     raise(signum);
@@ -161,15 +162,16 @@ Spawner::ProcessHandle::ProcessHandle(Deployment *deploment, bool redirectOutput
         argv[i + 1] = const_cast<char *>(args[i].c_str());
     }
     
-    std::cout << "Executing " << cmd;
+    std::stringstream ss;
+    ss << "Executing ";
     for(const std::string& arg : args){
-        std::cout << arg << " ";
+        ss << arg << " ";
     }
-    std::cout << std::endl;
+    LOG_INFO_S << ss.str();
     execvp(cmd.c_str(), argv);
     
     //failure case
-    std::cout << "Start of " << cmd << " failed:" << strerror(errno) << std::endl;
+    LOG_ERROR_S << "Start of " << cmd << " failed:" << strerror(errno);
     
     throw std::runtime_error(std::string("Start of ") + cmd + " failed:" + strerror(errno));
     
@@ -196,7 +198,7 @@ bool Spawner::ProcessHandle::alive() const
     }
     else if(ret == 0){
         //Not yet terminated, but also no error.. so it's still alive
-        std::cout << "Process " << pid << " is still running" << std::endl;
+        LOG_DEBUG_S << "Process " << pid << " is still running";
         return isRunning;
     }
     else if(ret == pid){
@@ -204,7 +206,7 @@ bool Spawner::ProcessHandle::alive() const
         if(WIFEXITED(status))
         {
             int exitStatus = WEXITSTATUS(status);
-            std::cout << "Process " << pid << " terminated normaly, return code " << exitStatus << std::endl;
+            LOG_INFO_S << "Process " << pid << " terminated normaly, return code " << exitStatus;
             isRunning = false;
         }
 
@@ -217,11 +219,11 @@ bool Spawner::ProcessHandle::alive() const
             if(sigNum == SIGSEGV)
             {
 
-                std::cout << "Process " << processName << " segfaulted " << std::endl;
+                LOG_WARN_S << "Process " << processName << " segfaulted ";
             }
             else
             {
-                std::cout << "Process " << processName << " was terminated by SIG " << sigNum << std::endl;
+                LOG_INFO_S << "Process " << processName << " was terminated by SIG " << sigNum;
             }
         }
     }
@@ -243,7 +245,7 @@ void Spawner::ProcessHandle::sendSigKill() const
 {
     if(kill(pid, SIGKILL))
     {
-         std::cout << "Error sending of SIGKILL to pid " << pid << " failed:" << strerror(errno) << std::endl;
+         LOG_ERROR_S << "Error sending of SIGKILL to pid " << pid << " failed:" << strerror(errno);
     }
 }
 
@@ -251,7 +253,7 @@ void Spawner::ProcessHandle::sendSigInt() const
 {
     if(kill(pid, SIGINT))
     {
-         std::cout << "Error sending of SIGINT to pid " << pid << " failed:" << strerror(errno) << std::endl;
+         LOG_ERROR_S << "Error sending of SIGINT to pid " << pid << " failed:" << strerror(errno);
     }
 }
 
@@ -259,7 +261,7 @@ void Spawner::ProcessHandle::sendSigTerm() const
 {
     if(kill(pid, SIGTERM))
     {
-         std::cout << "Error sending of SIGTERM to pid " << pid << " failed:" << strerror(errno) << std::endl;
+         LOG_ERROR_S << "Error sending of SIGTERM to pid " << pid << " failed:" << strerror(errno);
     }
 }
 
@@ -339,12 +341,14 @@ void Spawner::waitUntilAllReady(const base::Time& timeout)
         
         if(base::Time::now() - start > timeout)
         {
-            std::cout << "Spawner::waitUntilAllReady: Error the tasks :" << std::endl;
+            std::stringstream ss;
+            ss << "Spawner::waitUntilAllReady: Error the tasks :\n";
             for(const std::string &name: notReadyList)
             {
-                std::cout << "    " << name << std::endl;
+                ss << "    " << name << "\n";
             }
-            std::cout << "did not register at nameservice" << std::endl;
+            ss << "did not register at nameservice";
+            LOG_ERROR_S << ss.str();
             killAll();
             throw std::runtime_error("Spawner::waitUntilAllReady: Error timeout while waiting for tasks to register at nameservice");
         }
@@ -360,7 +364,7 @@ void Spawner::killAll()
         for(const std::string &tName: handle->getDeployment().getTaskNames())
         {
             try {
-                std::cout << "Trying to stop task " << tName << std::endl;
+                LOG_DEBUG_S << "Trying to stop task " << tName;
                 RTT::corba::TaskContextProxy *proxy = RTT::corba::TaskContextProxy::Create(tName, false);
                 if(proxy && proxy->isRunning())
                     proxy->stop();
@@ -428,18 +432,18 @@ void Spawner::ProcessHandle::redirectOutput(const std::string& filename)
     int newFd = open(filename.c_str(), O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
     if(!newFd)
     {
-        std::cout << "Error, could not redirect cout to " << filename << std::endl;
+        LOG_WARN_S << "Error, could not redirect cout to " << filename;
         return;
     }
     
     if(dup2(newFd, fileno(stdout))  == -1)
     {
-        std::cout << "Error, could not redirect cout to " << filename << std::endl;
+        LOG_WARN_S << "Error, could not redirect cout to " << filename;
         return;
     }
     if(dup2(newFd, fileno(stderr))  == -1)
     {
-        std::cout << "Error, could not redirect cerr to " << filename << std::endl;
+        LOG_WARN_S << "Error, could not redirect cerr to " << filename;
         return;
     }
 }

@@ -15,4 +15,5 @@
   <depend package="tools/orocos_cpp_base" />
   <depend package="tools/logger" />
   <depend package="tools/lib_config" />
+  <depend package="base/logging" />
 </package>
