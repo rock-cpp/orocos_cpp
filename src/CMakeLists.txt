@@ -35,6 +35,7 @@ rock_library(orocos_cpp
         orocos-rtt-corba-${OROCOS_TARGET}
         typelib
         lib_config
+        base-logging
         backward
     DEPS_PLAIN 
         Boost_SYSTEM Boost_FILESYSTEM Boost_REGEX Boost_THREAD
