@@ -14,6 +14,7 @@ typedef libConfig::SingleBundle SingleBundle;
 typedef std::shared_ptr<SingleBundle> SingleBundlePtr;
 typedef libConfig::Bundle Bundle;
 typedef std::shared_ptr<Bundle> BundlePtr;
+typedef std::shared_ptr<const Bundle> BundleConstPtr;
 
 class OrocosCpp{
 public:
