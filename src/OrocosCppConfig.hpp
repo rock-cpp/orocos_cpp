@@ -9,6 +9,7 @@ public:
         package_initialization_whitelist(std::vector<std::string>()),
         load_all_packages(false),
         init_bundle(false),
+        create_log_folder(false),
         load_task_configs(false),
         init_type_registry(false),
         load_typekits(true),
@@ -38,6 +39,9 @@ public:
     //! If set to \value false, configuration files in the bundle will not be
     //! avaliable.
     bool init_bundle;
+
+    //! If true and init_bundle is also true, a new log folder is created inside the bundle
+    bool create_log_folder;
 
     //! Should task configuration configurations in bundle be loaded?
     //! Only evaluated if \var init_bundle is \value true.
