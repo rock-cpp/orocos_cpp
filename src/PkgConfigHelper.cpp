@@ -75,7 +75,7 @@ bool substitude(const std::string& line, const std::map<std::string, std::string
             std::string val = variables.at(varname);
             size_t pos = new_line.find(varstr);
             new_line.replace(pos, varstr.size(), val);
-        }catch(std::out_of_range ex){
+        }catch(std::out_of_range& ex){
             LOG_WARN_S << "Could not substitude varibale " << varname;
             ok=false;
         }

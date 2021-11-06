@@ -42,7 +42,7 @@ bool orocos_cpp::PkgConfig::getProperty(const std::string &fieldName, std::strin
 bool orocos_cpp::PkgConfig::load(const std::string &filepath)
 {
     bool st = PkgConfigHelper::parsePkgConfig(filepath, variables, properties);
-    bool got_name = getProperty("Name", name);
+    getProperty("Name", name);
     sourceFile = filepath;
     return st;
 }

@@ -25,7 +25,7 @@ bool applyValue(Typelib::Value &value, const SimpleConfigValue& conf)
     T *val = static_cast<T *>(value.getData());
     try {
         *val = boost::lexical_cast<T>(conf.getValue());
-    } catch (boost::bad_lexical_cast bc)
+    } catch (boost::bad_lexical_cast& bc)
     {
         std::cout << "Error, could not set value " << conf.getValue() << " on property " << conf.getName() << " Bad lexical cast : " << bc.what() << std::endl;
         std::cout << " Target Type " << value.getType().getName() << std::endl;
@@ -40,7 +40,7 @@ bool applyValue<uint8_t>(Typelib::Value &value, const SimpleConfigValue& conf)
     uint8_t *val = static_cast<uint8_t *>(value.getData());
     try {
         *val = boost::numeric_cast<uint8_t>(boost::lexical_cast<unsigned int>(conf.getValue()));
-    } catch (boost::bad_lexical_cast bc)
+    } catch (boost::bad_lexical_cast& bc)
     {
         std::cout << "Error, could not set value " << conf.getValue() << " on property " << conf.getName() << " Bad lexical cast : " << bc.what() << std::endl;
         std::cout << " Target Type " << value.getType().getName() << std::endl;
@@ -55,7 +55,7 @@ bool applyValue<int8_t>(Typelib::Value &value, const SimpleConfigValue& conf)
     int8_t *val = static_cast<int8_t *>(value.getData());
     try {
         *val = boost::numeric_cast<int8_t>(boost::lexical_cast<int>(conf.getValue()));
-    } catch (boost::bad_lexical_cast bc)
+    } catch (boost::bad_lexical_cast& bc)
     {
         std::cout << "Error, could not set value " << conf.getValue() << " on property " << conf.getName() << " Bad lexical cast : " << bc.what() << std::endl;
         std::cout << " Target Type " << value.getType().getName() << std::endl;
@@ -78,7 +78,7 @@ bool applyValue<double>(Typelib::Value &value, const SimpleConfigValue& conf)
       try {
 	  *val = boost::lexical_cast<double>(conf.getValue());
       } 
-      catch (boost::bad_lexical_cast bc)
+      catch (boost::bad_lexical_cast& bc)
       {
 	  std::cout << "Error, could not set value " << conf.getValue() << " on property " << conf.getName() << " Bad lexical cast : " << bc.what() << std::endl;
 	  std::cout << " Target Type " << value.getType().getName() << std::endl;

@@ -41,7 +41,7 @@ CosNaming::NamingContext_var getNameService(const std::string name_service_ip, c
 
     try{
         rootContext = CosNaming::NamingContext::_narrow(obj.in());
-    }catch(CORBA::TRANSIENT ex){
+    }catch(CORBA::TRANSIENT& ex){
         std::cerr << "CORBA::TRANSIENT received while trying to obtain reference to NameService Client" << std::endl;
     }
     if(CORBA::is_nil(rootContext)){
@@ -140,7 +140,7 @@ bool OrocosCpp::initialize(const OrocosCppConfig& config, bool quiet)
         {
             try{
                 st = PluginHelper::loadTypekitAndTransports(tkn);
-            }catch(std::runtime_error ex){
+            }catch(std::runtime_error& ex){
                 std::cerr << ex.what() << std::endl;
             }
         }
