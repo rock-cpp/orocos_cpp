@@ -37,7 +37,7 @@ public:
         
         Deployment *deployment;
     public:
-        ProcessHandle(Deployment *deployment, bool redirectOutput, const std::string &logDir);
+        ProcessHandle(Deployment *deployment, bool redirectOutput, const std::string &logDir, const std::string textLogFileName);
         
         const Deployment &getDeployment() const;
         bool alive() const;
@@ -73,7 +73,7 @@ public:
      * @arg dplName Name of the deployment executable that should be started
      * @return  A Process handle, which may be used to request the process status
      * */
-    ProcessHandle &spawnDeployment(const std::string &dplName, bool redirectOutput = true);
+    ProcessHandle &spawnDeployment(const std::string &dplName, bool redirectOutput = true, const std::string textLogFileName = "");
 
     /**
      * This method spawns a process that executes the given 
@@ -83,7 +83,7 @@ public:
      * @arg dplName The deployment that should be started. The ownership of the deployment will be taken over by the spawner.
      * @return  A Process handle, which may be used to request the process status
      * */
-    ProcessHandle &spawnDeployment(Deployment *deployment, bool redirectOutput = true);
+    ProcessHandle &spawnDeployment(Deployment *deployment, bool redirectOutput = true, const std::string textLogFileName = "");
     
     /**
      * This method checks if all spawened processes are still alive

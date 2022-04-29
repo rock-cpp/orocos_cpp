@@ -93,7 +93,7 @@ Spawner& Spawner::getInstace()
 }
 
 
-Spawner::ProcessHandle::ProcessHandle(Deployment *deploment, bool redirectOutputv, const std::string &logDir) : isRunning(true), deployment(deploment)
+Spawner::ProcessHandle::ProcessHandle(Deployment *deployment, bool redirectOutputv, const std::string &logDir, const std::string textLogFileName = "") : isRunning(true), deployment(deployment)
 {
     std::string cmd;
     std::vector< std::string > args;
@@ -128,7 +128,7 @@ Spawner::ProcessHandle::ProcessHandle(Deployment *deploment, bool redirectOutput
             throw std::runtime_error("Spawner : ProcessHandle could not unblock SIGINT");
         }
             
-        processName = deploment->getName();
+        processName = deployment->getName();
         return;
     }
 
@@ -145,15 +145,15 @@ Spawner::ProcessHandle::ProcessHandle(Deployment *deploment, bool redirectOutput
         {
             throw std::runtime_error("Error, log directory '" + logDir + "' does not exist, but it should !");
         }
-        processName = deploment->getName();
+        processName = deployment->getName();
 
-        if(processName.find("orogen_default_") == 0)
+        if (!textLogFileName.empty())
         {
-            redirectOutput(logDir + "/" + deployment->getTaskNames().at(0) + ".txt");            
+            redirectOutput(logDir + "/" + textLogFileName + "-" + boost::lexical_cast<std::string>(getpid()) + ".txt");
         }
         else
         {
-            redirectOutput(logDir + "/" + processName + ".txt");    
+            redirectOutput(logDir + "/" + processName + "-" + boost::lexical_cast<std::string>(getpid()) + ".txt");
         }
     }
     
@@ -281,7 +281,7 @@ Spawner::ProcessHandle &Spawner::spawnTask(const std::string& cmp1, const std::s
     return spawnDeployment(dpl, redirectOutput);
 }
 
-Spawner::ProcessHandle& Spawner::spawnDeployment(Deployment* deployment, bool redirectOutput)
+Spawner::ProcessHandle& Spawner::spawnDeployment(Deployment* deployment, bool redirectOutput, const std::string textLogFileName)
 {
     if(redirectOutput && logDir.empty())
     {
@@ -289,7 +289,7 @@ Spawner::ProcessHandle& Spawner::spawnDeployment(Deployment* deployment, bool re
         logDir = Bundle::getInstance().getLogDirectory();
     }
 
-    ProcessHandle *handle = new ProcessHandle(deployment, redirectOutput, logDir);
+    ProcessHandle *handle = new ProcessHandle(deployment, redirectOutput, logDir, textLogFileName);
     
     handles.push_back(handle);
 
@@ -301,11 +301,11 @@ Spawner::ProcessHandle& Spawner::spawnDeployment(Deployment* deployment, bool re
     return *handle;
 }
 
-Spawner::ProcessHandle& Spawner::spawnDeployment(const std::string& dplName, bool redirectOutput)
+Spawner::ProcessHandle& Spawner::spawnDeployment(const std::string& dplName, bool redirectOutput, const std::string textLogFileName)
 {
-    Deployment *deploment = new Deployment(dplName);
+    Deployment *deployment = new Deployment(dplName);
 
-    return spawnDeployment(deploment, redirectOutput);
+    return spawnDeployment(deployment, redirectOutput, textLogFileName);
 }
 
 bool Spawner::checkAllProcesses()
