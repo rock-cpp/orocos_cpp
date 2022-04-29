@@ -37,7 +37,7 @@ public:
         
         Deployment *deployment;
     public:
-        ProcessHandle(Deployment *deployment, bool redirectOutput, const std::string &logDir, const std::string textLogFileName);
+        ProcessHandle(Deployment *deployment, bool redirectOutput, const std::string &logDir, const std::string textLogFileName = "");
         
         const Deployment &getDeployment() const;
         bool alive() const;

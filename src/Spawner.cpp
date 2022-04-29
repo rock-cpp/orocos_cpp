@@ -93,7 +93,7 @@ Spawner& Spawner::getInstace()
 }
 
 
-Spawner::ProcessHandle::ProcessHandle(Deployment *deployment, bool redirectOutputv, const std::string &logDir, const std::string textLogFileName = "") : isRunning(true), deployment(deployment)
+Spawner::ProcessHandle::ProcessHandle(Deployment *deployment, bool redirectOutputv, const std::string &logDir, const std::string textLogFileName) : isRunning(true), deployment(deployment)
 {
     std::string cmd;
     std::vector< std::string > args;
