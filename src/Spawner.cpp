@@ -146,7 +146,15 @@ Spawner::ProcessHandle::ProcessHandle(Deployment *deploment, bool redirectOutput
             throw std::runtime_error("Error, log directory '" + logDir + "' does not exist, but it should !");
         }
         processName = deploment->getName();
-        redirectOutput(logDir + "/" + processName + "-" + boost::lexical_cast<std::string>(getpid()) + ".txt");
+
+        if(processName.find("orogen_default_") == 0)
+        {
+            redirectOutput(logDir + "/" + deployment->getTaskNames().at(0) + ".txt");            
+        }
+        else
+        {
+            redirectOutput(logDir + "/" + processName + ".txt");    
+        }
     }
     
     //do the exec
