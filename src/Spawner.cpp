@@ -149,7 +149,7 @@ Spawner::ProcessHandle::ProcessHandle(Deployment *deployment, bool redirectOutpu
 
         if (!textLogFileName.empty())
         {
-            redirectOutput(logDir + "/" + textLogFileName + "-" + boost::lexical_cast<std::string>(getpid()) + ".txt");
+            redirectOutput(logDir + "/" + textLogFileName + ".txt");
         }
         else
         {
