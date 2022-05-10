@@ -37,7 +37,7 @@ public:
         
         Deployment *deployment;
     public:
-        ProcessHandle(Deployment *deployment, bool redirectOutput, const std::string &logDir);
+        ProcessHandle(Deployment *deployment, bool redirectOutput, const std::string &logDir, const std::string textLogFileName = "");
         
         const Deployment &getDeployment() const;
         bool alive() const;
@@ -57,33 +57,41 @@ public:
     /**
      * This method spawns a default deployment matching the given componente description.
      * If a second argument is given, the task will be renamed to the given name.
+     * If a third argument is given, the task text logs will be redirected to the bundle log folder.
      * The method will throw if any error occures.
      * 
      * @arg cmp1 The task model name e.g Hokuyo::Task 
      * @arg as The name unter wich the taskmodel should be registered a the nameservice
+     * @arg redirectOutput flag about whether the deployment text log files should be redirected
      * @return A Process handle, which may be used to request the process status
      * */
     ProcessHandle &spawnTask(const std::string &cmp1, const std::string &as = std::string(), bool redirectOutput = true);
     
     /**
-     * This method spawns a process that executes the deployment
-     * with the given name. This method will throw if any error
-     * occures.
+     * This method spawns a process that executes the deployment with the given name.
+     * This method will throw if any error occures.
+     * If a second argument is given, the task text logs will be redirected to the bundle log folder.
+     * If a third argument is given then this argument will be used as the name of the text log file.
      * 
      * @arg dplName Name of the deployment executable that should be started
+     * @arg redirectOutput flag about whether the deployment text log files should be redirected
+     * @arg textLogFileName Name (without .txt extension) of the output deployment text log file
      * @return  A Process handle, which may be used to request the process status
      * */
-    ProcessHandle &spawnDeployment(const std::string &dplName, bool redirectOutput = true);
+    ProcessHandle &spawnDeployment(const std::string &dplName, bool redirectOutput = true, const std::string textLogFileName = "");
 
     /**
-     * This method spawns a process that executes the given 
-     * deployment. This method will throw if any error
-     * occures.
+     * This method spawns a process that executes the given deployment.
+     * This method will throw if any error occures.
+     * If a second argument is given, the task text logs will be redirected to the bundle log folder.
+     * If a third argument is given then this argument will be used as the name of the text log file.
      * 
      * @arg dplName The deployment that should be started. The ownership of the deployment will be taken over by the spawner.
+     * @arg redirectOutput flag about whether the deployment text log files should be redirected
+     * @arg textLogFileName Name (without .txt extension) of the output deployment text log file
      * @return  A Process handle, which may be used to request the process status
      * */
-    ProcessHandle &spawnDeployment(Deployment *deployment, bool redirectOutput = true);
+    ProcessHandle &spawnDeployment(Deployment *deployment, bool redirectOutput = true, const std::string textLogFileName = "");
     
     /**
      * This method checks if all spawened processes are still alive
