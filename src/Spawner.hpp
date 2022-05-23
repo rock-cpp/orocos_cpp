@@ -44,6 +44,12 @@ public:
         void sendSigInt() const;
         void sendSigTerm() const;
         void sendSigKill() const;
+        inline const pid_t& getPID() const{
+            return this->pid;
+        }
+        inline const std::string& getProcessName() const{
+            return this->processName;
+        }
     };
 
 public:
@@ -141,6 +147,8 @@ public:
      * If no log directory is set it will be determined using bundles.
      */
     void setLogDirectory(const std::string& log_folder);
+
+    void writePIDFile(const std::string& file_path);
     
 private:
     

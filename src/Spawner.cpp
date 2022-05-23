@@ -486,3 +486,17 @@ void Spawner::setLogDirectory(const std::string& log_folder)
     logDir = log_folder;
 }
 
+void Spawner::writePIDFile(const std::string &file_path)
+{
+    std::ofstream fout;
+    std::cout << "Writing to " << file_path << std::endl;
+    fout.open(file_path);
+    for(ProcessHandle *handle: handles)
+    {
+        if(handle->alive()){
+            fout << handle->getPID() << "\n";
+        }
+    }
+    fout.close();
+}
+
