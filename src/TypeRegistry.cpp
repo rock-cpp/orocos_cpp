@@ -188,4 +188,17 @@ bool TypeRegistry::getStateID(const std::string &task_model_name, const std::str
     return true;
 }
 
+bool TypeRegistry::getStateName(const std::string &task_model_name, const unsigned int &id, std::string &state_name )
+{
+    for (const std::pair<std::string, unsigned>& elem : taskStateToID)
+    {
+        const std::string& tmodelname_statename = elem.first;
+        if(tmodelname_statename.rfind(task_model_name, 0) == 0 && elem.second == id){
+            state_name = tmodelname_statename.substr(task_model_name.size()+1);
+            return true;
+        }
+    }
+    return false;
+}
+
 }

@@ -76,6 +76,15 @@ public:
      * @returns false if the state or the task is unknown and cant be loaded
      */
     bool getStateID(const std::string &task_model_name, const std::string &state_name, unsigned& id);
+    /**
+     * Returns the name of a given state ID of a task.
+     * @param task_model_name e.g. "auv_control::AccelerationController"
+     * @param id e.g. 2
+     * @param state_name the corresponding state name
+     *
+     * @returns false if the state or the task is unknown and cant be loaded
+     */
+    bool getStateName(const std::string &task_model_name, const unsigned int &id, std::string &state_name );
     bool hasType(const std::string& typeName);
     const Typelib::Type *getTypeModel(const std::string& typeName);
     std::shared_ptr<Typelib::Registry> registry;
