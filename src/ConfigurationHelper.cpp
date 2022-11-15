@@ -98,13 +98,43 @@ bool applyConfOnTypelibEnum(Typelib::Value &value, const SimpleConfigValue& conf
         return false;
     }
     
+    // first, check if given config value is an int representation of the enum
+    int32_t enum_int = -1;
+    try {
+        enum_int = std::stoi(conf.getValue());
+    } 
+    catch (std::invalid_argument& e1) {
+        std::cerr << "Could not convert config value '" << conf.getValue() << "' to int." << std::endl;
+    } 
+    catch (std::out_of_range& e2) {
+        std::cerr << "Could not convert config value '" << conf.getValue() << "' to int, because number is out of range of int." << std::endl;
+    }
+
+    std::string enumName = "";
+    if (enum_int != -1) {
+        //check if enum_int is valid  
+        for (auto e : myenum->values()) {
+            if (e.second == enum_int) {
+                enumName = e.first;
+                int32_t *val = static_cast<int32_t *>(value.getData());
+                *val = enum_int;
+                return true;
+            }
+        }
+
+        if (enumName.empty()) {
+            std::cerr << "Error : " << conf.getValue() << " is not a valid enum int representation " << std::endl;
+            return false;
+        }        
+    }
+
     //values are sometimes given as RUBY constants. We need to remove the ':' in front of them
-    std::string enumName;
+    
     if(conf.getValue().at(0) == ':')
         enumName = conf.getValue().substr(1, conf.getValue().size());
     else
         enumName = conf.getValue();
-    
+
     std::map<std::string, int>::const_iterator it = myenum->values().find(enumName);
     
     if(it == myenum->values().end())
