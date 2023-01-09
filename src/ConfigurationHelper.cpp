@@ -318,9 +318,9 @@ bool ConfigurationHelper::applyConfOnTyplibValue(Typelib::Value &value, const Co
 
                     for(const std::shared_ptr<ConfigValue> val: array->getValues())
                     {
-                        
-                        //TODO check, this may be a memory leak
-                        Typelib::Value v(new uint8_t[indirect.getSize()], indirect);
+                        std::vector<uint8_t> storage;
+                        storage.resize(indirect.getSize());
+                        Typelib::Value v(storage.data(), indirect);
                         Typelib::init(v);
                         Typelib::zero(v);
                         
@@ -419,6 +419,8 @@ bool ConfigurationHelper::applyConfigValueOnDSB(RTT::base::DataSourceBase::share
     
     //destroy handle to avoid memory leak
     typelibTransport->deleteHandle(handle);
+
+    Typelib::destroy(dest);
     
     return true;
 }
