@@ -10,27 +10,32 @@
 
 using namespace orocos_cpp;
 
-Deployment::Deployment(const std::string& name) : deploymentName(name), withValgrind(false)
+Deployment::Deployment(const std::string& name, int doExecutableCheck) : deploymentName(name), withValgrind(false)
 {
     loadPkgConfigFile(name);
-    if(!checkExecutable(name))
-        throw std::runtime_error("Deployment::Error, executable for deployment '" + name + "' could not be found in PATH");
+    if (doExecutableCheck == 0) {
+        LOG_DEBUG_S << "Deployment::Warn, the existence of the deployment executable " << name << " in the local workspace will be CHECKED.";
+        if(!checkExecutable(name))
+            throw std::runtime_error("Deployment::Error, executable for deployment '" + name + "' could not be found in PATH");
+    } else {
+        LOG_WARN_S << "Deployment::Warn, No check for the existence of the deployment executable " << name << " in the local workspace.";
+    }
 }
 
-Deployment::Deployment(const std::string &cmp1, const std::string &as) : withValgrind(false)
+Deployment::Deployment(const std::string &cmp1, const std::string &as, int doExecutableCheck) : withValgrind(false)
 {
     //cmp1 is expected in the format "module::TaskSpec"
     std::string::size_type pos = cmp1.find_first_of(":");
-    
+
     if(pos == std::string::npos || cmp1.at(pos +1) != ':')
     {
         throw std::runtime_error("given component name " + cmp1 + " is not in the format 'module::TaskSpec'");
     }
-    
+
     std::string moduleName = cmp1.substr(0, pos);
     std::string taskModelName = cmp1.substr(pos + 2, cmp1.size()) ;
     std::string defaultDeploymentName = "orogen_default_" + moduleName + "__" + taskModelName;
-    
+
     deploymentName = defaultDeploymentName;
     try {
         loadPkgConfigFile(deploymentName);
@@ -38,12 +43,17 @@ Deployment::Deployment(const std::string &cmp1, const std::string &as) : withVal
     {
         throw std::runtime_error("Deployment::Error, could not find pkgConfig file for deployment " + deploymentName);
     }
-    if(!checkExecutable(deploymentName))
-        throw std::runtime_error("Deployment::Error, executable for deployment " + deploymentName + " could not be found in PATH");
+    if (doExecutableCheck == 0) {
+        LOG_DEBUG_S << "Deployment::Warn, the existence of the deployment executable " << deploymentName << " in the local workspace will be CHECKED.";
+        if(!checkExecutable(deploymentName))
+            throw std::runtime_error("Deployment::Error, executable for deployment " + deploymentName + " could not be found in PATH");
+    } else {
+        LOG_WARN_S << "Deployment::Warn, No check for the existence of the deployment executable " << deploymentName << " in the local workspace.";
+    }
 
     std::string taskName = as;
     std::vector<std::string> args;
-    
+
     if(!taskName.empty())
     {
         renameTask(defaultDeploymentName, taskName);
@@ -65,18 +75,18 @@ bool Deployment::checkExecutable(const std::string& name)
 {
     if(boost::filesystem::exists(name))
         return true;
-    
+
     const char *binPath = getenv("PATH");
     if(!binPath)
     {
         throw std::runtime_error("Deployment::Internal Error, PATH is not set found.");
     }
-    
+
     std::string binPathS = binPath;
-    
+
     boost::char_separator<char> sep(":");
     boost::tokenizer<boost::char_separator<char> > paths(binPathS, sep);
-    
+
     for(const std::string &path: paths)
     {
         std::string candidate = path + "/" + name;
@@ -117,7 +127,7 @@ bool Deployment::loadPkgConfigFile(const std::string& deploymentName)
     {
         renameMap[taskName] = taskName;
         tasks.push_back(taskName);
-        
+
         //Identify if task is logger...
         //FIXME: Looks complicated. Does it look for the longest task name with '_Logger' suffix? WHy not simply assume '#{deploymentName}_Logger'?
         std::string loggerString("_Logger");
@@ -152,7 +162,7 @@ void Deployment::renameTask(const std::string& orignalName, const std::string& n
     {
         throw std::runtime_error("Deployment::renameTask : Error, deployment " + deploymentName + " has no task " + orignalName);
     }
-    
+
     //set new name
     std::string origName = it->second;
     renameMap.erase(it);
@@ -168,7 +178,7 @@ bool Deployment::getExecString(std::string& cmd, std::vector< std::string >& arg
     args.clear();
 
     cmd = deploymentName;
-    
+
     //FIXME: Better handle Valgrind (and GDB and possibly more) at the software module that actually controls the processes. E.g. ProcessServer in cnd/orogen/execution
     if(withValgrind)
     {
@@ -192,7 +202,7 @@ bool Deployment::getExecString(std::string& cmd, std::vector< std::string >& arg
 
     for(const std::string& arg : cmdLineArgs)
         args.push_back(arg);
-    
+
     return true;
 }
 
