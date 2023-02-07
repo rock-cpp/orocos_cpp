@@ -48,6 +48,8 @@ public:
     
     /**
      * Renames a task from the deployment to the given name
+     *
+     * @throws std::out_of_range when originalName does not exist
      * */
     void renameTask(const std::string &orignalName, const std::string &newName);
 

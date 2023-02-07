@@ -150,7 +150,7 @@ void Deployment::renameTask(const std::string& orignalName, const std::string& n
     auto it = renameMap.find(orignalName);
     if(it == renameMap.end())
     {
-        throw std::runtime_error("Deployment::renameTask : Error, deployment " + deploymentName + " has no task " + orignalName);
+        throw std::out_of_range("Deployment::renameTask : Error, deployment " + deploymentName + " has no task " + orignalName);
     }
     
     //set new name
