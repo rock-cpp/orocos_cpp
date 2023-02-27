@@ -30,9 +30,9 @@ private:
     std::vector<std::string> cmdLineArgs;
     
 public:
-    Deployment(const std::string &name);
+    Deployment(const std::string &name, bool load_pkgconfig=true);
     
-    Deployment(const std::string &model, const std::string &as);
+    Deployment(const std::string &model, const std::string &as, bool load_pkgconfig=true);
     
     /**
      * Returns the name of the deployment

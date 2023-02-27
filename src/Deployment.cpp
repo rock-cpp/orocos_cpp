@@ -10,14 +10,16 @@
 
 using namespace orocos_cpp;
 
-Deployment::Deployment(const std::string& name) : deploymentName(name), withValgrind(false)
+Deployment::Deployment(const std::string& name, bool load_pkg_config) : deploymentName(name), withValgrind(false)
 {
-    loadPkgConfigFile(name);
+    if(load_pkg_config){
+        loadPkgConfigFile(name);
+    }
     if(!checkExecutable(name))
         throw std::runtime_error("Deployment::Error, executable for deployment '" + name + "' could not be found in PATH");
 }
 
-Deployment::Deployment(const std::string &cmp1, const std::string &as) : withValgrind(false)
+Deployment::Deployment(const std::string &cmp1, const std::string &as, bool load_pkg_config) : withValgrind(false)
 {
     //cmp1 is expected in the format "module::TaskSpec"
     std::string::size_type pos = cmp1.find_first_of(":");
@@ -32,11 +34,14 @@ Deployment::Deployment(const std::string &cmp1, const std::string &as) : withVal
     std::string defaultDeploymentName = "orogen_default_" + moduleName + "__" + taskModelName;
     
     deploymentName = defaultDeploymentName;
-    try {
-        loadPkgConfigFile(deploymentName);
-    } catch (const std::runtime_error &e)
-    {
-        throw std::runtime_error("Deployment::Error, could not find pkgConfig file for deployment " + deploymentName);
+    if(load_pkg_config){
+        try {
+            loadPkgConfigFile(deploymentName);
+        }
+        catch (const std::runtime_error &e)
+        {
+            throw std::runtime_error("Deployment::Error, could not find pkgConfig file for deployment " + deploymentName);
+        }
     }
     if(!checkExecutable(deploymentName))
         throw std::runtime_error("Deployment::Error, executable for deployment " + deploymentName + " could not be found in PATH");
@@ -147,7 +152,7 @@ const std::vector< std::string >& Deployment::getNeededTypekits() const
 
 void Deployment::renameTask(const std::string& orignalName, const std::string& newName)
 {
-    auto it = renameMap.find(orignalName);
+    /*auto it = renameMap.find(orignalName);
     if(it == renameMap.end())
     {
         throw std::out_of_range("Deployment::renameTask : Error, deployment " + deploymentName + " has no task " + orignalName);
@@ -155,8 +160,8 @@ void Deployment::renameTask(const std::string& orignalName, const std::string& n
     
     //set new name
     std::string origName = it->second;
-    renameMap.erase(it);
-    renameMap[newName] = origName;
+    renameMap.erase(it);*/
+    renameMap[newName] = orignalName;
 
     //regenerate the task list
     regenerateNameVectors();
