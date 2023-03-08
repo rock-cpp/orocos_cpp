@@ -152,15 +152,6 @@ const std::vector< std::string >& Deployment::getNeededTypekits() const
 
 void Deployment::renameTask(const std::string& orignalName, const std::string& newName)
 {
-    /*auto it = renameMap.find(orignalName);
-    if(it == renameMap.end())
-    {
-        throw std::out_of_range("Deployment::renameTask : Error, deployment " + deploymentName + " has no task " + orignalName);
-    }
-    
-    //set new name
-    std::string origName = it->second;
-    renameMap.erase(it);*/
     renameMap[newName] = orignalName;
 
     //regenerate the task list
