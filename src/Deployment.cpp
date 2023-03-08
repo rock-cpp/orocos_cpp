@@ -159,8 +159,6 @@ void Deployment::renameTask(const std::string& orignalName, const std::string& n
                throw std::out_of_range("Deployment::renameTask : Error, deployment " + deploymentName + " has no task " + orignalName);
         }
 
-        //set new name
-        std::string origName = it->second;
         renameMap.erase(it);
     }
 
