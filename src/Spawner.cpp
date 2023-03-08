@@ -65,7 +65,6 @@ void shutdownHandler(int signum, siginfo_t *info, void *data)
     }
     restoreSignalHandler(signum);
     raise(signum);
-    
 }
 
 Spawner::Spawner()
@@ -101,13 +100,6 @@ Spawner::ProcessHandle::ProcessHandle(Deployment *deployment, bool redirectOutpu
     if(!deployment->getExecString(cmd, args))
         throw std::runtime_error("Error, could not get parameters to start deployment " + deployment->getName() );
     
-    /* Block SIGINT. */
-    sigset_t mask, omask;
-    sigemptyset(&mask);
-    sigaddset(&mask, SIGINT);
-    if(sigprocmask(SIG_BLOCK, &mask, &omask))
-        throw std::runtime_error("Spawner : ProcessHandle could not block SIGINT");
-    
     pid = fork();
     
     if(pid < 0)
@@ -121,11 +113,6 @@ Spawner::ProcessHandle::ProcessHandle(Deployment *deployment, bool redirectOutpu
         if (setpgid(pid, pid) < 0 && errno != EACCES)
         {
             throw std::runtime_error("Spawner : ProcessHandle: Parent : Error changing process group of child");
-        }
-        
-        if(sigprocmask(SIG_SETMASK, &omask, NULL))
-        {
-            throw std::runtime_error("Spawner : ProcessHandle could not unblock SIGINT");
         }
             
         processName = deployment->getName();
