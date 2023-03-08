@@ -30,9 +30,9 @@ private:
     std::vector<std::string> cmdLineArgs;
     
 public:
-    Deployment(const std::string &name);
+    Deployment(const std::string &name, bool load_pkgconfig=true);
     
-    Deployment(const std::string &model, const std::string &as);
+    Deployment(const std::string &model, const std::string &as, bool load_pkgconfig=true);
     
     /**
      * Returns the name of the deployment
@@ -51,7 +51,7 @@ public:
      *
      * @throws std::out_of_range when originalName does not exist
      * */
-    void renameTask(const std::string &orignalName, const std::string &newName);
+    void renameTask(const std::string &orignalName, const std::string &newName, bool check_existence_in_rename_map=true);
 
     /**
      * Returns the command line string, needed to 
