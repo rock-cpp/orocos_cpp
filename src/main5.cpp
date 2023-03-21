@@ -101,15 +101,31 @@ int main(int argc, char **argv)
                         std::cout << element.toString() << std::endl;
                     }
 
-                    // Typelib::Value elem = wrap["elements"]->getTypelibValue();
-                    // std::cout << elem.getType().getName() << std::endl;
 
-                    // datasource->getTypeInfo()->get
-                    
-
-                    // for (const auto& member : datasource->getMemberNames()) {
-                    //     std::cout << "member" << member << std::endl;
-                    // }
+                    // example to get all numeric values
+                    std::shared_ptr<orocos_cpp::TypeWrapper> wrapptr = std::make_shared<orocos_cpp::TypeWrapper>(val);
+                    std::list<std::shared_ptr<orocos_cpp::TypeWrapper>> typelist;
+                    std::list<std::string> namelist;
+                    typelist.push_back(wrapptr);
+                    namelist.push_back(identifier);
+                    while (typelist.size()) {
+                        std::shared_ptr<orocos_cpp::TypeWrapper> current = typelist.front();
+                        std::string name = namelist.front();
+                        typelist.pop_front();
+                        namelist.pop_front();
+                        if (current->getTypelibValue().getType().getCategory() == Typelib::Type::Numeric) {
+                            // set value
+                            double data = current->toDouble();
+                            std::cout << name << ": " << data << std::endl;
+                        } else {
+                            // add other entries
+                            for (const auto& newentry : *current) {
+                                typelist.push_back(newentry.second);
+                                std::string newname = name + "/" + newentry.first;
+                                namelist.push_back(newname);
+                            }
+                        }
+                    }
 
                 }
             }

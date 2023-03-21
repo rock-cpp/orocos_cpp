@@ -66,7 +66,6 @@ void TypeWrapper::addArray() {
         // as the [] operator is overloaded, we need to call directly
         std::map<std::string, std::shared_ptr<TypeWrapper>>::operator[](std::to_string(i)) = std::make_shared<TypeWrapper>(newvalue);
     }
-
 }
 
 std::string TypeWrapper::toString() {
@@ -78,35 +77,38 @@ std::string TypeWrapper::toString() {
     }
 }
 
-std::string TypeWrapper::numericToString() {
+double TypeWrapper::toDouble() {
+    if (value.getType().getCategory() != Typelib::Type::Category::Numeric) {
+        throw std::runtime_error("Type is not numeric");
+    }
     if (value.getType().getCategory() == Typelib::Type::Category::Numeric) {
         if (value.getType().getName() == "/bool") {
-            return (*static_cast<bool *>(value.getData())?"true":"false");
+            return (static_cast<bool>(value.getData()));
         }
         const Typelib::Numeric& numeric = dynamic_cast<const Typelib::Numeric&>(value.getType());
         switch (numeric.getNumericCategory()) {
             case Typelib::Numeric::Float:
                 if (numeric.getSize() == sizeof(float)) {
-                    return std::to_string(*static_cast<float*>(value.getData()));
+                    return *static_cast<float*>(value.getData());
                 } else {
-                    return std::to_string(*static_cast<double*>(value.getData()));
+                    return *static_cast<double*>(value.getData());
                 }
             case Typelib::Numeric::SInt:
                 switch (numeric.getSize()) {
-                    case sizeof(int8_t):  return std::to_string(static_cast<int>(*static_cast<int8_t *>(value.getData())));
-                    case sizeof(int16_t): return std::to_string(*static_cast<int16_t*>(value.getData()));
-                    case sizeof(int32_t): return std::to_string(*static_cast<int32_t*>(value.getData()));
-                    case sizeof(int64_t): return std::to_string(*static_cast<int64_t*>(value.getData()));
+                    case sizeof(int8_t):  return static_cast<int>(*static_cast<int8_t *>(value.getData()));
+                    case sizeof(int16_t): return *static_cast<int16_t*>(value.getData());
+                    case sizeof(int32_t): return *static_cast<int32_t*>(value.getData());
+                    case sizeof(int64_t): return *static_cast<int64_t*>(value.getData());
                     default:
                         std::cerr << "Error, got integer of unexpected size " << numeric.getSize() << std::endl;
                         throw std::runtime_error("got integer of unexpected size");
                 }
             case Typelib::Numeric::UInt: {
                 switch (numeric.getSize()) {
-                    case sizeof(uint8_t):  return std::to_string(static_cast<unsigned int>(*static_cast<uint8_t *>(value.getData())));
-                    case sizeof(uint16_t): return std::to_string(*static_cast<uint16_t*>(value.getData()));
-                    case sizeof(uint32_t): return std::to_string(*static_cast<uint32_t*>(value.getData()));
-                    case sizeof(uint64_t): return std::to_string(*static_cast<uint64_t*>(value.getData()));
+                    case sizeof(uint8_t):  return static_cast<unsigned int>(*static_cast<uint8_t *>(value.getData()));
+                    case sizeof(uint16_t): return *static_cast<uint16_t*>(value.getData());
+                    case sizeof(uint32_t): return *static_cast<uint32_t*>(value.getData());
+                    case sizeof(uint64_t): return *static_cast<uint64_t*>(value.getData());
                     default:
                         std::cout << "Error, got integer of unexpected size " << numeric.getSize() << std::endl;
                         throw std::runtime_error("got integer of unexpected size");
@@ -115,6 +117,17 @@ std::string TypeWrapper::numericToString() {
             case Typelib::Numeric::NumberOfValidCategories:
             default: throw std::runtime_error("Internal Error: Got invalid Category");
         }
+    }
+    return 0;
+
+}
+
+std::string TypeWrapper::numericToString() {
+    if (value.getType().getCategory() == Typelib::Type::Category::Numeric) {
+        if (value.getType().getName() == "/bool") {
+            return (*static_cast<bool *>(value.getData())?"true":"false");
+        }
+        return std::to_string(toDouble());
     }
     return "";
 }

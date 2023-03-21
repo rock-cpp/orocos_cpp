@@ -50,6 +50,9 @@ class TypeWrapper : public std::map<std::string, std::shared_ptr<TypeWrapper> > 
 
     std::string toString();
 
+    double toDouble();
+
+
     // double toValue();
 
     /**
