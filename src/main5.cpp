@@ -55,14 +55,13 @@ int main(int argc, char **argv)
 
     std::vector<std::string> tasks = ns->getRegisteredTasks();
     for (const std::string &tname : tasks) {
-        RTT::corba::TaskContextProxy* tcp = orocos->getTaskContext(tname);
         RTT::TaskContext* tc = ns->getTaskContext(tname);
         if (tc) {
             for (auto& portname : tc->ports()->getPortNames()) {
                 RTT::base::OutputPortInterface* portInterfacePtr = dynamic_cast<RTT::base::OutputPortInterface*>(tc->getPort(portname));
                 if (portInterfacePtr) {
                     std::string type = portInterfacePtr->getTypeInfo()->getTypeName();
-                    if (type == "/base/samples/Joints") {
+                    // if (type == "/base/samples/Joints") {
                         // create local port the "/" is the identifier for subgroups
                         std::string identifier = tname+"/"+portname;
                         const RTT::types::TypeInfo* typeinfo = portInterfacePtr->getTypeInfo();
@@ -70,7 +69,7 @@ int main(int argc, char **argv)
                         input_ports[identifier] = input_port;
                         // connect all ports
                         portInterfacePtr->connectTo(input_port);
-                    }
+                    // }
                 }
             }
         }
@@ -89,19 +88,18 @@ int main(int argc, char **argv)
                 RTT::base::DataSourceBase::shared_ptr datasource = transport->getDataSource(transportHandle);
 
                 while (port.second->read(datasource) == RTT::NewData) {
-
-                    printf("%s:%i %s\n", __PRETTY_FUNCTION__, __LINE__, port.first.c_str());
-                    
-
-                    //convert the native, Orocos sample back to its marshallable and inspectable Typelib form
+                    // convert the native, Orocos sample back to its marshallable and inspectable Typelib form
                     transport->refreshTypelibSample(transportHandle);
-
-
-
                     Typelib::Value val(transport->getTypelibSample(transportHandle), *(typeptr));
 
                     orocos_cpp::TypeWrapper wrap(val);
                     wrap.printType();
+
+                    if (wrap.getTypelibTypeName() == "/base/samples/joints") {
+                        std::cout << "printing subtype" << std::endl;
+                        TypeWrapper& element = wrap["elements"][0];
+                        std::cout << element.toString() << std::endl;
+                    }
 
                     // Typelib::Value elem = wrap["elements"]->getTypelibValue();
                     // std::cout << elem.getType().getName() << std::endl;

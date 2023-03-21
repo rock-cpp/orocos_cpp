@@ -8,6 +8,18 @@
 
 namespace orocos_cpp {
 
+
+/**
+ * @brief This wrapper gived convinoent access to the data of a typelib type without linking the actual type
+ * 
+ * The constructor creates a map so that a call on e.g. /base/samples/Joints data linke thsi is possible
+ * Typelib::Value joints;
+ * TypeWrapper jointwrapper(joints);
+ * TypeWrapper element = jointwrapper["elements"][0];
+ * std::cout << element.toString() << std::endl;
+ * 
+ * 
+ */
 class TypeWrapper : public std::map<std::string, std::shared_ptr<TypeWrapper> > {
  public:
     TypeWrapper(Typelib::Value& value);
@@ -16,11 +28,15 @@ class TypeWrapper : public std::map<std::string, std::shared_ptr<TypeWrapper> > 
         printType("");
     }
 
+    TypeWrapper& operator[](const std::string& key) {
+        return *(std::map<std::string, std::shared_ptr<TypeWrapper>>::operator[](key));
+    }
+
     const Typelib::Value& getTypelibValue() {
         return value;
     }
 
-    std::string getTypelibType() {
+    std::string getTypelibTypeName() {
         return value.getType().getName();
     }
 
@@ -33,9 +49,7 @@ class TypeWrapper : public std::map<std::string, std::shared_ptr<TypeWrapper> > 
 
     std::string toString();
 
-    // const Typelib::Type* getType() {
-    //     return type;
-    // }
+    double toValue();
 
  protected:
     void printType(std::string ident);
@@ -45,9 +59,13 @@ class TypeWrapper : public std::map<std::string, std::shared_ptr<TypeWrapper> > 
     // void add(Typelib::Value& value);
     std::string numericToString();
 
+    std::string containerToString();
+
     void addCompound();
 
     void addContainer();
+
+    void addArray();
 
     Typelib::Type::Category category;
     Typelib::Value value;

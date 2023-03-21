@@ -15,39 +15,28 @@ TypeWrapper::TypeWrapper(Typelib::Value& value):value(value) {
         case Typelib::Type::Category::Container:
             addContainer();
             break;
+        case Typelib::Type::Category::Array:
+            addArray();
+            break;
         case Typelib::Type::Category::Numeric:
             category = Typelib::Type::Category::Numeric;
+            break;
         default:
             std::cout << "category "<<  value.getType().getCategory() << " of type " << value.getType().getName() << std::endl;
             break;
     }
-
 }
-
-// void TypeWrapper::add(Typelib::Value& value) {
-
-//     // std::cout << "add is a " << value.getType().getName() << std::endl;
-
-
-// }
-
 
 void TypeWrapper::addCompound() {
     category = Typelib::Type::Category::Compound;
     // iterate fields
     const Typelib::Compound& compound = static_cast<const Typelib::Compound&>(value.getType());
 
-
     uint8_t *data = static_cast<uint8_t *>(value.getData());
     for (const auto& field : compound.getFields()) {
-        // Typelib::Value newvalue = Typelib::value_get_field(value, field.getName());
-
         Typelib::Value newvalue(data + field.getOffset(), field.getType());
-
-        std::cout << "compound " << newvalue.getType().getName() << std::endl;
-
-        (*this)[field.getName()] = std::make_shared<TypeWrapper>(newvalue);
-
+        // as the [] operator is overloaded, we need to call directly
+        std::map<std::string, std::shared_ptr<TypeWrapper>>::operator[](field.getName()) = std::make_shared<TypeWrapper>(newvalue);
     }
 }
 
@@ -56,10 +45,10 @@ void TypeWrapper::addContainer() {
     const Typelib::Container& container = dynamic_cast<const Typelib::Container&>(value.getType());
 
     if (container.isRandomAccess()) {
-        printf("%s:%i\n", __PRETTY_FUNCTION__, __LINE__);
-        for (int i = 0; i < container.getElementCount(value.getData()); ++i) {
+        for (size_t i = 0; i < container.getElementCount(value.getData()); ++i) {
             Typelib::Value newvalue = container.getElement(value.getData(), i);
-            (*this)[std::to_string(i)] = std::make_shared<TypeWrapper>(newvalue);
+            // as the [] operator is overloaded, we need to call directly
+            std::map<std::string, std::shared_ptr<TypeWrapper>>::operator[](std::to_string(i)) = std::make_shared<TypeWrapper>(newvalue);
         }
     } else {
         // should be a /std/string
@@ -67,10 +56,24 @@ void TypeWrapper::addContainer() {
     }
 }
 
+void TypeWrapper::addArray() {
+    category = Typelib::Type::Category::Array;
+    const Typelib::Array& array = dynamic_cast<const Typelib::Array&>(value.getType());
+    const Typelib::Type &indirect(array.getIndirection());
+
+    for (size_t i = 0; i < array.getDimension(); ++i) {
+        Typelib::Value newvalue(static_cast<uint8_t *>(value.getData()) + i * indirect.getSize(), indirect);
+        // as the [] operator is overloaded, we need to call directly
+        std::map<std::string, std::shared_ptr<TypeWrapper>>::operator[](std::to_string(i)) = std::make_shared<TypeWrapper>(newvalue);
+    }
+
+}
+
 std::string TypeWrapper::toString() {
     switch (value.getType().getCategory()) {
         //case Typelib::Type::Category::Compound: return compoundToString();
         case Typelib::Type::Category::Numeric: return numericToString();
+        case Typelib::Type::Category::Container: return containerToString();
         default: return "";
     }
 }
@@ -113,6 +116,17 @@ std::string TypeWrapper::numericToString() {
             default: throw std::runtime_error("Internal Error: Got invalid Category");
         }
     }
+    return "";
+}
+
+std::string TypeWrapper::containerToString() {
+    const Typelib::Container& container = dynamic_cast<const Typelib::Container&>(value.getType());
+
+    if (container.getName() == "/std/string") {
+        return *static_cast<const std::string *>(value.getData());
+    }
+    // this is a real container, will be represented by other typewrappers
+    return "";
 }
 
 
