@@ -18,18 +18,19 @@ namespace orocos_cpp {
  * TypeWrapper element = jointwrapper["elements"][0];
  * std::cout << element.toString() << std::endl;
  * 
+ * see main5.cpp for an example to get values from an unidentified port
+ * 
  * 
  */
 class TypeWrapper : public std::map<std::string, std::shared_ptr<TypeWrapper> > {
  public:
     TypeWrapper(Typelib::Value& value);
 
+    /**
+     * @brief prints the whole type introspection to the console
+     */
     void printType() {
         printType("");
-    }
-
-    TypeWrapper& operator[](const std::string& key) {
-        return *(std::map<std::string, std::shared_ptr<TypeWrapper>>::operator[](key));
     }
 
     const Typelib::Value& getTypelibValue() {
@@ -49,7 +50,15 @@ class TypeWrapper : public std::map<std::string, std::shared_ptr<TypeWrapper> > 
 
     std::string toString();
 
-    double toValue();
+    // double toValue();
+
+    /**
+     * @brief overload operator to skip the shared_ptr content in the map of the base class
+     */
+    TypeWrapper& operator[](const std::string& key) {
+        return *(std::map<std::string, std::shared_ptr<TypeWrapper>>::operator[](key));
+    }
+
 
  protected:
     void printType(std::string ident);
