@@ -53,31 +53,15 @@ void TypeWrapper::addContainer() {
     category = Typelib::Type::Category::Container;
     const Typelib::Container& container = dynamic_cast<const Typelib::Container&>(value.getType());
 
-
-
-    // type = container.getIndirection();
-    // auto &cnt = static_cast<Typelib::Container const&>(type);
-    const Typelib::Type &indirType = container.getIndirection();
-
-    // std::cout << "indir type " << indirvalue.getType().getName() << std::endl;
-
-    // const Typelib::Container& indir_container = static_cast<const Typelib::Container&>(indirType);
-    // container = static_cast<const Typelib::Container*>(&indirType);
-
     if (container.isRandomAccess()) {
-
-            // size_t byte_count = reinterpret_cast< std::vector<int8_t> const* >(value.getData())->size();
-            // std::cout << byte_count / indirvalue.getType().getSize() << std::endl;
-
-        std::cout << "container of " << value.getType().getName() << ":" << container.kind() << " has " << container.getElementCount(value.getData()) << " elements"  << std::endl;
-
-        // for (int i = 0; i < container->getElementCount(&value); ++i) {
-        //     Typelib::Value newvalue = container->getElement(value.getData(), i);
-        //     (*this)[std::to_string(i)] = std::make_shared<TypeWrapper>(newvalue);
-        // }
+        printf("%s:%i\n", __PRETTY_FUNCTION__, __LINE__);
+        for (int i = 0; i < container.getElementCount(value.getData()); ++i) {
+            Typelib::Value newvalue = container.getElement(value.getData(), i);
+            (*this)[std::to_string(i)] = std::make_shared<TypeWrapper>(newvalue);
+        }
     } else {
-        //std::srtring?
-        std::cout << "addContainer " <<  container.getName() << " unsupported" << std::endl;
+        // should be a /std/string
+        //printf("%s:%i\n", __PRETTY_FUNCTION__, __LINE__);
     }
 }
 
