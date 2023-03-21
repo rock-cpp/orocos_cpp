@@ -13,6 +13,7 @@ rock_library(orocos_cpp
         PluginHelper.cpp
         PkgConfigRegistry.cpp
         orocos_cpp.cpp
+        TypeWrapper.cpp
         OrocosCppConfig.hpp
     HEADERS 
         ConfigurationHelper.hpp
@@ -26,6 +27,7 @@ rock_library(orocos_cpp
         PluginHelper.hpp
         PkgConfigRegistry.hpp
         orocos_cpp.hpp
+        TypeWrapper.hpp
         OrocosCppConfig.hpp
     DEPS_PKGCONFIG
         orocos_cpp_base
@@ -54,5 +56,9 @@ rock_executable(config main3.cpp
     NOINSTALL)
 
 rock_executable(nameservice main4.cpp
+    DEPS orocos_cpp
+    NOINSTALL)
+
+rock_executable(typewrapper main5.cpp
     DEPS orocos_cpp
     NOINSTALL)
