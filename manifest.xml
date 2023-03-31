@@ -11,7 +11,7 @@
   <depend package="base/cmake" />
   <depend package="rtt" />
   <depend package="rtt_typelib" />
-  <depend package="tools/backward" />
+  <depend package="tools/backward-cpp" />
   <depend package="tools/orocos_cpp_base" />
   <depend package="tools/logger" />
   <depend package="tools/lib_config" />
