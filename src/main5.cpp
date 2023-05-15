@@ -10,7 +10,7 @@
 using namespace orocos_cpp;
 
 
-RTT::base::InputPortInterface*  createInputPort(RTT::TaskContext* task_context, RTT::types::TypeInfo const * type, ::std::string const & port_name) {
+RTT::base::InputPortInterface* createInputPort(RTT::TaskContext* task_context, RTT::types::TypeInfo const * type, ::std::string const & port_name) {
     std::string name = port_name + "_input";
     RTT::base::PortInterface *pi = task_context->getPort(port_name);
     if (pi) {

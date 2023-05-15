@@ -26,6 +26,10 @@ class TypeWrapper : public std::map<std::string, std::shared_ptr<TypeWrapper> > 
  public:
     TypeWrapper(Typelib::Value& value);
 
+    bool isValid() {
+        return value.getData();
+    }
+
     /**
      * @brief prints the whole type introspection to the console
      */
@@ -59,7 +63,12 @@ class TypeWrapper : public std::map<std::string, std::shared_ptr<TypeWrapper> > 
      * @brief overload operator to skip the shared_ptr content in the map of the base class
      */
     TypeWrapper& operator[](const std::string& key) {
-        return *(std::map<std::string, std::shared_ptr<TypeWrapper>>::operator[](key));
+        auto type = this->find(key);
+        if (type != this->end()) {
+            // std::shared_ptr<TypeWrapper> wrap = std::map<std::string, std::shared_ptr<TypeWrapper>>::operator[](key);
+            return *(type->second);
+        }
+        throw(std::runtime_error(key + " is not a valid field of this type"));
     }
 
 
