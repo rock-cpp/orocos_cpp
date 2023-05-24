@@ -149,9 +149,7 @@ int main(int argc, char **argv)
 
                     if (sample->getName() == "/base/samples/joints") {
                         std::cout << "printing subtype" << std::endl;
-                        //TypeWrapper& element = wrap["elements"][0];
                         field = extract_field(sample, {"elements", 0});
-                        //std::cout << element.toString() << std::endl;
                         field->print(std::cout);
 
                     }
@@ -169,17 +167,11 @@ int main(int argc, char **argv)
                         typelist.pop_front();
                         if (current->getType() == libConfig::ConfigValue::Type::SIMPLE) {
                             // set value
-                            //double data = current->toDouble();
                             std::shared_ptr<libConfig::SimpleConfigValue> val = std::dynamic_pointer_cast<libConfig::SimpleConfigValue>(current);
                             double data = atof(val->getValue().c_str());
                             std::cout << name << ": " << data << std::endl;
                         } else {
                             // add other entries
-                            //for (const auto& newentry : *current) {
-                            //    typelist.push_back(newentry.second);
-                            //    std::string newname = name + "/" + newentry.first;
-                            //    namelist.push_back(newname);
-                            //}
                             if (current->getType() == libConfig::ConfigValue::Type::ARRAY){
                                 std::shared_ptr<libConfig::ArrayConfigValue> val = std::dynamic_pointer_cast<libConfig::ArrayConfigValue>(current);
                                 typelist.insert(typelist.end(), val->getValues().begin(), val->getValues().end());
