@@ -62,3 +62,7 @@ rock_executable(nameservice main4.cpp
 rock_executable(typewrapper main5.cpp
     DEPS orocos_cpp
     NOINSTALL)
+
+rock_executable(config_wrapper main6.cpp
+    DEPS orocos_cpp
+    NOINSTALL)

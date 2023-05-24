@@ -42,8 +42,9 @@ int main(int argc, char **argv)
     }
 
     orocos_cpp::OrocosCppConfig config;
-    config.load_all_packages = true;
-    config.load_typekits = true;  // this fails because of qt4 linked into some typekits
+    config.load_all_packages = false;
+    config.load_typekits = true;
+    config.package_initialization_whitelist = {"base", "base-types"};
     std::shared_ptr<orocos_cpp::OrocosCpp> orocos = std::make_shared<orocos_cpp::OrocosCpp>();
     orocos->initialize(config, false);
 
@@ -75,7 +76,7 @@ int main(int argc, char **argv)
         }
     }
 
-    while (true) {
+    //while (true) {
         for (const auto& port : input_ports) {
             if (port.second != nullptr) {
                 std::string identifier = port.first;
@@ -130,7 +131,7 @@ int main(int argc, char **argv)
                 }
             }
         }
-    }
+    //}
 
     
     return 0;
