@@ -82,11 +82,9 @@ double TypeWrapper::toDouble() {
         throw std::runtime_error("Type is not numeric");
     }
     if (value.getType().getCategory() == Typelib::Type::Category::Numeric) {
-        if (value.getType().getName() == "/bool") {
-            return (static_cast<bool>(value.getData()));
-        }
         const Typelib::Numeric& numeric = dynamic_cast<const Typelib::Numeric&>(value.getType());
         switch (numeric.getNumericCategory()) {
+            // "/bool" is encoded as uint8_t, no need for extra treatment
             case Typelib::Numeric::Float:
                 if (numeric.getSize() == sizeof(float)) {
                     return *static_cast<float*>(value.getData());
