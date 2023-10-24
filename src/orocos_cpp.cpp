@@ -120,13 +120,12 @@ bool OrocosCpp::initialize(const OrocosCppConfig& config, bool quiet)
     }
 
     //Init Bundle
-    bundle.reset(new Bundle); //We want a valid pointer also if we don't initialize the bundle
+    bundle.reset(new Bundle()); //We want a valid pointer also if we don't initialize the bundle
     if(config.init_bundle){
         if(!quiet) std::cout << "\nInitializing Bundle.." << std::endl;
         st = bundle->initialize(config.load_task_configs);
         if(!st){
             std::cerr << "Error during initialization of Bundle" << std::endl;
-            bundle.reset();
             return false;
         }
         if(config.create_log_folder){
