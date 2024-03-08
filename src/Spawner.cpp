@@ -446,6 +446,7 @@ void Spawner::ProcessHandle::redirectOutput(const std::string& filename)
         LOG_WARN_S << "Error, could not redirect cerr to " << filename;
         return;
     }
+    close(newFd);
 }
 
 std::vector< const Deployment* > Spawner::getRunningDeployments()
