@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <stdlib.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
 #include "CorbaNameService.hpp"
@@ -92,7 +93,7 @@ Spawner& Spawner::getInstace()
 }
 
 
-Spawner::ProcessHandle::ProcessHandle(Deployment *deployment, bool redirectOutputv, const std::string &logDir, const std::string textLogFileName) : isRunning(true), deployment(deployment)
+Spawner::ProcessHandle::ProcessHandle(Deployment *deployment, bool redirectOutputv, const std::string &logDir, std::string textLogFileName) : isRunning(true), deployment(deployment)
 {
     std::string cmd;
     std::vector< std::string > args;
@@ -124,6 +125,12 @@ Spawner::ProcessHandle::ProcessHandle(Deployment *deployment, bool redirectOutpu
         throw std::runtime_error("Spawner : ProcessHandle: Child : Error could not change process group");
     }
     
+    if (textLogFileName.empty())
+    {
+        processName = deployment->getName();
+        textLogFileName = processName + "-" + boost::lexical_cast<std::string>(getpid());
+    }
+
     //child, redirect output
     if(redirectOutputv)
     {
@@ -132,18 +139,16 @@ Spawner::ProcessHandle::ProcessHandle(Deployment *deployment, bool redirectOutpu
         {
             throw std::runtime_error("Error, log directory '" + logDir + "' does not exist, but it should !");
         }
-        processName = deployment->getName();
 
-        if (!textLogFileName.empty())
-        {
-            redirectOutput(logDir + "/" + textLogFileName + ".txt");
-        }
-        else
-        {
-            redirectOutput(logDir + "/" + processName + "-" + boost::lexical_cast<std::string>(getpid()) + ".txt");
-        }
+        redirectOutput(logDir + "/" + textLogFileName + ".txt");
     }
     
+    //set ORO_LOGFILE so the new deployment logs to its own orocos.log file
+    if(setenv("ORO_LOGFILE", (logDir + "/" + textLogFileName + "-orocos.log").c_str(), true) != 0)
+    {
+        LOG_WARN_S << "Could not set ORO_LOGFILE environment variable";
+    }
+
     //do the exec
     
     char * argv[args.size() + 2];
@@ -441,6 +446,7 @@ void Spawner::ProcessHandle::redirectOutput(const std::string& filename)
         LOG_WARN_S << "Error, could not redirect cerr to " << filename;
         return;
     }
+    close(newFd);
 }
 
 std::vector< const Deployment* > Spawner::getRunningDeployments()

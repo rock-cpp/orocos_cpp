@@ -39,8 +39,8 @@ rock_library(orocos_cpp
         lib_config
         base-logging
         backward
-    DEPS_PLAIN 
-        Boost_SYSTEM Boost_FILESYSTEM Boost_REGEX Boost_THREAD
+    DEPS
+        Boost::system Boost::filesystem Boost::regex Boost::thread
     )
 
 rock_executable(listAll Main.cpp

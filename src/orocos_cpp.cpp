@@ -2,6 +2,7 @@
 #include <orocos_cpp/CorbaNameService.hpp>
 #include <rtt/transports/corba/TaskContextServer.hpp>
 #include <lib_config/YAMLConfiguration.hpp>
+#include <boost/lexical_cast.hpp>
 #include "PluginHelper.hpp"
 
 
@@ -129,9 +130,9 @@ bool OrocosCpp::initialize(const OrocosCppConfig& config, bool quiet)
             return false;
         }
         if(config.create_log_folder){
-            st = set_env("ORO_LOGFILE", bundle->getLogDirectory()+"/orocos.log", true);
+            set_env("ORO_LOGFILE", bundle->getLogDirectory()+"/orocos-"+boost::lexical_cast<std::string>(getpid())+".log", true);
         }else{
-            set_env("ORO_LOGFILE", "orocos.log");
+            set_env("ORO_LOGFILE", "orocos-"+boost::lexical_cast<std::string>(getpid())+".log");
         }
     }
 
@@ -141,7 +142,7 @@ bool OrocosCpp::initialize(const OrocosCppConfig& config, bool quiet)
         for(std::string tkn : package_registry->getRegisteredTypekitNames())
         {
             try{
-                st = PluginHelper::loadTypekitAndTransports(tkn);
+                PluginHelper::loadTypekitAndTransports(tkn);
             }catch(std::runtime_error& ex){
                 std::cerr << ex.what() << std::endl;
             }
