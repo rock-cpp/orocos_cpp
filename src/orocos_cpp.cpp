@@ -98,6 +98,10 @@ bool initializeCORBA(int argc, char**argv, std::string host="", size_t max_messa
     return true;
 }
 
+static std::string default_oro_log_file_path(){
+    return "orocos-"+boost::lexical_cast<std::string>(getpid())+".log";
+}
+
 bool OrocosCpp::initialize(const OrocosCppConfig& config, bool quiet)
 {
     bool st;
@@ -120,6 +124,13 @@ bool OrocosCpp::initialize(const OrocosCppConfig& config, bool quiet)
         return false;
     }
 
+    // Set orocos log file
+    if(config.oro_log_file_path == ""){
+        set_env("ORO_LOGFILE", default_oro_log_file_path(), true);
+    }else{
+        set_env("ORO_LOGFILE", config.oro_log_file_path, true);
+    }
+
     //Init Bundle
     bundle.reset(new Bundle()); //We want a valid pointer also if we don't initialize the bundle
     if(config.init_bundle){
@@ -129,10 +140,11 @@ bool OrocosCpp::initialize(const OrocosCppConfig& config, bool quiet)
             std::cerr << "Error during initialization of Bundle" << std::endl;
             return false;
         }
+
         if(config.create_log_folder){
-            set_env("ORO_LOGFILE", bundle->getLogDirectory()+"/orocos-"+boost::lexical_cast<std::string>(getpid())+".log", true);
-        }else{
-            set_env("ORO_LOGFILE", "orocos-"+boost::lexical_cast<std::string>(getpid())+".log");
+            if(config.oro_log_file_path != ""){
+                set_env("ORO_LOGFILE", bundle->getLogDirectory()+"/orocos-"+boost::lexical_cast<std::string>(getpid())+".log", true);
+            }
         }
     }
 

@@ -10,6 +10,7 @@ public:
         load_all_packages(false),
         init_bundle(false),
         create_log_folder(false),
+        oro_log_file_path(""),
         load_task_configs(false),
         init_type_registry(false),
         load_typekits(true),
@@ -42,6 +43,9 @@ public:
 
     //! If true and init_bundle is also true, a new log folder is created inside the bundle
     bool create_log_folder;
+
+    //! filepath to the ororoc log file
+    std::string oro_log_file_path;
 
     //! Should task configuration configurations in bundle be loaded?
     //! Only evaluated if \var init_bundle is \value true.
