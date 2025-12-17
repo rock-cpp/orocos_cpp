@@ -17,7 +17,7 @@
 #include "CorbaNameService.hpp"
 #include <lib_config/Bundle.hpp>
 #include <signal.h>
-#include <backward/backward.hpp>
+#include <backward.hpp>
 #include <rtt/transports/corba/TaskContextProxy.hpp>
 #include <base-logging/Logging.hpp>
 
