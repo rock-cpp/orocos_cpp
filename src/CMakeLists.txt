@@ -1,4 +1,5 @@
 find_package( Boost COMPONENTS thread system filesystem regex)
+find_package( Backward REQUIRED)
 rock_library(orocos_cpp
     SOURCES 
         ConfigurationHelper.cpp
@@ -38,9 +39,12 @@ rock_library(orocos_cpp
         typelib
         lib_config
         base-logging
-        backward
     DEPS
-        Boost::system Boost::filesystem Boost::regex Boost::thread
+        Boost::system
+        Boost::filesystem
+        Boost::regex
+        Boost::thread
+        Backward::Interface
     )
 
 rock_executable(listAll Main.cpp
