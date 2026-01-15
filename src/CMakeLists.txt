@@ -39,7 +39,7 @@ rock_library(orocos_cpp
         typelib
         lib_config
         base-logging
-    DEPS
+    DEPS_TARGET
         Boost::system
         Boost::filesystem
         Boost::regex
