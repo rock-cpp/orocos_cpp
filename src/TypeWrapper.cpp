@@ -93,7 +93,7 @@ double TypeWrapper::toDouble() {
                 }
             case Typelib::Numeric::SInt:
                 switch (numeric.getSize()) {
-                    case sizeof(int8_t):  return static_cast<int>(*static_cast<int8_t *>(value.getData()));
+                    case sizeof(int8_t):  return *static_cast<int8_t *>(value.getData());
                     case sizeof(int16_t): return *static_cast<int16_t*>(value.getData());
                     case sizeof(int32_t): return *static_cast<int32_t*>(value.getData());
                     case sizeof(int64_t): return *static_cast<int64_t*>(value.getData());
@@ -103,7 +103,7 @@ double TypeWrapper::toDouble() {
                 }
             case Typelib::Numeric::UInt: {
                 switch (numeric.getSize()) {
-                    case sizeof(uint8_t):  return static_cast<unsigned int>(*static_cast<uint8_t *>(value.getData()));
+                    case sizeof(uint8_t):  return *static_cast<uint8_t *>(value.getData());
                     case sizeof(uint16_t): return *static_cast<uint16_t*>(value.getData());
                     case sizeof(uint32_t): return *static_cast<uint32_t*>(value.getData());
                     case sizeof(uint64_t): return *static_cast<uint64_t*>(value.getData());
