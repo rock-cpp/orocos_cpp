@@ -564,7 +564,12 @@ bool ConfigurationHelper::registerOverride(const std::string& taskName, Configur
 }
 
 YAML::Emitter &toYAML(YAML::Emitter &out, const Typelib::Numeric &type, const Typelib::Value &value){
-
+    if (type.getName() == "/bool")
+    {
+        //the /bool type must be output as "true" or "false"
+        out << (*static_cast<bool *>(value.getData())?"true":"false");
+        return out;
+    }
     switch(type.getNumericCategory())
     {
     case Typelib::Numeric::Float:
@@ -581,7 +586,8 @@ YAML::Emitter &toYAML(YAML::Emitter &out, const Typelib::Numeric &type, const Ty
         switch(type.getSize())
         {
         case sizeof(int8_t):
-            out << *(static_cast<int8_t *>(value.getData()));
+            //need to cast uint8_t to int so it is not interpreted as character but as number
+            out << static_cast<int>(*(static_cast<int8_t *>(value.getData())));
             break;
         case sizeof(int16_t):
             out << *(static_cast<int16_t *>(value.getData()));
@@ -603,7 +609,8 @@ YAML::Emitter &toYAML(YAML::Emitter &out, const Typelib::Numeric &type, const Ty
         switch(type.getSize())
         {
         case sizeof(uint8_t):
-            out << *(static_cast<uint8_t *>(value.getData()));
+            //need to cast uint8_t to unsigned int so it is not interpreted as character but as number
+            out << static_cast<unsigned int>(*(static_cast<uint8_t *>(value.getData())));
             break;
         case sizeof(uint16_t):
             out << *(static_cast<uint16_t *>(value.getData()));
