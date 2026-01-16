@@ -600,7 +600,7 @@ YAML::Emitter &toYAML(YAML::Emitter &out, const Typelib::Numeric &type, const Ty
             break;
         default:
             std::cerr << "Error, got integer of unexpected size " << type.getSize() << std::endl;
-            throw std::runtime_error("got integer of unexpected size " + type.getSize());
+            throw std::runtime_error("got integer of unexpected size " + std::to_string(type.getSize()));
             break;
         }
         break;
@@ -623,7 +623,7 @@ YAML::Emitter &toYAML(YAML::Emitter &out, const Typelib::Numeric &type, const Ty
             break;
         default:
             std::cout << "Error, got integer of unexpected size " << type.getSize() << std::endl;
-            throw std::runtime_error("got integer of unexpected size " + type.getSize());
+            throw std::runtime_error("got integer of unexpected size " + std::to_string(type.getSize()));
             break;
         }
     }
