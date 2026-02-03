@@ -318,9 +318,9 @@ bool ConfigurationHelper::applyConfOnTyplibValue(Typelib::Value &value, const Co
 
                     for(const std::shared_ptr<ConfigValue> val: array->getValues())
                     {
-                        
-                        //TODO check, this may be a memory leak
-                        Typelib::Value v(new uint8_t[indirect.getSize()], indirect);
+                        std::vector<uint8_t> storage;
+                        storage.resize(indirect.getSize());
+                        Typelib::Value v(storage.data(), indirect);
                         Typelib::init(v);
                         Typelib::zero(v);
                         
@@ -330,6 +330,8 @@ bool ConfigurationHelper::applyConfOnTyplibValue(Typelib::Value &value, const Co
                         }
                         
                         cont->push(value.getData(), v);
+
+                        Typelib::destroy(v);
                     }
                 }
             }
@@ -406,8 +408,14 @@ bool ConfigurationHelper::applyConfigValueOnDSB(RTT::base::DataSourceBase::share
         typelibTransport->refreshTypelibSample(handle);
     }
 
-    if(!applyConfOnTyplibValue(dest, value))
+    if(!applyConfOnTyplibValue(dest, value)) {
+        //destroy handle to avoid memory leak
+        //this also deletes all referenced memory by calling
+        //orogen_transports::TypelibMarshaller<T>::deleteSamples
+        typelibTransport->deleteHandle(handle);
+
         return false;
+    }
     
 
     //we modified the typlib samples, so we need to trigger the opaque
@@ -416,10 +424,12 @@ bool ConfigurationHelper::applyConfigValueOnDSB(RTT::base::DataSourceBase::share
 
     //write value back
     typelibTransport->writeDataSource(*dsb, handle);
-    
+
     //destroy handle to avoid memory leak
+    //this also deletes all referenced memory by calling
+    //orogen_transports::TypelibMarshaller<T>::deleteSamples
     typelibTransport->deleteHandle(handle);
-    
+
     return true;
 }
 
@@ -554,7 +564,12 @@ bool ConfigurationHelper::registerOverride(const std::string& taskName, Configur
 }
 
 YAML::Emitter &toYAML(YAML::Emitter &out, const Typelib::Numeric &type, const Typelib::Value &value){
-
+    if (type.getName() == "/bool")
+    {
+        //the /bool type must be output as "true" or "false"
+        out << (*static_cast<bool *>(value.getData())?"true":"false");
+        return out;
+    }
     switch(type.getNumericCategory())
     {
     case Typelib::Numeric::Float:
@@ -571,7 +586,8 @@ YAML::Emitter &toYAML(YAML::Emitter &out, const Typelib::Numeric &type, const Ty
         switch(type.getSize())
         {
         case sizeof(int8_t):
-            out << *(static_cast<int8_t *>(value.getData()));
+            //need to cast uint8_t to int so it is not interpreted as character but as number
+            out << static_cast<int>(*(static_cast<int8_t *>(value.getData())));
             break;
         case sizeof(int16_t):
             out << *(static_cast<int16_t *>(value.getData()));
@@ -584,7 +600,7 @@ YAML::Emitter &toYAML(YAML::Emitter &out, const Typelib::Numeric &type, const Ty
             break;
         default:
             std::cerr << "Error, got integer of unexpected size " << type.getSize() << std::endl;
-            throw std::runtime_error("got integer of unexpected size " + type.getSize());
+            throw std::runtime_error("got integer of unexpected size " + std::to_string(type.getSize()));
             break;
         }
         break;
@@ -593,7 +609,8 @@ YAML::Emitter &toYAML(YAML::Emitter &out, const Typelib::Numeric &type, const Ty
         switch(type.getSize())
         {
         case sizeof(uint8_t):
-            out << *(static_cast<uint8_t *>(value.getData()));
+            //need to cast uint8_t to unsigned int so it is not interpreted as character but as number
+            out << static_cast<unsigned int>(*(static_cast<uint8_t *>(value.getData())));
             break;
         case sizeof(uint16_t):
             out << *(static_cast<uint16_t *>(value.getData()));
@@ -606,7 +623,7 @@ YAML::Emitter &toYAML(YAML::Emitter &out, const Typelib::Numeric &type, const Ty
             break;
         default:
             std::cout << "Error, got integer of unexpected size " << type.getSize() << std::endl;
-            throw std::runtime_error("got integer of unexpected size " + type.getSize());
+            throw std::runtime_error("got integer of unexpected size " + std::to_string(type.getSize()));
             break;
         }
     }
